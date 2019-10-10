@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/StructureBoxes.iml" filepath="$PROJECT_DIR$/.idea/StructureBoxes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/API/StructureBoxes-API.iml" filepath="$PROJECT_DIR$/API/StructureBoxes-API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-WE6/StructureBoxes-WE6.iml" filepath="$PROJECT_DIR$/StructureBoxes-WE6/StructureBoxes-WE6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Bukkit/structureboxes-bukkit.iml" filepath="$PROJECT_DIR$/StructureBoxes-Bukkit/structureboxes-bukkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Sponge/structureboxes-sponge.iml" filepath="$PROJECT_DIR$/StructureBoxes-Sponge/structureboxes-sponge.iml" />
+    </modules>
+  </component>
+</project>

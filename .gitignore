@@ -1,0 +1,5 @@
+# Project exclude paths
+/API/target/
+/StructureBoxes-Sponge/target/
+/StructureBoxes-WE6/target/
+/target/
