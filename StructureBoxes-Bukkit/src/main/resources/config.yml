@@ -1,6 +1,12 @@
 Structure Box Item: chest
 Structure Box Display Name: §6Structure Box
-Structure Box Instruction Message:
+Alternative Display Names:
+  - SiB
+Structure Box Prefix: '§6Structure Box: '
+Alternative Prefixes:
+  - 'SiB: '
+Structure Box Instruction Message: ''
+
 #Determines if the structure box must be placed inside of a region of supported anti-griefing plugins
 Restrict to regions:
   Enabled: false

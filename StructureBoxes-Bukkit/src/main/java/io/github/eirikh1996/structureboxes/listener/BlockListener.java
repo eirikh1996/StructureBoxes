@@ -6,6 +6,7 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
+import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,11 +29,28 @@ public class BlockListener implements Listener {
         !event.getItemInHand().getItemMeta().hasLore()){
             return;
         }
-        if (!event.getItemInHand().getItemMeta().getDisplayName().equals(Settings.StructureBoxLore)){
+        if (!event.getItemInHand().getItemMeta().getDisplayName().equals(Settings.StructureBoxLore) &&
+                !Settings.AlternativeDisplayNames.contains(event.getItemInHand().getItemMeta().getDisplayName())){
             return;
         }
         List<String> lore = event.getItemInHand().getItemMeta().getLore();
         String schematicID = ChatColor.stripColor(lore.get(0));
+        if (!schematicID.startsWith(ChatColor.stripColor(Settings.StructureBoxPrefix))){
+            boolean hasAlternativePrefix = false;
+            for (String prefix : Settings.AlternativePrefixes){
+                if (!schematicID.startsWith(prefix)){
+                    continue;
+                }
+                hasAlternativePrefix = true;
+                schematicID = schematicID.replace(prefix, "");
+                break;
+            }
+            if (!hasAlternativePrefix){
+                return;
+            }
+        } else {
+            schematicID = schematicID.replace(ChatColor.stripColor(Settings.StructureBoxPrefix), "");
+        }
         if (Settings.RequirePermissionPerStructureBox && !event.getPlayer().hasPermission("structureboxes.place." + schematicID)){
             event.getPlayer().sendMessage(String.format(I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
             return;
@@ -42,7 +60,7 @@ public class BlockListener implements Listener {
             return;
         }
         final Location placed = event.getBlockPlaced().getLocation();
-        Direction clipboardDir = StructureBoxes.getInstance().getWorldEditHandler().getClipboardFacingFromOrigin(clipboard, placed);
+        Direction clipboardDir = StructureBoxes.getInstance().getWorldEditHandler().getClipboardFacingFromOrigin(clipboard, MathUtils.bukkit2SBLoc(placed));
         Direction playerDir = Direction.fromYaw(event.getPlayer().getLocation().getYaw());
         int angle = playerDir.getAngle() - clipboardDir.getAngle();
         final Location loc = event.getBlockPlaced().getLocation();

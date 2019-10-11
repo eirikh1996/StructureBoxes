@@ -15,15 +15,7 @@
         <module>StructureBoxes-Sponge</module>
     </modules>
     <repositories>
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>sponge-repo</id>
-            <name>Sponge Maven Repository</name>
-            <url>https://repo.spongepowered.org/maven</url>
-        </repository>
+
         <repository>
             <id>sk89q-repo</id>
             <url>https://maven.sk89q.com/repo</url>

@@ -30,4 +30,8 @@ public class MathUtils {
         }
         return angle;
     }
+
+    public static Location bukkit2SBLoc(org.bukkit.Location bukkitLoc){
+        return new Location(bukkitLoc.getWorld().getUID(), bukkitLoc.getBlockX(), bukkitLoc.getBlockY(), bukkitLoc.getBlockZ());
+    }
 }

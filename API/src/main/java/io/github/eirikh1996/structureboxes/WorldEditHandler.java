@@ -1,8 +1,8 @@
 package io.github.eirikh1996.structureboxes;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 

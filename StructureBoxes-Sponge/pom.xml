@@ -11,6 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>structureboxes-sponge</artifactId>
+    <repositories>
+        <repository>
+            <id>sponge-repo</id>
+            <name>Sponge Maven Repository</name>
+            <url>https://repo.spongepowered.org/maven</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.spongepowered</groupId>

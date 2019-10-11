@@ -8,8 +8,10 @@ import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.Location;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +57,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
+        Settings.AlternativeDisplayNames = getConfig().getStringList("Alternative Display Names");
+        Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
+        Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
         ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
         Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
         ConfigurationSection freeSpace = getConfig().getConfigurationSection("Free space");
@@ -103,7 +109,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         try {
             final Class weHandler = Class.forName("io.github.eirikh1996.structureboxes.compat.we" + versionNumber + ".IWorldEditHandler");
             if (WorldEditHandler.class.isAssignableFrom(weHandler)){
-                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(Plugin.class).newInstance(this);
+                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(File.class, SBMain.class).newInstance(getWorldEditPlugin().getDataFolder(), this);
             }
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             getLogger().severe(I18nSupport.getInternationalisedString("Startup - Unsupported WorldEdit"));
@@ -177,5 +183,19 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public Platform getPlatform() {
         return Platform.BUKKIT;
+    }
+
+    @Override
+    public boolean isFreeSpace(ArrayList<Location> locations) {
+        for (Location location : locations){
+            World world = getServer().getWorld(location.getWorld());
+            org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
+            Material test = bukkitLoc.getBlock().getType();
+            if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 }

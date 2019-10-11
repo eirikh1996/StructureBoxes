@@ -14,14 +14,10 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.world.World;
 import io.github.eirikh1996.structureboxes.Direction;
-import io.github.eirikh1996.structureboxes.Platform;
 import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
-import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.Yaml;
@@ -30,18 +26,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class IWorldEditHandler implements WorldEditHandler {
-    private final Plugin plugin;
-    public IWorldEditHandler(Plugin plugin){
-        this.plugin = plugin;
+    private final File weDataFolder;
+    private final SBMain sbMain;
+    public IWorldEditHandler(File weDataFolder, SBMain sbMain){
+        this.weDataFolder = weDataFolder;
+        this.sbMain = sbMain;
     }
     @Override
     public Clipboard loadClipboardFromSchematic(Player player, String schematicName) {
-        WorldEditPlugin worldEditPlugin = (WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit");
-        File weConfig = new File(worldEditPlugin.getDataFolder(), "config.yml");
+        File weConfig = new File(weDataFolder, "config.yml");
         Yaml yaml = new Yaml();
         final Map<String, Object> data;
         try {
@@ -50,7 +47,7 @@ public class IWorldEditHandler implements WorldEditHandler {
             throw new WorldEditConfigException("Failed to load WorldEdit config", e);
         }
         String schematicDirectory = ((Map<String, String>) data.get("saving")).get("dir");
-        String path = worldEditPlugin.getDataFolder().getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
+        String path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
         File schematicFile = new File(path);
         BukkitWorld bukkitWorld = new BukkitWorld(player.getWorld());
         Clipboard clipboard;
@@ -98,13 +95,27 @@ public class IWorldEditHandler implements WorldEditHandler {
         builder.ignoreAirBlocks(true);
         Vector to = new Vector(pasteLoc.getX(), pasteLoc.getY(), pasteLoc.getZ());
         builder.to(to);
-        final SBMain sbMain = (SBMain) plugin;
-        final boolean freeSpace;
-        if (sbMain.getPlatform() == Platform.BUKKIT){
-            freeSpace = BukkitUtils.isFreeSpace(holder.getClipboard(), pasteLoc);
-        } else {
-            freeSpace = true;
+        ArrayList<Location> structureLocs = new ArrayList<Location>();
+        int minX = clipboard.getMinimumPoint().getBlockX();
+        int maxX = clipboard.getMaximumPoint().getBlockX();
+        int minY = clipboard.getMinimumPoint().getBlockY();
+        int maxY = clipboard.getMaximumPoint().getBlockY();
+        int minZ = clipboard.getMinimumPoint().getBlockZ();
+        int maxZ = clipboard.getMaximumPoint().getBlockZ();
+        Vector distance = new Vector(to.getX(), to.getY(), to.getZ()).subtract(clipboard.getOrigin());
+        for (int x = minX ; x <= maxX ; x++){
+            for (int y = minY ; y <= maxY ; y++){
+                for (int z = minZ ; z <= maxZ ; z++){
+                    BaseBlock baseBlock = clipboard.getBlock(new Vector(x, y, z));
+                    if (baseBlock.getType() == 0){
+                        continue;
+                    }
+                    structureLocs.add(new Location(pasteLoc.getWorldID(), x + distance.getBlockX(), y + distance.getBlockY(), z + distance.getBlockZ()));
+                }
+            }
         }
+
+        final boolean freeSpace = sbMain.isFreeSpace(structureLocs);
         if (!freeSpace){
             return false;
         }
