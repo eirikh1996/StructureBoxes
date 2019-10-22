@@ -186,8 +186,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     @Override
-    public boolean isFreeSpace(ArrayList<Location> locations) {
+    public boolean isFreeSpace(List<Location> locations) {
         for (Location location : locations){
+            getLogger().info(location.toString());
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             Material test = bukkitLoc.getBlock().getType();

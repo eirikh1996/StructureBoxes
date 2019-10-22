@@ -1,9 +1,10 @@
 package io.github.eirikh1996.structureboxes;
 
-import org.bukkit.Bukkit;
-
 public enum Direction {
-    NORTH(0), EAST(90), SOUTH(180), WEST(270);
+    NORTH(0),
+    EAST(90),
+    SOUTH(180),
+    WEST(270);
 
     private final int angle;
     Direction(int angle){
@@ -12,7 +13,6 @@ public enum Direction {
     public static Direction fromYaw(final float yaw){
         Direction dir = null;
         double angle = yaw > 0 ? yaw : 360f + yaw;
-        Bukkit.broadcastMessage(String.valueOf(angle));
         if (angle > 315f || angle <=45f){
             dir = NORTH;
         } else if (angle > 45f && angle <=135f){

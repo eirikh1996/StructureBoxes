@@ -24,12 +24,6 @@
     <orderEntry type="library" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:6.1.5" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-API" />
-    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />

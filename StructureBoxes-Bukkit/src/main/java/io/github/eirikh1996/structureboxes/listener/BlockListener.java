@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -30,7 +31,7 @@ public class BlockListener implements Listener {
             return;
         }
         if (!event.getItemInHand().getItemMeta().getDisplayName().equals(Settings.StructureBoxLore) &&
-                !Settings.AlternativeDisplayNames.contains(event.getItemInHand().getItemMeta().getDisplayName())){
+                !Settings.AlternativeDisplayNames.contains(ChatColor.stripColor(event.getItemInHand().getItemMeta().getDisplayName()))){
             return;
         }
         List<String> lore = event.getItemInHand().getItemMeta().getLore();
@@ -55,7 +56,7 @@ public class BlockListener implements Listener {
             event.getPlayer().sendMessage(String.format(I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
             return;
         }
-        Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(event.getPlayer(), schematicID);
+        Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schematicID);
         if (clipboard == null){
             return;
         }
@@ -78,6 +79,7 @@ public class BlockListener implements Listener {
             I18nSupport.getInternationalisedString("Place - Must be within region");
             return;
         }
+        Bukkit.broadcastMessage(playerDir.name());
         if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(clipboard, Math.abs(angle), new IWorldEditLocation(placed))){
             event.getPlayer().sendMessage(I18nSupport.getInternationalisedString("Place - No free space"));
             event.setCancelled(true);

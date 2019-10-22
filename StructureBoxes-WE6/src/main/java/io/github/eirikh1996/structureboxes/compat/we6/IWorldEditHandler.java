@@ -17,9 +17,8 @@ import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.utils.Location;
+import io.github.eirikh1996.structureboxes.utils.RotationUtils;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -28,6 +27,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
+
+import static java.lang.Math.PI;
 
 public class IWorldEditHandler implements WorldEditHandler {
     private final File weDataFolder;
@@ -37,7 +39,7 @@ public class IWorldEditHandler implements WorldEditHandler {
         this.sbMain = sbMain;
     }
     @Override
-    public Clipboard loadClipboardFromSchematic(Player player, String schematicName) {
+    public Clipboard loadClipboardFromSchematic(World world, String schematicName) {
         File weConfig = new File(weDataFolder, "config.yml");
         Yaml yaml = new Yaml();
         final Map<String, Object> data;
@@ -49,12 +51,11 @@ public class IWorldEditHandler implements WorldEditHandler {
         String schematicDirectory = ((Map<String, String>) data.get("saving")).get("dir");
         String path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
         File schematicFile = new File(path);
-        BukkitWorld bukkitWorld = new BukkitWorld(player.getWorld());
         Clipboard clipboard;
         ClipboardFormat format = ClipboardFormat.findByFile(schematicFile);
         try {
             ClipboardReader reader = format.getReader(new FileInputStream(schematicFile));
-            clipboard = reader.read(bukkitWorld.getWorldData());
+            clipboard = reader.read(world.getWorldData());
         } catch (IOException e) {
             clipboard = null;
             e.printStackTrace();
@@ -97,24 +98,29 @@ public class IWorldEditHandler implements WorldEditHandler {
         builder.to(to);
         ArrayList<Location> structureLocs = new ArrayList<Location>();
         int minX = clipboard.getMinimumPoint().getBlockX();
-        int maxX = clipboard.getMaximumPoint().getBlockX();
         int minY = clipboard.getMinimumPoint().getBlockY();
-        int maxY = clipboard.getMaximumPoint().getBlockY();
         int minZ = clipboard.getMinimumPoint().getBlockZ();
-        int maxZ = clipboard.getMaximumPoint().getBlockZ();
-        Vector distance = new Vector(to.getX(), to.getY(), to.getZ()).subtract(clipboard.getOrigin());
-        for (int x = minX ; x <= maxX ; x++){
-            for (int y = minY ; y <= maxY ; y++){
-                for (int z = minZ ; z <= maxZ ; z++){
-                    BaseBlock baseBlock = clipboard.getBlock(new Vector(x, y, z));
+        int xLength = clipboard.getDimensions().getBlockX();
+        int yLength = clipboard.getDimensions().getBlockY();
+        int zLength = clipboard.getDimensions().getBlockZ();
+        sbMain.getLogger().info(clipboard.getMinimumPoint().toString() + " " + clipboard.getMaximumPoint().toString());
+        Vector offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
+        Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
+        final double theta = angle * (PI / 180.0);
+        for (int x = 0 ; x <= xLength ; x++){
+            for (int y = 0 ; y <= yLength ; y++){
+                for (int z = 0 ; z <= zLength ; z++){
+                    BaseBlock baseBlock = clipboard.getBlock(new Vector(minX + x, minY + y, minZ + z));
                     if (baseBlock.getType() == 0){
                         continue;
                     }
-                    structureLocs.add(new Location(pasteLoc.getWorldID(), x + distance.getBlockX(), y + distance.getBlockY(), z + distance.getBlockZ()));
+                    Location loc = minPoint.add(x, y, z);
+
+                    structureLocs.add(loc.rotate(theta, pasteLoc.toSBloc()));
                 }
             }
         }
-
+        sbMain.getLogger().info(String.valueOf(structureLocs.size()));
         final boolean freeSpace = sbMain.isFreeSpace(structureLocs);
         if (!freeSpace){
             return false;

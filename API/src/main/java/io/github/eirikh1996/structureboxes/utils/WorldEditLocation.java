@@ -7,6 +7,7 @@ import java.util.UUID;
 public interface WorldEditLocation {
     World getWorld();
     UUID getWorldID();
+    Location toSBloc();
     int getX();
     int getY();
     int getZ();

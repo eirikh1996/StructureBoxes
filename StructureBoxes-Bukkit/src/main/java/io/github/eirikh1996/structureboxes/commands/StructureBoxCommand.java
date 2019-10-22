@@ -1,8 +1,10 @@
 package io.github.eirikh1996.structureboxes.commands;
 
 import io.github.eirikh1996.structureboxes.StructureBoxes;
+import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -13,6 +15,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class StructureBoxCommand implements TabExecutor {
     private final String schematicDir;
@@ -25,7 +29,7 @@ public class StructureBoxCommand implements TabExecutor {
             return false;
         }
         if (strings.length == 0){
-            return true;
+            return false;
         }
         if (strings[0].equalsIgnoreCase("create")){
             return createStructureBox(commandSender, strings[1]);
@@ -76,15 +80,16 @@ public class StructureBoxCommand implements TabExecutor {
         if (emptySlot < 0){
             return true;
         }
-        ItemStack structureBox = new ItemStack(Settings.StructureBoxItem);
+        ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
         List<String> lore = new ArrayList<>();
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
-        lore.add(ChatColor.AQUA + schematicName);
+        lore.add(Settings.StructureBoxPrefix + schematicName);
         lore.add(ChatColor.AQUA + "Place structure box in a free space to spawn a structure");
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         player.getInventory().addItem(structureBox);
+        player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - New structure box created"));
         return true;
     }
 }

@@ -15,4 +15,4 @@ commands:
   structurebox:
     aliases:
       - sb
-    usage: /structurebox <create|undo>
+    usage: /structurebox <create|reload|undo>

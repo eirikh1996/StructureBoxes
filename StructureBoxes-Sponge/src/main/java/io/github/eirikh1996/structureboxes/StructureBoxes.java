@@ -1,7 +1,7 @@
 package io.github.eirikh1996.structureboxes;
 
 import io.github.eirikh1996.structureboxes.utils.Location;
-import org.bukkit.World;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
@@ -9,14 +9,14 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Plugin(id = "structureboxes",
         name = "Structure Boxes",
         version = "1.0",
         authors = {"eirikh1996"},
-        dependencies = {@Dependency(id = "worldedit")})
+        dependencies = {@Dependency(id = "worldedit"), @Dependency(id = "redprotect", optional = true)})
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
@@ -27,6 +27,7 @@ public class StructureBoxes implements SBMain {
     @Listener
     public void onServerStarting(GameStartingServerEvent event){
         instance = this;
+
     }
 
     @Listener
@@ -42,11 +43,15 @@ public class StructureBoxes implements SBMain {
         return Platform.SPONGE;
     }
 
-    public boolean isFreeSpace(ArrayList<Location> locations) {
+    public boolean isFreeSpace(List<Location> locations) {
         for (Location loc : locations){
 
         }
         return false;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public static synchronized StructureBoxes getInstance() {

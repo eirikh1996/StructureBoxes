@@ -25,6 +25,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.14.4-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>io.github.eirikh1996</groupId>
             <artifactId>structureboxes-api</artifactId>
             <version>API</version>
@@ -78,7 +93,7 @@
             </resource>
         </resources>
         <finalName>StructureBoxes-Bukkit</finalName>
-        <directory>../target</directory>
+        <directory>target</directory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

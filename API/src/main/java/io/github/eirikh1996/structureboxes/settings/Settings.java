@@ -1,14 +1,12 @@
 package io.github.eirikh1996.structureboxes.settings;
 
-import io.github.eirikh1996.structureboxes.Platform;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Settings {
     public static String locale;
-    public static Material StructureBoxItem;
+    public static Object StructureBoxItem;
     public static String StructureBoxLore;
     public static List<String> AlternativeDisplayNames;
     public static String StructureBoxPrefix;
