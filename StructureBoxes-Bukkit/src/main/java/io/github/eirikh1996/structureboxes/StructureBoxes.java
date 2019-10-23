@@ -188,13 +188,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public boolean isFreeSpace(List<Location> locations) {
         for (Location location : locations){
-            getLogger().info(location.toString());
+
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             Material test = bukkitLoc.getBlock().getType();
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
                 continue;
             }
+            getLogger().info(location.toString() + test.name());
             return false;
         }
         return true;

@@ -3,6 +3,7 @@ package io.github.eirikh1996.structureboxes.listener;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
+import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.Direction;
@@ -10,13 +11,16 @@ import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
+import static java.lang.Math.abs;
 
 public class BlockListener implements Listener {
 
@@ -63,7 +67,7 @@ public class BlockListener implements Listener {
         final Location placed = event.getBlockPlaced().getLocation();
         Direction clipboardDir = StructureBoxes.getInstance().getWorldEditHandler().getClipboardFacingFromOrigin(clipboard, MathUtils.bukkit2SBLoc(placed));
         Direction playerDir = Direction.fromYaw(event.getPlayer().getLocation().getYaw());
-        int angle = playerDir.getAngle() - clipboardDir.getAngle();
+        int angle = playerDir.getAngle(clipboardDir);
         final Location loc = event.getBlockPlaced().getLocation();
         boolean exemptFromRegionRestriction = false;
         if (!Settings.RestrictToRegionsExceptions.isEmpty()){
@@ -79,8 +83,8 @@ public class BlockListener implements Listener {
             I18nSupport.getInternationalisedString("Place - Must be within region");
             return;
         }
-        Bukkit.broadcastMessage(playerDir.name());
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(clipboard, Math.abs(angle), new IWorldEditLocation(placed))){
+        Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(clipboard, abs(angle), new IWorldEditLocation(placed))){
             event.getPlayer().sendMessage(I18nSupport.getInternationalisedString("Place - No free space"));
             event.setCancelled(true);
             return;
@@ -95,6 +99,15 @@ public class BlockListener implements Listener {
         }.runTask(StructureBoxes.getInstance());
 
 
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockPhysics(BlockPhysicsEvent event){
+        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(event.getSourceBlock().getWorld().getUID(), event.getSourceBlock().getX(), event.getSourceBlock().getY(), event.getSourceBlock().getZ());
+        if (!StructureManager.getInstance().isPartOfStructure(structureLoc)){
+            return;
+        }
+        event.setCancelled(true);
     }
 
 

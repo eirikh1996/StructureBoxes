@@ -8,6 +8,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -15,6 +17,7 @@ import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.world.World;
 import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.SBMain;
+import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.RotationUtils;
@@ -65,10 +68,7 @@ public class IWorldEditHandler implements WorldEditHandler {
 
     @Override
     public Direction getClipboardFacingFromOrigin(Clipboard clipboard, Location location) {
-        Vector distance = clipboard.getOrigin().subtract(new Vector(clipboard.getMinimumPoint().getBlockX() + clipboard.getDimensions().getBlockX() / 2,
-                clipboard.getMinimumPoint().getBlockY() + clipboard.getDimensions().getBlockY() / 2,
-                clipboard.getMinimumPoint().getBlockZ() + clipboard.getDimensions().getBlockZ() / 2));
-        Direction returnFace;
+        Vector distance = clipboard.getMaximumPoint().subtract(clipboard.getOrigin());
         if (Math.abs(distance.getBlockX()) > Math.abs(distance.getBlockZ())){
             if (distance.getBlockX() > 0){
                 return Direction.EAST;
@@ -87,6 +87,7 @@ public class IWorldEditHandler implements WorldEditHandler {
 
     @Override
     public boolean pasteClipboard(Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
+        sbMain.getLogger().info(String.valueOf(angle));
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard, world.getWorldData());
         AffineTransform transform = new AffineTransform();
@@ -125,8 +126,10 @@ public class IWorldEditHandler implements WorldEditHandler {
         if (!freeSpace){
             return false;
         }
+        StructureManager.getInstance().addStructure(structureLocs);
         try {
-            Operations.complete(builder.build());
+            Operation op = builder.build();
+            Operations.complete(op);
         } catch (WorldEditException e) {
             e.printStackTrace();
             return false;

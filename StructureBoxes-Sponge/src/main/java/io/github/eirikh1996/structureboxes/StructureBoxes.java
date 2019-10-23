@@ -16,7 +16,9 @@ import java.util.logging.Logger;
         name = "Structure Boxes",
         version = "1.0",
         authors = {"eirikh1996"},
-        dependencies = {@Dependency(id = "worldedit"), @Dependency(id = "redprotect", optional = true)})
+        dependencies = {@Dependency(id = "worldedit"),
+                @Dependency(id = "redprotect", optional = true),
+                @Dependency(id = "worldguard", optional = true)})
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
