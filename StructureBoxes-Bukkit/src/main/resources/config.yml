@@ -1,5 +1,8 @@
+Debug: false
 Structure Box Item: chest
 Structure Box Display Name: §6Structure Box
+Max Structure Size: 10000
+Max Session Time: 60
 Alternative Display Names:
   - SiB
 Structure Box Prefix: '§6Structure Box: '
@@ -16,4 +19,4 @@ Restrict to regions:
 Free space:
   Require free space: true
   Blocks to ignore:
-    - grass
+    - tall_grass

@@ -10,6 +10,7 @@ import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,6 +19,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.UUID;
 
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
 import static java.lang.Math.abs;
@@ -84,16 +86,17 @@ public class BlockListener implements Listener {
             return;
         }
         Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(clipboard, abs(angle), new IWorldEditLocation(placed))){
-            event.getPlayer().sendMessage(I18nSupport.getInternationalisedString("Place - No free space"));
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), clipboard, angle, new IWorldEditLocation(placed))){
+
             event.setCancelled(true);
             return;
         }
 
-
+        final UUID id = event.getPlayer().getUniqueId();
         new BukkitRunnable() {
             @Override
             public void run() {
+                StructureManager.getInstance().removeStructure(StructureBoxes.getInstance().getWorldEditHandler().getStructureByPlayer(id));
                 loc.getBlock().setType(Material.AIR);
             }
         }.runTask(StructureBoxes.getInstance());
@@ -103,11 +106,20 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event){
-        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(event.getSourceBlock().getWorld().getUID(), event.getSourceBlock().getX(), event.getSourceBlock().getY(), event.getSourceBlock().getZ());
+        Block b = event.getBlock();
+        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ());
         if (!StructureManager.getInstance().isPartOfStructure(structureLoc)){
             return;
         }
         event.setCancelled(true);
+    }
+
+    private boolean requireWallSupport(Material type){
+        return type.name().endsWith("WALL_SIGN") ||
+                type.name().endsWith("TORCH") ||
+                type == Material.LADDER ||
+                type.name().equalsIgnoreCase("BED_BLOCK") ||
+                type.name().endsWith("BED");
     }
 
 

@@ -99,4 +99,23 @@ public enum Direction {
     public int getAngle() {
         return angle;
     }
+
+    public Direction getOpposite(){
+        Direction ret = null;
+        switch (this){
+            case EAST:
+                ret = WEST;
+                break;
+            case WEST:
+                ret = EAST;
+                break;
+            case NORTH:
+                ret = SOUTH;
+                break;
+            case SOUTH:
+                ret = NORTH;
+                break;
+        }
+        return ret;
+    }
 }
