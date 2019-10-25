@@ -14,7 +14,7 @@ public abstract class WorldEditHandler {
     protected Map<UUID, ArrayList<Location>> structurePlayerMap = new HashMap<>();
     public abstract Clipboard loadClipboardFromSchematic(World world, String schematicName);
     public abstract Direction getClipboardFacingFromOrigin(Clipboard clipboard, Location location);
-    public abstract boolean pasteClipboard(UUID playerID, Clipboard clipboard, double angle, WorldEditLocation pasteLoc);
+    public abstract boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc);
     public abstract int getStructureSize(Clipboard clipboard);
 
     public ArrayList<Location> getStructureByPlayer(UUID id){

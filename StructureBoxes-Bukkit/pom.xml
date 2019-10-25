@@ -52,6 +52,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-factions3</artifactId>
+            <version>Factions3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>MassiveCore</artifactId>
             <version>LATEST</version>

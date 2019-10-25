@@ -85,8 +85,11 @@ public class BlockListener implements Listener {
             I18nSupport.getInternationalisedString("Place - Must be within region");
             return;
         }
-        Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), clipboard, angle, new IWorldEditLocation(placed))){
+        if (Settings.Debug){
+            Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
+        }
+
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))){
 
             event.setCancelled(true);
             return;

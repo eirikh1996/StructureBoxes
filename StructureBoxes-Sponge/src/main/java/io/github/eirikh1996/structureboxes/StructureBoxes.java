@@ -10,6 +10,7 @@ import org.spongepowered.api.plugin.Plugin;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Plugin(id = "structureboxes",
@@ -23,8 +24,7 @@ public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
 
-    @Inject
-    private Logger logger;
+    @Inject private Logger logger;
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event){
@@ -45,11 +45,15 @@ public class StructureBoxes implements SBMain {
         return Platform.SPONGE;
     }
 
-    public boolean isFreeSpace(List<Location> locations) {
+    public boolean isFreeSpace(UUID playerID, String schematicName, List<Location> locations) {
         for (Location loc : locations){
 
         }
         return false;
+    }
+
+    public void sendMessageToPlayer(UUID recipient, String message) {
+
     }
 
     public Logger getLogger() {

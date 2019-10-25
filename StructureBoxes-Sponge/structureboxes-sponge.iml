@@ -42,5 +42,6 @@
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
   </component>
 </module>

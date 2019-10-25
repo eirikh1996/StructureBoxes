@@ -8,15 +8,17 @@ import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.Location;
+import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -24,10 +26,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class StructureBoxes extends JavaPlugin implements SBMain {
     private static StructureBoxes instance;
@@ -37,6 +38,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private Factions factionsPlugin;
     private RedProtect redProtectPlugin;
     private GriefPrevention griefPreventionPlugin;
+    private SessionTask sessionTask;
 
     private static Method GET_MATERIAL;
 
@@ -55,6 +57,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     @Override
     public void onEnable() {
+        String packageName = getServer().getClass().getPackage().getName();
+        String version = packageName.substring(packageName.lastIndexOf(".") + 1);
+        Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
         saveResource("localisation/lang_en.properties", false);
         saveDefaultConfig();
         Settings.locale = getConfig().getString("Locale", "en");
@@ -154,7 +159,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
+        sessionTask = new SessionTask();
+        sessionTask.runTaskTimerAsynchronously(this, 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
+    }
+
+    @Override
+    public void onDisable(){
+        sessionTask.cancel();
     }
 
     public static StructureBoxes getInstance(){
@@ -192,7 +204,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     @Override
-    public boolean isFreeSpace(List<Location> locations) {
+    public boolean isFreeSpace(UUID playerID, String schematicName, List<Location> locations) {
+        final HashMap<Location, Object> originalBlocks = new HashMap<>();
+        @NotNull final Player p = getServer().getPlayer(playerID);
         for (Location location : locations){
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
@@ -200,12 +214,31 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 world.spawnParticle(Particle.VILLAGER_ANGRY, bukkitLoc, 10);
             }
             Material test = bukkitLoc.getBlock().getType();
+            originalBlocks.put(location, test);
+
+            if ((getRedProtectPlugin() != null && !RedProtectUtils.canBuild(p, bukkitLoc))){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect"));
+                return false;
+            }
+            if (getGriefPreventionPlugin() != null && GriefPreventionUtils.canBuild(p, bukkitLoc)){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
+                return false;
+            }
+            if (getFactionsPlugin() != null && (Settings.IsLegacy ? FactionsUtils.allowBuild(p, bukkitLoc) : Factions3Utils.allowBuild(p, bukkitLoc))){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
+                return false;
+            }
+            if (getWorldGuardPlugin() != null && WorldGuardUtils.allowBuild(p, bukkitLoc)){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
+                return false;
+            }
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
                 continue;
             }
-            getLogger().info(location.toString() + test.name());
+            p.sendMessage(I18nSupport.getInternationalisedString("Place - No free space") );
             return false;
         }
+        StructureManager.getInstance().addStructureByPlayer(playerID, schematicName, originalBlocks);
         return true;
     }
 

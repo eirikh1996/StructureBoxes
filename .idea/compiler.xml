@@ -9,6 +9,7 @@
         <module name="StructureBoxes-API" />
         <module name="StructureBoxes-WE6" />
         <module name="structureboxes-sponge" />
+        <module name="StructureBoxes-Factions3" />
         <module name="structureboxes-bukkit" />
       </profile>
     </annotationProcessing>
@@ -16,6 +17,7 @@
       <module name="StructureBoxes" target="1.5" />
       <module name="StructureBoxes-API" target="7" />
       <module name="structureboxes-bukkit" target="1.8" />
+      <module name="StructureBoxes-Factions3" target="1.5" />
       <module name="structureboxes-main" target="1.8" />
       <module name="structureboxes-sponge" target="1.5" />
       <module name="StructureBoxes-Sponge" target="1.5" />

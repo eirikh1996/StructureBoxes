@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Settings {
     public static String locale;
+    public static boolean IsLegacy;
     public static boolean Debug;
     public static Object StructureBoxItem;
     public static String StructureBoxLore;

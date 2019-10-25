@@ -88,7 +88,7 @@ public class IWorldEditHandler extends WorldEditHandler {
 
 
     @Override
-    public boolean pasteClipboard(UUID playerID, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
+    public boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
         sbMain.getLogger().info(String.valueOf(angle));
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard, world.getWorldData());
@@ -127,9 +127,9 @@ public class IWorldEditHandler extends WorldEditHandler {
             }
         }
         sbMain.getLogger().info(String.valueOf(structureLocs.size()));
-        final boolean freeSpace = sbMain.isFreeSpace(structureLocs);
+        final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
-            sbMain.sendMessageToPlayer(playerID, "Place - No free space");
+
             return false;
         }
         StructureManager.getInstance().addStructure(structureLocs);
