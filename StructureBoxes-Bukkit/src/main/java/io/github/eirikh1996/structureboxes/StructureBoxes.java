@@ -18,6 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
@@ -65,6 +66,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
+        Settings.StructureBoxInstruction = getConfig().getString("Structure Box Instruction Message", "§bPlace structure box in a free space to spawn a structure");
         Settings.AlternativeDisplayNames = getConfig().getStringList("Alternative Display Names");
         Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
         Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
@@ -159,6 +161,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
+        this.getCommand("structurebox").setTabCompleter(new StructureBoxCommand());
         sessionTask = new SessionTask();
         sessionTask.runTaskTimerAsynchronously(this, 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
@@ -224,11 +227,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
                 return false;
             }
-            if (getFactionsPlugin() != null && (Settings.IsLegacy ? FactionsUtils.allowBuild(p, bukkitLoc) : Factions3Utils.allowBuild(p, bukkitLoc))){
+            if (getFactionsPlugin() != null && (Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }
-            if (getWorldGuardPlugin() != null && WorldGuardUtils.allowBuild(p, bukkitLoc)){
+            if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                 return false;
             }
@@ -245,5 +248,15 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void sendMessageToPlayer(UUID recipient, String message) {
         Bukkit.getPlayer(recipient).sendMessage(I18nSupport.getInternationalisedString(message));
+    }
+
+    @Override
+    public void clearInterior(ArrayList<Location> interior) {
+                for (Location location : interior){
+                    org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
+                    bukkitLoc.getBlock().setType(Material.AIR);
+                }
+
+
     }
 }

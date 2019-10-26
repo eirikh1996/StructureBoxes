@@ -10,6 +10,7 @@ import io.github.eirikh1996.structureboxes.utils.BlockUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import javafx.util.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,6 +22,8 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,45 +60,7 @@ public class StructureBoxCommand implements TabExecutor {
         return false;
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        ArrayList<String> subCmds = new ArrayList<>();
-        if (strings.length == 0){
-            return subCmds;
-        }
-        else if (strings.length <= 1) {
-            if (commandSender.hasPermission("structureboxes.create")) {
-                subCmds.add("create");
-            }
-            if (commandSender.hasPermission("structureboxes.undo")) {
-                subCmds.add("undo");
-            }
-        }
 
-        else if (strings[0].equalsIgnoreCase("create")){
-            File schematicDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + this.schematicDir);
-            if (!schematicDir.exists()){
-                return Collections.emptyList();
-            }
-            for (File schem : schematicDir.listFiles()){
-                if (schem == null){
-                    continue;
-                } else if (schem.getName().endsWith(".schematic")){
-                    subCmds.add(schem.getName().replace(".schematic", ""));
-                } else if (schem.getName().endsWith(".schem")){
-                    subCmds.add(schem.getName().replace(".schem", ""));
-                }
-            }
-        }
-        ArrayList<String> completions = new ArrayList<>();
-        for (String subCmd : subCmds){
-            if (!subCmd.startsWith(strings[0])){
-                continue;
-            }
-            completions.add(subCmd);
-        }
-        return completions;
-    }
 
     private boolean createStructureBox(CommandSender sender, String schematicName){
         if (!(sender instanceof Player)){
@@ -134,7 +99,7 @@ public class StructureBoxCommand implements TabExecutor {
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
-        lore.add(ChatColor.AQUA + "Place structure box in a free space to spawn a structure");
+        lore.add(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         player.getInventory().addItem(structureBox);
@@ -183,13 +148,57 @@ public class StructureBoxCommand implements TabExecutor {
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
-        lore.add(ChatColor.AQUA + "Place structure box in a free space to spawn a structure");
+        lore.add(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
-        p.getInventory().addItem(structureBox);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
+        if (p.getInventory().addItem(structureBox).isEmpty()){
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space"));
+            p.getWorld().dropItem(p.getLocation(), structureBox);
+        }
+
         return true;
 
 
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        List<String> subCmds = new ArrayList<>();
+        if (strings.length <= 1) {
+            if (commandSender.hasPermission("structureboxes.create")) {
+                subCmds.add("create");
+            }
+            if (commandSender.hasPermission("structureboxes.undo")) {
+                subCmds.add("undo");
+            }
+            if (commandSender.hasPermission("structureboxes.reload")) {
+                subCmds.add("reload");
+            }
+        } else if (strings[0].equalsIgnoreCase("create")){
+            File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder(), schematicDir);
+            if (!schemFolder.exists()){
+                return Collections.emptyList();
+            }
+            for (File schem : schemFolder.listFiles()){
+                if (schem == null){
+                    continue;
+                }
+                if (schem.getName().endsWith(".schematic")){
+                    subCmds.add(schem.getName().replace(".schematic", ""));
+                }
+            }
+        }
+        if (strings.length == 0){
+            return subCmds;
+        }
+        List<String> completions = new ArrayList<>();
+        for (String arg : subCmds){
+            if (!arg.startsWith(strings[0])){
+                continue;
+            }
+            completions.add(arg);
+        }
+        return completions;
     }
 }

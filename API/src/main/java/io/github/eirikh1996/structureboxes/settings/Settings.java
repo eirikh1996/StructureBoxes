@@ -12,6 +12,7 @@ public class Settings {
     public static String StructureBoxLore;
     public static List<String> AlternativeDisplayNames;
     public static String StructureBoxPrefix;
+    public static String StructureBoxInstruction;
     public static List<String> AlternativePrefixes;
     public static boolean RestrictToRegionsEnabled;
     public static boolean RequirePermissionPerStructureBox;

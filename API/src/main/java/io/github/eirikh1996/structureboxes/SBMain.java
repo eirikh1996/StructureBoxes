@@ -13,4 +13,5 @@ public interface SBMain {
     boolean isFreeSpace(UUID playerID, String schematicName, List<Location> locations);
     void sendMessageToPlayer(UUID recipient, String message);
     Logger getLogger();
+    void clearInterior(ArrayList<Location> interior);
 }

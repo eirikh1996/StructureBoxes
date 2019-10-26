@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes.utils;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -50,6 +51,46 @@ public final class Location {
         final int xRot = (int) (centre.getX() + cos(theta) * (getX() - centre.getX()) - sin(theta) * (getZ() - centre.getZ()));
         final int zRot = (int) (centre.getZ() + sin(theta) * (getX() - centre.getX()) + cos(theta) * (getZ() - centre.getZ()));
         return new Location(getWorld(), xRot, getY(), zRot);
+    }
+
+    public static Location min(ArrayList<Location> structure){
+        int x = Integer.MAX_VALUE;
+        int y = Integer.MAX_VALUE;
+        int z = Integer.MAX_VALUE;
+        UUID wID = null;
+        for (Location loc : structure){
+            wID = loc.getWorld();
+            if (loc.getX() < x){
+                x = loc.getX();
+            }
+            if (loc.getY() < y){
+                y = loc.getY();
+            }
+            if (loc.getZ() < z){
+                z = loc.getZ();
+            }
+        }
+        return new Location(wID, x, y, z);
+    }
+
+    public static Location max(ArrayList<Location> structure) {
+        int x = Integer.MIN_VALUE;
+        int y = Integer.MIN_VALUE;
+        int z = Integer.MIN_VALUE;
+        UUID wID = null;
+        for (Location loc : structure) {
+            wID = loc.getWorld();
+            if (loc.getX() > x) {
+                x = loc.getX();
+            }
+            if (loc.getY() > y) {
+                y = loc.getY();
+            }
+            if (loc.getZ() > z) {
+                z = loc.getZ();
+            }
+        }
+        return new Location(wID, x, y, z);
     }
     @Override
     public int hashCode() {

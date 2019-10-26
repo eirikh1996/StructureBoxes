@@ -10,6 +10,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -30,9 +31,11 @@ public class WorldGuardUtils {
                 e.printStackTrace();
                 return true;
             }
+        } else {
+            ApplicableRegionSet regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(player.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+            LocalPlayer lp = StructureBoxes.getInstance().getWorldGuardPlugin().wrapPlayer(player);
+            return lp.hasPermission("worldguard.region.bypass." + player.getWorld().getName()) || regions.isMemberOfAll(lp) || regions.isOwnerOfAll(lp);
         }
-        ApplicableRegionSet regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(player.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        LocalPlayer lp = StructureBoxes.getInstance().getWorldGuardPlugin().wrapPlayer(player);
-        return regions.isMemberOfAll(lp) || regions.isOwnerOfAll(lp);
+
     }
 }

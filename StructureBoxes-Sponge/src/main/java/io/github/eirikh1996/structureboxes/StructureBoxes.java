@@ -9,6 +9,7 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -58,6 +59,12 @@ public class StructureBoxes implements SBMain {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public void clearInterior(ArrayList<Location> interior) {
+        for (Location loc : interior){
+
+        }
     }
 
     public static synchronized StructureBoxes getInstance() {

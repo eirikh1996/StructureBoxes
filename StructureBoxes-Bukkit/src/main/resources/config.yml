@@ -8,7 +8,8 @@ Alternative Display Names:
 Structure Box Prefix: '§6Structure Box: '
 Alternative Prefixes:
   - 'SiB: '
-Structure Box Instruction Message: ''
+Structure Box Instruction Message: '§bPlace structure box in a free space to spawn a structure'
+Air Marker: bedrock
 
 #Determines if the structure box must be placed inside of a region of supported anti-griefing plugins
 Restrict to regions:
@@ -19,4 +20,9 @@ Restrict to regions:
 Free space:
   Require free space: true
   Blocks to ignore:
-    - tall_grass
+    - long_grass
+    - double_plant
+    - stationary_water
+    - water
+    - lava
+    - stationary_lava

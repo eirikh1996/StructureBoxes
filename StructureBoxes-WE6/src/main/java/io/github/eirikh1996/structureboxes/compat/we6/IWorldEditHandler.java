@@ -20,6 +20,7 @@ import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.RotationUtils;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
@@ -70,7 +71,8 @@ public class IWorldEditHandler extends WorldEditHandler {
 
     @Override
     public Direction getClipboardFacingFromOrigin(Clipboard clipboard, Location location) {
-        Vector distance = clipboard.getMaximumPoint().subtract(clipboard.getOrigin());
+        Vector centerpoint = clipboard.getMinimumPoint().add(clipboard.getDimensions().divide(2));
+        Vector distance = centerpoint.subtract(clipboard.getOrigin());
         if (Math.abs(distance.getBlockX()) > Math.abs(distance.getBlockZ())){
             if (distance.getBlockX() > 0){
                 return Direction.EAST;
@@ -106,12 +108,13 @@ public class IWorldEditHandler extends WorldEditHandler {
         int xLength = clipboard.getDimensions().getBlockX();
         int yLength = clipboard.getDimensions().getBlockY();
         int zLength = clipboard.getDimensions().getBlockZ();
-        sbMain.getLogger().info(clipboard.getMinimumPoint().toString() + " " + clipboard.getMaximumPoint().toString());
+        Location min = new Location(pasteLoc.getWorldID(), minX, minY, minZ);
+        Location max = new Location(pasteLoc.getWorldID(), minX + xLength, minY + yLength, minZ + zLength);
+
         Vector offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
         Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
-        sbMain.getLogger().info(String.valueOf(theta));
-        int size = 0;
+
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
@@ -119,13 +122,16 @@ public class IWorldEditHandler extends WorldEditHandler {
                     if (baseBlock.getType() == 0){
                         continue;
                     }
-                    size++;
                     Location loc = minPoint.add(x, y, z);
 
                     structureLocs.add(loc.rotate(theta, pasteLoc.toSBloc()));
                 }
             }
         }
+        final ArrayList<Location> exterior = CollectionUtils.exterior(structureLocs);
+        final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
+        final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
+        structureLocs.addAll(interior);
         sbMain.getLogger().info(String.valueOf(structureLocs.size()));
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
@@ -136,6 +142,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         try {
             Operation op = builder.build();
             Operations.complete(op);
+            sbMain.clearInterior(interior);
         } catch (WorldEditException e) {
             e.printStackTrace();
             return false;
@@ -164,6 +171,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         }
         return count;
     }
+
 
 
     private static final class WorldEditConfigException extends RuntimeException{

@@ -35,6 +35,9 @@ public class StructureManager implements Iterable<ArrayList<Location>> {
 
     public Pair<String, HashMap<Location, Object>> getLatestStructure(UUID playerID){
         LinkedList<Pair<Long, Pair<String, HashMap<Location, Object>>>> pairLinkedList = playerTimeStructureMap.get(playerID);
+        if (pairLinkedList == null || pairLinkedList.isEmpty()){
+            return null;
+        }
         Pair<Long, Pair<String, HashMap<Location, Object>>> pair = pairLinkedList.pollFirst();
         return pair != null ? pair.getValue() : null;
 
