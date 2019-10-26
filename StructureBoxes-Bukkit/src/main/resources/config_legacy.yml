@@ -16,37 +16,12 @@ Restrict to regions:
   Exceptions:
     - Merchantman
     - MM
-#Settings for free space requirements
 Free space:
   Require free space: true
   Blocks to ignore:
-    - grass
-    - tall_grass
-    - fern
-    - large_fern
+    - long_grass
     - double_plant
+    - stationary_water
     - water
     - lava
-    - kelp
-    - kelp_plant
-    - seagrass
-    - tall_seagrass
-    - dandelion
-    - poppy
-    - blue_orchid
-    - allium
-    - azure_bluet
-    - red_tulip
-    - orange_tulip
-    - white_tulip
-    - pink_tulip
-    - oxeye_daisy
-    - cornflower
-    - lily_of_the_valley
-    - wither_rose
-    - sunflower
-    - lilac
-    - rose_bush
-    - peony
-    - sea_pickle
-    - bubble_column
+    - stationary_lava

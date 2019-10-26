@@ -15,6 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,9 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -62,7 +62,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         String version = packageName.substring(packageName.lastIndexOf(".") + 1);
         Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
         saveResource("localisation/lang_en.properties", false);
-        saveDefaultConfig();
+        if (Settings.IsLegacy){
+            saveLegacyConfig();
+        } else {
+            saveDefaultConfig();
+        }
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
@@ -243,6 +247,20 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         StructureManager.getInstance().addStructureByPlayer(playerID, schematicName, originalBlocks);
         return true;
+    }
+
+    private void saveLegacyConfig(){
+        File configFile = new File(getDataFolder(), "config.yml");
+        if (configFile.exists())
+            return;
+        InputStream resource = getResource("config_legacy.yml");
+        Reader reader = new InputStreamReader(resource);
+        FileConfiguration config = YamlConfiguration.loadConfiguration(reader);
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

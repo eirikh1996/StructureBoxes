@@ -152,11 +152,22 @@ public class StructureBoxCommand implements TabExecutor {
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
-        if (p.getInventory().addItem(structureBox).isEmpty()){
+        boolean fullInventory = true;
+        for (ItemStack iStack : p.getInventory()){
+            if (iStack == null){
+                fullInventory = false;
+                break;
+            } else if (iStack.equals(structureBox) && iStack.getAmount() < structureBox.getMaxStackSize()){
+                fullInventory = false;
+                break;
+            }
+        }
+        if (fullInventory){
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space"));
             p.getWorld().dropItem(p.getLocation(), structureBox);
+            return true;
         }
-
+        p.getInventory().addItem(structureBox);
         return true;
 
 

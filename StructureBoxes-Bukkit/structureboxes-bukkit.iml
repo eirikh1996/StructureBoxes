@@ -26,6 +26,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-API" />
     <orderEntry type="module" module-name="StructureBoxes-WE6" />
+    <orderEntry type="module" module-name="StructureBoxes-WE7" />
     <orderEntry type="module" module-name="StructureBoxes-Factions3" />
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:LATEST">

@@ -11,6 +11,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>structureboxes-sponge</artifactId>
+    <name>StructureBoxes-Sponge</name>
+    <version>1.0</version>
+    <packaging>jar</packaging>
     <repositories>
         <repository>
             <id>sponge-repo</id>
