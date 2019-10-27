@@ -12,6 +12,7 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -45,6 +46,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
+    private Metrics metrics;
 
     private static Method GET_MATERIAL;
 
@@ -79,6 +81,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.AlternativeDisplayNames = getConfig().getStringList("Alternative Display Names");
         Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
         Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
+        Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
         ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
         Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
         Settings.MaxSessionTime = getConfig().getLong("Max Session Time", 60);
@@ -188,6 +191,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
+        if (Settings.Metrics){
+            metrics = new Metrics(this);
+        }
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
         this.getCommand("structurebox").setTabCompleter(new StructureBoxCommand());
         sessionTask = new SessionTask();
@@ -236,6 +242,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return plotSquaredInstalled;
     }
 
+    public Metrics getMetrics() {
+        return metrics;
+    }
+
     @Override
     public WorldEditHandler getWorldEditHandler() {
         return worldEditHandler;
@@ -273,6 +283,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             }
             if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
+                return false;
+            }
+            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc))){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
+                return false;
+            }
+            if (getTownyPlugin() != null && !TownyUtils.canBuild(p, bukkitLoc)){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Towny"));
+                return false;
+            }
+            if (getLandClaimingPlugin() != null && !LandClaimingUtils.canBuild(p, bukkitLoc)){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "LandClaiming"));
                 return false;
             }
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){

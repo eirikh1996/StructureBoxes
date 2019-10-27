@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +74,7 @@ public class StructureBoxCommand implements TabExecutor {
             return true;
         }
         if (schematicName == null){
-            sender.sendMessage(I18nSupport.getInternationalisedString("Command - No permission"));
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
         File schematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + schematicName + ".schematic");
@@ -82,16 +83,17 @@ public class StructureBoxCommand implements TabExecutor {
             schematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + schematicName + ".schem");
         }
         if (!schematicFile.exists()){
-            sender.sendMessage(I18nSupport.getInternationalisedString("Command - No schematic"));
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No schematic"));
             return true;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
         if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
-            sender.sendMessage(I18nSupport.getInternationalisedString("Command - Structure too large"));
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
             return true;
         }
         int emptySlot = player.getInventory().firstEmpty();
         if (emptySlot < 0){
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Insufficient inventory space"));
             return true;
         }
         ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
@@ -118,6 +120,10 @@ public class StructureBoxCommand implements TabExecutor {
             return true;
         }
         Pair<String, HashMap<Location, Object>> stringStructurePair = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
+        if (stringStructurePair == null){
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
+            return true;
+        }
         String schematicName = stringStructurePair.getKey();
         HashMap<Location, Object> locationMaterialHashMap = stringStructurePair.getValue();
         if (locationMaterialHashMap == null) {
@@ -173,6 +179,19 @@ public class StructureBoxCommand implements TabExecutor {
 
     }
 
+    private boolean reloadCommand(CommandSender sender){
+        if (!sender.hasPermission("structureboxes.reload")){
+            sender.sendMessage(I18nSupport.getInternationalisedString("Command - No permission"));
+            return true;
+        }
+        StructureBoxes sb = StructureBoxes.getInstance();
+        PluginManager plugMan = sb.getServer().getPluginManager();
+        plugMan.disablePlugin(sb);
+        plugMan.enablePlugin(sb);
+        sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Reload successful"));
+        return true;
+    }
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         List<String> subCmds = new ArrayList<>();
@@ -187,7 +206,7 @@ public class StructureBoxCommand implements TabExecutor {
                 subCmds.add("reload");
             }
         } else if (strings[0].equalsIgnoreCase("create")){
-            File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder(), schematicDir);
+            File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
             if (!schemFolder.exists()){
                 return Collections.emptyList();
             }
@@ -197,6 +216,9 @@ public class StructureBoxCommand implements TabExecutor {
                 }
                 if (schem.getName().endsWith(".schematic")){
                     subCmds.add(schem.getName().replace(".schematic", ""));
+                }
+                if (schem.getName().endsWith(".schem")){
+                    subCmds.add(schem.getName().replace(".schem", ""));
                 }
             }
         }

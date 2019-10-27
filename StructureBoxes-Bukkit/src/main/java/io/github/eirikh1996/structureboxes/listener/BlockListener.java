@@ -121,13 +121,5 @@ public class BlockListener implements Listener {
         event.setCancelled(true);
     }
 
-    private boolean requireWallSupport(Material type){
-        return type.name().endsWith("WALL_SIGN") ||
-                type.name().endsWith("TORCH") ||
-                type == Material.LADDER ||
-                type.name().equalsIgnoreCase("BED_BLOCK") ||
-                type.name().endsWith("BED");
-    }
-
 
 }

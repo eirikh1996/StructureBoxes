@@ -25,24 +25,32 @@
         <id>github-Towny</id>
         <url>https://maven.pkg.github.com/TownyAdvanced/Towny/packages</url>
     </repository>
+    <repository>
+        <id>CodeMC</id>
+        <url>https://repo.codemc.org/repository/maven-public</url>
+    </repository>
 </repositories>
 
     <dependencies>
+        <!--Bukkit-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.14.4-R0.1-SNAPSHOT</version>
         </dependency>
+        <!--WorldEdit-->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.0.1-SNAPSHOT</version>
         </dependency>
+        <!--WorldGuard-->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.0.1-SNAPSHOT</version>
         </dependency>
+        <!--StructureBoxes dependencies-->
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
             <artifactId>structureboxes-api</artifactId>
@@ -67,6 +75,7 @@
             <version>NonLegacy</version>
             <type>jar</type>
         </dependency>
+        <!--MassiveCore-->
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>MassiveCore</artifactId>
@@ -74,6 +83,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/MassiveCore.jar</systemPath>
         </dependency>
+        <!--Factions-->
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>Factions</artifactId>
@@ -81,6 +91,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/Factions.jar</systemPath>
         </dependency>
+        <!--RedProtect-->
         <dependency>
             <groupId>br.net.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Core</artifactId>
@@ -93,6 +104,7 @@
             <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
+        <!--GriefPrevention-->
         <dependency>
             <groupId>me.ryanhamshire</groupId>
             <artifactId>GriefPrevention</artifactId>
@@ -108,6 +120,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
         </dependency>
+        <!--LandClaiming-->
         <dependency>
             <groupId>me.zombie_striker</groupId>
             <artifactId>LandClaiming</artifactId>
@@ -115,12 +128,20 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/LandClaiming.jar</systemPath>
         </dependency>
+        <!--Towny-->
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>Towny</artifactId>
             <version>0.95.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/Towny-0.95.0.0.jar</systemPath>
+        </dependency>
+        <!--bStats-->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>1.5</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>
@@ -146,6 +167,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.1</version>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <!-- Replace this with your package! -->
+                            <shadedPattern>io.github.eirikh1996.structureboxes</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>

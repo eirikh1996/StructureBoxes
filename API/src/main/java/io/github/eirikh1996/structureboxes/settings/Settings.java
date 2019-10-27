@@ -21,4 +21,5 @@ public class Settings {
     public static int MaxStructureSize;
     public static long MaxSessionTime;
 
+    public static boolean Metrics;
 }
