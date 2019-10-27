@@ -22,4 +22,5 @@ public class Settings {
     public static long MaxSessionTime;
 
     public static boolean Metrics;
+    public static long PlaceCooldownTime;
 }

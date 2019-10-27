@@ -57,6 +57,8 @@ public class StructureBoxCommand implements TabExecutor {
             return createStructureBox(commandSender, schematicName);
         } else if (strings[0].equalsIgnoreCase("undo")){
             return undoCommand(commandSender);
+        } else if (strings[0].equalsIgnoreCase("reload")){
+            return reloadCommand(commandSender);
         }
         return false;
     }
@@ -181,7 +183,7 @@ public class StructureBoxCommand implements TabExecutor {
 
     private boolean reloadCommand(CommandSender sender){
         if (!sender.hasPermission("structureboxes.reload")){
-            sender.sendMessage(I18nSupport.getInternationalisedString("Command - No permission"));
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
         StructureBoxes sb = StructureBoxes.getInstance();

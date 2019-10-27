@@ -2,7 +2,8 @@ Debug: false
 Structure Box Item: chest
 Structure Box Display Name: §6Structure Box
 Max Structure Size: 10000
-Max Session Time: 60
+Max Session Time: 300
+Place cooldown time: 10
 Alternative Display Names:
   - SiB
 Structure Box Prefix: '§6Structure Box: '

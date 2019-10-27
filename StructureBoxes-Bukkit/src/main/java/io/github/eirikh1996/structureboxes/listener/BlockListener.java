@@ -18,20 +18,23 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
 import static java.lang.Math.abs;
 
 public class BlockListener implements Listener {
-
+    private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
 
     @EventHandler
     public void onBlockPlace(final BlockPlaceEvent event){
         if (event.isCancelled()){
             return;
         }
+        final UUID id = event.getPlayer().getUniqueId();
         if (!event.getBlockPlaced().getType().equals(Settings.StructureBoxItem) &&
         !event.getItemInHand().getItemMeta().hasLore()){
             return;
@@ -59,7 +62,11 @@ public class BlockListener implements Listener {
             schematicID = schematicID.replace(ChatColor.stripColor(Settings.StructureBoxPrefix), "");
         }
         if (Settings.RequirePermissionPerStructureBox && !event.getPlayer().hasPermission("structureboxes.place." + schematicID)){
-            event.getPlayer().sendMessage(String.format(I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
+            event.getPlayer().sendMessage(String.format(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
+            return;
+        }
+        if (playerTimeMap.containsKey(id) && playerTimeMap.get(id) != null && (System.currentTimeMillis() - playerTimeMap.get(id)) < Settings.PlaceCooldownTime){
+            event.getPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Cooldown"));
             return;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schematicID);
@@ -82,7 +89,7 @@ public class BlockListener implements Listener {
             }
         }
         if (Settings.RestrictToRegionsEnabled && !isWithinRegion(placed) && !exemptFromRegionRestriction && !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction")){
-            I18nSupport.getInternationalisedString("Place - Must be within region");
+            event.getPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Must be within region"));
             return;
         }
         if (Settings.Debug){
@@ -96,7 +103,7 @@ public class BlockListener implements Listener {
                     return;
                 }
 
-                final UUID id = event.getPlayer().getUniqueId();
+
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -104,7 +111,7 @@ public class BlockListener implements Listener {
                         loc.getBlock().setType(Material.AIR);
                     }
                 }.runTask(StructureBoxes.getInstance());
-
+        playerTimeMap.put(id, System.currentTimeMillis());
 
 
 

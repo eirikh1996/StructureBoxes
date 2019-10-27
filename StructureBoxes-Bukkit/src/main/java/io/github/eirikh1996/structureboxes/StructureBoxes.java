@@ -75,6 +75,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             saveDefaultConfig();
         }
         Settings.locale = getConfig().getString("Locale", "en");
+        Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
         Settings.StructureBoxInstruction = getConfig().getString("Structure Box Instruction Message", "§bPlace structure box in a free space to spawn a structure");
@@ -330,6 +331,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     public void clearInterior(ArrayList<Location> interior) {
                 for (Location location : interior){
                     org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
+                    //ignore air blocks
+                    if (bukkitLoc.getBlock().getType().name().endsWith("AIR")){
+                        continue;
+                    }
                     bukkitLoc.getBlock().setType(Material.AIR);
                 }
 
