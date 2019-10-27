@@ -91,7 +91,6 @@ public class IWorldEditHandler extends WorldEditHandler {
 
     @Override
     public boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
-        sbMain.getLogger().info(String.valueOf(angle));
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard, world.getWorldData());
         AffineTransform transform = new AffineTransform();
@@ -132,7 +131,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
         final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
         structureLocs.addAll(interior);
-        sbMain.getLogger().info(String.valueOf(structureLocs.size()));
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
 

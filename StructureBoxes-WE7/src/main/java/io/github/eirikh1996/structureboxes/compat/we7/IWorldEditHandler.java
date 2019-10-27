@@ -129,7 +129,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         final ArrayList<Location> exterior = CollectionUtils.exterior(structureLocs);
         final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
         final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
-        sbMain.getLogger().info(String.valueOf(structureLocs.size()));
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
 
