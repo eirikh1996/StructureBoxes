@@ -28,7 +28,7 @@ public class BlockListener implements Listener {
 
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event){
+    public void onBlockPlace(final BlockPlaceEvent event){
         if (event.isCancelled()){
             return;
         }
@@ -88,21 +88,25 @@ public class BlockListener implements Listener {
         if (Settings.Debug){
             Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
+        final String schemID = schematicID;
 
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))){
+                if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed))){
 
-            event.setCancelled(true);
-            return;
-        }
+                    event.setCancelled(true);
+                    return;
+                }
 
-        final UUID id = event.getPlayer().getUniqueId();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                StructureManager.getInstance().removeStructure(StructureBoxes.getInstance().getWorldEditHandler().getStructureByPlayer(id));
-                loc.getBlock().setType(Material.AIR);
-            }
-        }.runTask(StructureBoxes.getInstance());
+                final UUID id = event.getPlayer().getUniqueId();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        StructureManager.getInstance().removeStructure(StructureBoxes.getInstance().getWorldEditHandler().getStructureByPlayer(id));
+                        loc.getBlock().setType(Material.AIR);
+                    }
+                }.runTask(StructureBoxes.getInstance());
+
+
+
 
 
     }

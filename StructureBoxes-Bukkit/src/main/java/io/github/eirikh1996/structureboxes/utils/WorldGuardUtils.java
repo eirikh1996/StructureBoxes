@@ -38,4 +38,19 @@ public class WorldGuardUtils {
         }
 
     }
+
+    public static boolean insideRegion(Location location){
+        if (GET_REGION_MANAGER != null && GET_APPLICABLE_REGIONS != null){
+            try {
+                RegionManager manager = (RegionManager) GET_REGION_MANAGER.invoke(StructureBoxes.getInstance().getWorldGuardPlugin(), location.getWorld());
+                ApplicableRegionSet regions = (ApplicableRegionSet) GET_APPLICABLE_REGIONS.invoke(manager, location);
+                return regions.size() > 0;
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(location.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ())).size() > 0;
+        }
+    }
 }

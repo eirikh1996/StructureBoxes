@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/StructureBoxes.iml" filepath="$PROJECT_DIR$/.idea/StructureBoxes.iml" />
       <module fileurl="file://$PROJECT_DIR$/API/StructureBoxes-API.iml" filepath="$PROJECT_DIR$/API/StructureBoxes-API.iml" />
-      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Factions3/StructureBoxes-Factions3.iml" filepath="$PROJECT_DIR$/StructureBoxes-Factions3/StructureBoxes-Factions3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-NonLegacy/StructureBoxes-NonLegacy.iml" filepath="$PROJECT_DIR$/StructureBoxes-NonLegacy/StructureBoxes-NonLegacy.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-WE6/StructureBoxes-WE6.iml" filepath="$PROJECT_DIR$/StructureBoxes-WE6/StructureBoxes-WE6.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-WE7/StructureBoxes-WE7.iml" filepath="$PROJECT_DIR$/StructureBoxes-WE7/StructureBoxes-WE7.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Bukkit/structureboxes-bukkit.iml" filepath="$PROJECT_DIR$/StructureBoxes-Bukkit/structureboxes-bukkit.iml" />

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.github.intellectualsites.plotsquared:PlotSquared-API:latest">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/PlotSquared-API-latest.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/PlotSquared-API-latest-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/PlotSquared-API-latest-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

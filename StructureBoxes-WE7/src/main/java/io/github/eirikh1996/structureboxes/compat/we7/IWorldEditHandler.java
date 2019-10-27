@@ -93,7 +93,6 @@ public class IWorldEditHandler extends WorldEditHandler {
 
     @Override
     public boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
-        sbMain.getLogger().info(String.valueOf(angle));
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard);
         AffineTransform transform = new AffineTransform();
@@ -110,7 +109,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         int xLength = clipboard.getDimensions().getBlockX();
         int yLength = clipboard.getDimensions().getBlockY();
         int zLength = clipboard.getDimensions().getBlockZ();
-
         BlockVector3 offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
         Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
@@ -131,7 +129,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         final ArrayList<Location> exterior = CollectionUtils.exterior(structureLocs);
         final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
         final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
-        structureLocs.addAll(interior);
         sbMain.getLogger().info(String.valueOf(structureLocs.size()));
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
@@ -148,7 +145,6 @@ public class IWorldEditHandler extends WorldEditHandler {
             return false;
         }
         structurePlayerMap.put(playerID, structureLocs);
-
         return true;
     }
 

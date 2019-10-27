@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import com.massivecraft.factions.Factions;
+import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
@@ -10,6 +11,7 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import me.zombie_striker.landclaiming.LandClaiming;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -40,6 +42,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private RedProtect redProtectPlugin;
     private GriefPrevention griefPreventionPlugin;
     private SessionTask sessionTask;
+    private LandClaiming landClaimingPlugin;
+    private Towny townyPlugin;
+    private boolean plotSquaredInstalled = false;
 
     private static Method GET_MATERIAL;
 
@@ -159,7 +164,26 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
             griefPreventionPlugin = (GriefPrevention) gp;
         }
-        if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null){
+        //Check for PlotSquared
+        Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
+        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)){
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
+            plotSquaredInstalled = true;
+        }
+        //Check for landClaiming
+        Plugin lp = getServer().getPluginManager().getPlugin("LandClaiming");
+        if (lp instanceof LandClaiming){
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - LandClaiming detected"));
+            landClaimingPlugin = (LandClaiming) lp;
+        }
+        //Check for Towny
+        Plugin tp = getServer().getPluginManager().getPlugin("Towny");
+        if (tp instanceof Towny){
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Towny detected"));
+            townyPlugin = (Towny) tp;
+        }
+        //If no compatible protection plugin is found, disable region restriction if it is on
+        if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null && !plotSquaredInstalled && landClaimingPlugin == null){
             getLogger().warning(I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin"));
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
@@ -198,6 +222,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public GriefPrevention getGriefPreventionPlugin() {
         return griefPreventionPlugin;
+    }
+
+    public LandClaiming getLandClaimingPlugin() {
+        return landClaimingPlugin;
+    }
+
+    public Towny getTownyPlugin() {
+        return townyPlugin;
+    }
+
+    public boolean isPlotSquaredInstalled() {
+        return plotSquaredInstalled;
     }
 
     @Override

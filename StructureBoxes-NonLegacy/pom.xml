@@ -9,14 +9,29 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>structureboxes-factions3</artifactId>
-    <name>StructureBoxes-Factions3</name>
-    <version>Factions3</version>
+    <artifactId>structureboxes-nonlegacy</artifactId>
+    <name>StructureBoxes-NonLegacy</name>
+    <version>NonLegacy</version>
     <packaging>jar</packaging>
     <repositories>
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <!-- PlotSquared repository -->
+        <repository>
+            <id>p2-repo</id>
+            <url>http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/</url>
+        </repository>
+        <!-- Jenkins4J -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <!-- WorldEdit -->
+        <repository>
+            <id>sk89q</id>
+            <url>http://maven.sk89q.com/repo/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -25,6 +40,7 @@
             <artifactId>bukkit</artifactId>
             <version>1.14.4-R0.1-SNAPSHOT</version>
         </dependency>
+        <!--MassiveCore 3 and Factions 3 APIs-->
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>MassiveCore</artifactId>
@@ -38,6 +54,12 @@
             <version>3.2.3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/Factions 3.2.3/Factions.jar</systemPath>
+        </dependency>
+        <!-- PlotSquared API -->
+        <dependency>
+            <groupId>com.github.intellectualsites.plotsquared</groupId>
+            <artifactId>PlotSquared-API</artifactId>
+            <version>latest</version>
         </dependency>
     </dependencies>
 

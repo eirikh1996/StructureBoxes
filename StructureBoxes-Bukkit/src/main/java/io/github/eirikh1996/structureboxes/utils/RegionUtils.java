@@ -5,6 +5,7 @@ import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.massivecore.ps.PS;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -12,6 +13,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
+import io.github.eirikh1996.structureboxes.settings.Settings;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -41,44 +43,31 @@ public class RegionUtils {
         boolean factions = false;
         boolean redprotect = false;
         boolean griefprevention = false;
+        boolean plotSquared = false;
+        boolean landClaiming = false;
+        boolean towny = false;
         StructureBoxes structureBoxes = StructureBoxes.getInstance();
         if (structureBoxes.getWorldGuardPlugin() != null){
-            ApplicableRegionSet regions;
-            if (GET_REGION_MANAGER != null){
-                RegionManager manager;
-                try {
-                    manager = (RegionManager) GET_REGION_MANAGER.invoke(structureBoxes.getWorldGuardPlugin(), location.getWorld());
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    manager = null;
-                    e.printStackTrace();
-                }
-                if (manager != null){
-                    try {
-                        regions = (ApplicableRegionSet) GET_APPLICABLE_REGIONS.invoke(manager, location);
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        regions = null;
-                    }
-                } else {
-                    regions = null;
-                }
-            } else {
-                regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(location.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-            }
-            worldguard = regions != null && regions.size() > 0;
+            worldguard = WorldGuardUtils.insideRegion(location);
         }
         if (structureBoxes.getFactionsPlugin() != null){
-            PS ps = PS.valueOf(location);
-            Faction faction = BoardColl.get().getFactionAt(ps);
-            factions = faction != FactionColl.get().getNone();
+            factions = FactionsUtils.withinRegion(location);
         }
         if (structureBoxes.getRedProtectPlugin() != null){
-            RedProtectAPI rpAPI = structureBoxes.getRedProtectPlugin().getAPI();
-            redprotect = rpAPI.getRegion(location) != null;
+            redprotect = RedProtectUtils.withinRegion(location);
         }
         if (structureBoxes.getGriefPreventionPlugin() != null){
-            GriefPrevention gp = structureBoxes.getGriefPreventionPlugin();
-            griefprevention = gp.dataStore.getClaimAt(location, false, null) != null;
+            griefprevention = GriefPreventionUtils.withinClaim(location);
         }
-        return worldguard || factions || redprotect || griefprevention;
+        if (structureBoxes.isPlotSquaredInstalled()){
+            plotSquared = Settings.IsLegacy ? PlotSquaredUtils.withinPlot(location) : PlotSquared4Utils.withinPlot(location);
+        }
+        if (structureBoxes.getLandClaimingPlugin() != null){
+            landClaiming = LandClaimingUtils.insideClaimedLand(location);
+        }
+        if (structureBoxes.getTownyPlugin() != null){
+            towny = TownyUtils.insideTownBlock(location);
+        }
+        return worldguard || factions || redprotect || griefprevention || plotSquared || landClaiming || towny;
     }
 }

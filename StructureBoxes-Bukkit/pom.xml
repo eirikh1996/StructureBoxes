@@ -21,6 +21,10 @@
         <id>redprotect-repo</id>
         <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
     </repository>
+    <repository>
+        <id>github-Towny</id>
+        <url>https://maven.pkg.github.com/TownyAdvanced/Towny/packages</url>
+    </repository>
 </repositories>
 
     <dependencies>
@@ -59,8 +63,8 @@
         </dependency>
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-factions3</artifactId>
-            <version>Factions3</version>
+            <artifactId>structureboxes-nonlegacy</artifactId>
+            <version>NonLegacy</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -95,6 +99,28 @@
             <version>LATEST</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/GriefPrevention.jar</systemPath>
+        </dependency>
+        <!-- PlotSquared legacy API -->
+        <dependency>
+            <groupId>com.plotsquared</groupId>
+            <artifactId>plotsquared-api</artifactId>
+            <version>latest</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>me.zombie_striker</groupId>
+            <artifactId>LandClaiming</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/LandClaiming.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.palmergames.bukkit.towny</groupId>
+            <artifactId>Towny</artifactId>
+            <version>0.95.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/Towny-0.95.0.0.jar</systemPath>
         </dependency>
     </dependencies>
     <build>

@@ -2,7 +2,6 @@ package io.github.eirikh1996.structureboxes.utils;
 
 import com.massivecraft.factions.entity.*;
 import com.massivecraft.massivecore.ps.PS;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -15,5 +14,10 @@ public class FactionsUtils {
             return true;
         }
         return f.isPermitted(MPerm.getPermBuild(), f.getRelationTo(mp));
+    }
+
+    public static boolean withinRegion(Location location){
+        return BoardColl.get().getFactionAt(PS.valueOf(location)) != FactionColl.get().getNone();
+
     }
 }

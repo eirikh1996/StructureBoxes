@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="StructureBoxes-Factions3" />
+        <module name="StructureBoxes-NonLegacy" />
         <module name="structureboxes-bukkit" />
         <module name="StructureBoxes-WE7" />
         <module name="StructureBoxes-WE6" />
@@ -18,9 +18,9 @@
       <module name="StructureBoxes" target="1.5" />
       <module name="StructureBoxes-API" target="7" />
       <module name="structureboxes-bukkit" target="1.8" />
-      <module name="StructureBoxes-Factions3" target="1.5" />
       <module name="structureboxes-main" target="1.8" />
-      <module name="structureboxes-sponge" target="1.5" />
+      <module name="StructureBoxes-NonLegacy" target="1.5" />
+      <module name="structureboxes-sponge" target="8" />
       <module name="StructureBoxes-Sponge" target="1.5" />
       <module name="StructureBoxes-WE6" target="1.8" />
       <module name="StructureBoxes-WE7" target="1.8" />
