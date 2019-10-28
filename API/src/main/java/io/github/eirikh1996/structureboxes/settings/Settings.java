@@ -16,7 +16,7 @@ public class Settings {
     public static List<String> AlternativePrefixes;
     public static boolean RestrictToRegionsEnabled;
     public static boolean RequirePermissionPerStructureBox;
-    public static ArrayList<String> RestrictToRegionsExceptions = new ArrayList<String>();
+    public static ArrayList<String> RestrictToRegionsExceptions = new ArrayList<>();
     public static ArrayList blocksToIgnore = new ArrayList();
     public static int MaxStructureSize;
     public static long MaxSessionTime;

@@ -85,6 +85,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
         ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
         Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
+        List<String> exceptions = restrictToRegions.getStringList("Exceptions");
+        if (!exceptions.isEmpty()){
+            Settings.RestrictToRegionsExceptions.addAll(exceptions);
+        }
         Settings.MaxSessionTime = getConfig().getLong("Max Session Time", 60);
         Settings.MaxStructureSize = getConfig().getInt("Max Structure Size", 10000);
         Settings.Debug = getConfig().getBoolean("Debug", false);
@@ -309,17 +313,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     private void saveLegacyConfig(){
+
         File configFile = new File(getDataFolder(), "config.yml");
         if (configFile.exists())
             return;
-        InputStream resource = getResource("config_legacy.yml");
-        Reader reader = new InputStreamReader(resource);
-        FileConfiguration config = YamlConfiguration.loadConfiguration(reader);
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        saveResource("config_legacy.yml", false);
+        File legacyConfigFile = new File(getDataFolder(), "config_legacy.yml");
+        legacyConfigFile.renameTo(configFile);
     }
 
     @Override

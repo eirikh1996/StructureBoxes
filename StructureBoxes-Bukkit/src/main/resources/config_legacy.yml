@@ -1,22 +1,23 @@
-Debug: false
-Structure Box Item: chest
-Structure Box Display Name: §6Structure Box
-Max Structure Size: 10000
+Debug: false #Debug mode
+Structure Box Item: chest #The item the structure box is. Must be a placable block
+Structure Box Display Name: '§6Structure Box' #Display names for structure boxes
+Max Structure Size: 10000 #Maximum allowed size of structures
 Max Session Time: 300 #Time in seconds
-Alternative Display Names:
+Place cooldown time: 10 #Time before players can place another structure box
+Alternative Display Names: #Other accepted display names. Useful if converting from similar plugins
   - SiB
-Structure Box Prefix: '§6Structure Box: '
-Alternative Prefixes:
+Structure Box Prefix: '§6Structure Box: ' #Prefix for schematic ID
+Alternative Prefixes: #Other accepted prefixes. Useful if converting from similar plugins
   - 'SiB: '
 Structure Box Instruction Message: '§bPlace in a free space to spawn a structure'
-Require permission per structure box: false
+Require permission per structure box: false #If enabled, players must have structureboxes.place.<schematic-ID> permission to place the structure
 #Determines if the structure box must be placed inside of a region of supported anti-griefing plugins
 Restrict to regions:
   Enabled: false
   Exceptions:
     - Merchantman
     - MM
-Free space:
+Free space: #Settings for free space check
   Require free space: true
   Blocks to ignore:
     - long_grass

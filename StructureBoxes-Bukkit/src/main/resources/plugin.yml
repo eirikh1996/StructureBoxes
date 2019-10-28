@@ -16,3 +16,6 @@ commands:
     aliases:
       - sb
     usage: /structurebox <create|reload|undo>
+permissions:
+  structureboxes.undo:
+    default: true

@@ -224,9 +224,6 @@ public class StructureBoxCommand implements TabExecutor {
                 }
             }
         }
-        if (strings.length == 0){
-            return subCmds;
-        }
         List<String> completions = new ArrayList<>();
         for (String arg : subCmds){
             if (!arg.startsWith(strings[0])){

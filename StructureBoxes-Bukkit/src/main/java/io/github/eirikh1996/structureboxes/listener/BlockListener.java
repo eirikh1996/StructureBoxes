@@ -81,15 +81,23 @@ public class BlockListener implements Listener {
         boolean exemptFromRegionRestriction = false;
         if (!Settings.RestrictToRegionsExceptions.isEmpty()){
             for (String exception : Settings.RestrictToRegionsExceptions){
-                if (!lore.get(0).contains(exception)){
+                if (exception == null){
                     continue;
                 }
-                exemptFromRegionRestriction = true;
-                break;
+                if (ChatColor.stripColor(lore.get(0)).toLowerCase().contains(exception.toLowerCase())){
+                    exemptFromRegionRestriction = true;
+                    break;
+                }
+
             }
         }
+        if (Settings.Debug){
+            Bukkit.broadcastMessage("Restrict to regions: " + Settings.RestrictToRegionsEnabled + " Outside region: " + !isWithinRegion(placed) + " Not Exempt: " + !exemptFromRegionRestriction + " unable to bypass : " + !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction"));
+        }
+
         if (Settings.RestrictToRegionsEnabled && !isWithinRegion(placed) && !exemptFromRegionRestriction && !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction")){
             event.getPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Must be within region"));
+            event.setCancelled(true);
             return;
         }
         if (Settings.Debug){
