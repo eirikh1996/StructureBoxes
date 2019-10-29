@@ -23,4 +23,5 @@ public class Settings {
 
     public static boolean Metrics;
     public static long PlaceCooldownTime;
+    public static boolean CheckFreeSpace;
 }

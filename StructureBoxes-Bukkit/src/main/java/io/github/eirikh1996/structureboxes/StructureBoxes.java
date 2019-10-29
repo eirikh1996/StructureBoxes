@@ -18,14 +18,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -118,6 +114,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             }
             Settings.blocksToIgnore.add(type);
         }
+        Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
         if (!I18nSupport.initialize()){
             return;
         }
@@ -305,6 +302,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
                 continue;
             }
+            if (!Settings.CheckFreeSpace){
+                continue;
+            }
             p.sendMessage(I18nSupport.getInternationalisedString("Place - No free space") );
             return false;
         }
@@ -340,4 +340,5 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
 
     }
+
 }

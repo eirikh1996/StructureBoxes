@@ -1,11 +1,16 @@
 package io.github.eirikh1996.structureboxes;
 
+import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import org.bstats.sponge.Metrics;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -15,6 +20,9 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.world.World;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +42,29 @@ public class StructureBoxes implements SBMain {
     private static StructureBoxes instance;
 
     @Inject private Logger logger;
+
+    @Inject
+    @DefaultConfig(sharedRoot = true)
+    private Path defaultConfig;
+
+    @Inject
+    @DefaultConfig(sharedRoot = true)
+    private @NonNull YAMLConfigurationLoader configManager = YAMLConfigurationLoader.builder().setPath(defaultConfig).build();
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private Path privateConfigDir;
+
+    @Inject
+    private SpongeWorldEdit worldEditPlugin;
+
+    @Inject
+    private WorldEditHandler worldEditHandler;
+    //private RedProtect redProtectPlugin;
+    //private GriefPrevention griefPreventionPlugin;
+    //private SessionTask sessionTask;
+    private boolean plotSquaredInstalled = false;
+    private Metrics metrics;
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event){

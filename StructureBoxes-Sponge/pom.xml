@@ -32,8 +32,13 @@
             <name>Sponge Maven Repository</name>
             <url>https://repo.spongepowered.org/maven</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.sk89q.com/repo</url>
+        </repository>
     </repositories>
     <dependencies>
+        <!--Sponge API-->
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
@@ -41,11 +46,23 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <!--StructureBoxes API-->
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
             <artifactId>structureboxes-api</artifactId>
             <version>API</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>3.6</version>
+        </dependency>
+        <!--WorldEdit-->
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-sponge</artifactId>
+            <version>7.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
