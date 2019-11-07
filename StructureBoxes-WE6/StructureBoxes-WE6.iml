@@ -23,7 +23,7 @@
     <orderEntry type="library" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:6.1.5" level="project" />
-    <orderEntry type="module" module-name="StructureBoxes-API" />
+    <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />

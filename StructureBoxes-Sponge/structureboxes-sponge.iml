@@ -25,12 +25,11 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.ben-manes.caffeine:guava:2.5.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:plugin-meta:0.4.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-hocon:3.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.typesafe:config:1.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-gson:3.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-math:1.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-noise:1.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm:5.2" level="project" />
-    <orderEntry type="module" module-name="StructureBoxes-API" />
+    <orderEntry type="library" name="Maven: io.github.eirikh1996:structureboxes-api:API" level="project" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-yaml:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-core:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
@@ -38,6 +37,35 @@
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-sponge:7.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:sponge:7.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.bstats:bstats-sponge:1.5" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/sponge/griefprevention-1.12.2-4.3.0.692.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.6.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.typesafe:config:1.3.4" level="project" />
+    <orderEntry type="module" module-name="StructureBoxes-WE7" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.13.2-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.8.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
+    <orderEntry type="module" module-name="StructureBoxes-Core" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Sponge-56:7.6.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:spongeapi:javadoc:6.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-hocon:3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-core:3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-gson:3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-yaml:3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.dynmap:DynmapCoreAPI:2.0" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />

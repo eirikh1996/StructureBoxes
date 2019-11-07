@@ -2,14 +2,18 @@ package io.github.eirikh1996.structureboxes.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
+import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,7 +28,6 @@ import java.util.UUID;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
-import static java.lang.Math.abs;
 
 public class BlockListener implements Listener {
     private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
@@ -100,22 +103,20 @@ public class BlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        ItemManager.getInstance().addItem(event.getPlayer().getUniqueId(), event.getItemInHand());
         if (Settings.Debug){
             Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
         final String schemID = schematicID;
 
-                if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed))){
+        StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed));
 
-                    event.setCancelled(true);
-                    return;
-                }
 
 
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        StructureManager.getInstance().removeStructure(StructureBoxes.getInstance().getWorldEditHandler().getStructureByPlayer(id));
+                        StructureManager.getInstance().removeStructure(StructureManager.getInstance().getStructureByPlayer(id));
                         loc.getBlock().setType(Material.AIR);
                     }
                 }.runTask(StructureBoxes.getInstance());

@@ -14,4 +14,5 @@ public interface SBMain {
     void sendMessageToPlayer(UUID recipient, String message);
     Logger getLogger();
     void clearInterior(ArrayList<Location> interior);
+    void addItemToPlayerInventory(UUID id, Object item);
 }

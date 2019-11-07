@@ -9,7 +9,7 @@
     <name>StructureBoxes-Parent</name>
     <version>Parent</version>
     <modules>
-        <module>API</module>
+        <module>StructureBoxes-Core</module>
         <module>StructureBoxes-WE6</module>
         <module>StructureBoxes-Bukkit</module>
         <module>StructureBoxes-Sponge</module>

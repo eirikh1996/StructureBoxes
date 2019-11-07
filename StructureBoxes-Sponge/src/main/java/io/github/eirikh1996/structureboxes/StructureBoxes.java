@@ -1,12 +1,17 @@
 package io.github.eirikh1996.structureboxes;
 
+import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
+import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
+import io.github.eirikh1996.structureboxes.compat.we7.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import me.ryanhamshire.griefprevention.GriefPrevention;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.bstats.sponge.Metrics;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.config.ConfigDir;
@@ -19,9 +24,6 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.world.World;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +43,11 @@ public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
 
-    @Inject private Logger logger;
+    @Inject
+    private Logger logger;
 
     @Inject
+    @NotNull
     @DefaultConfig(sharedRoot = true)
     private Path defaultConfig;
 
@@ -55,13 +59,12 @@ public class StructureBoxes implements SBMain {
     @ConfigDir(sharedRoot = false)
     private Path privateConfigDir;
 
-    @Inject
-    private SpongeWorldEdit worldEditPlugin;
 
-    @Inject
-    private WorldEditHandler worldEditHandler;
-    //private RedProtect redProtectPlugin;
-    //private GriefPrevention griefPreventionPlugin;
+
+    @Inject private SpongeWorldEdit worldEditPlugin;
+    WorldEditHandler worldEditHandler;
+    @Inject(optional = true) private RedProtect redProtectPlugin;
+    @Inject(optional = true) private GriefPrevention griefPreventionPlugin;
     //private SessionTask sessionTask;
     private boolean plotSquaredInstalled = false;
     private Metrics metrics;
@@ -74,7 +77,11 @@ public class StructureBoxes implements SBMain {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event){
+        if (redProtectPlugin != null){
 
+        }
+        worldEditPlugin.getWorkingDir();
+        worldEditHandler = new IWorldEditHandler(worldEditPlugin.getWorkingDir(), this);
     }
 
     public WorldEditHandler getWorldEditHandler() {

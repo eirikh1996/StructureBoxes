@@ -5,10 +5,12 @@ import com.massivecraft.factions.Factions;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import io.github.eirikh1996.structureboxes.async.AsyncManager;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.updater.UpdateCommandProcessor;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
@@ -19,14 +21,18 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -64,7 +70,16 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         String packageName = getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf(".") + 1);
         Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
-        saveResource("localisation/lang_en.properties", false);
+        final String[] LOCALES = {"en", "no", "it"};
+        for (String locale : LOCALES){
+            final File langFile = new File(getDataFolder().getAbsolutePath() + "/localisation/lang_" + locale + ".properties");
+            if (langFile.exists()){
+                continue;
+            }
+            saveResource("localisation/lang_" + locale + ".properties", false);
+        }
+
+
         if (Settings.IsLegacy){
             saveLegacyConfig();
         } else {
@@ -115,7 +130,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.blocksToIgnore.add(type);
         }
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
-        if (!I18nSupport.initialize()){
+        if (!I18nSupport.initialize(getDataFolder())){
             return;
         }
         worldEditPlugin = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
@@ -193,11 +208,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
-        if (Settings.Metrics){
-            metrics = new Metrics(this);
-        }
+        metrics = new Metrics(this);
+        getServer().getScheduler().runTaskTimerAsynchronously(this, AsyncManager.getInstance(), 0, 1);
+        getServer().getScheduler().runTaskTimer(this, UpdateCommandProcessor.getInstance(), 0, 1);
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
-        this.getCommand("structurebox").setTabCompleter(new StructureBoxCommand());
         sessionTask = new SessionTask();
         sessionTask.runTaskTimerAsynchronously(this, 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
@@ -339,6 +353,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 }
 
 
+    }
+
+    @Override
+    public void addItemToPlayerInventory(UUID id, Object item) {
+        Bukkit.getPlayer(id).getInventory().addItem((ItemStack) item);
     }
 
 }

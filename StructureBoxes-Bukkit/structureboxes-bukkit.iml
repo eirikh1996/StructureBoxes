@@ -23,7 +23,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
-    <orderEntry type="module" module-name="StructureBoxes-API" />
+    <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="module" module-name="StructureBoxes-WE6" />
     <orderEntry type="module" module-name="StructureBoxes-WE7" />
     <orderEntry type="module" module-name="StructureBoxes-NonLegacy" />
@@ -42,7 +42,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/MassiveCore.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/MassiveCore.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -51,7 +51,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:Factions:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/Factions.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/Factions.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -67,7 +67,7 @@
     <orderEntry type="module-library">
       <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/GriefPrevention.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/GriefPrevention.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -85,7 +85,7 @@
     <orderEntry type="module-library">
       <library name="Maven: me.zombie_striker:LandClaiming:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/LandClaiming.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/LandClaiming.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -94,7 +94,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.palmergames.bukkit.towny:Towny:0.95.0.0">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/Towny-0.95.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/Towny-0.95.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

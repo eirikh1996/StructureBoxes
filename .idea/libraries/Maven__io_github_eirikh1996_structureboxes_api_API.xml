@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Maven: io.github.eirikh1996:structureboxes-api:API">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/io/github/eirikh1996/structureboxes-api/API/structureboxes-api-API.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/StructureBoxes-Core/structureboxes-api-API-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/io/github/eirikh1996/structureboxes-api/API/structureboxes-api-API-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/StructureBoxes-Core/structureboxes-api-API-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/io/github/eirikh1996/structureboxes-api/API/structureboxes-api-API-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

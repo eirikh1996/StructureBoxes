@@ -46,14 +46,14 @@
             <artifactId>MassiveCore</artifactId>
             <version>3.2.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/Factions 3.2.3/MassiveCore.jar</systemPath>
+            <systemPath>${project.basedir}/../libs/bukkit/Factions 3.2.3/MassiveCore.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.massivecraft</groupId>
             <artifactId>Factions</artifactId>
             <version>3.2.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/Factions 3.2.3/Factions.jar</systemPath>
+            <systemPath>${project.basedir}/../libs/bukkit/Factions 3.2.3/Factions.jar</systemPath>
         </dependency>
         <!-- PlotSquared API -->
         <dependency>

@@ -9,6 +9,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class StructureManager implements Iterable<ArrayList<Location>> {
     private final Set<ArrayList<Location>> locationSets = new HashSet<>();
+    protected Map<UUID, ArrayList<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
     private StructureManager() {}
 
@@ -71,6 +72,13 @@ public class StructureManager implements Iterable<ArrayList<Location>> {
         return StructureManagerHolder.instance;
     }
 
+    public ArrayList<Location> getStructureByPlayer(UUID id){
+        return structurePlayerMap.get(id);
+    }
+
+    public void addStructureByPlayer(UUID id, ArrayList<Location> structure){
+        structurePlayerMap.put(id, structure);
+    }
     private static class StructureManagerHolder{
         static StructureManager instance = new StructureManager();
     }

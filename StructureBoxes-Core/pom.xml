@@ -6,19 +6,20 @@
         <artifactId>structureboxes-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
         <version>Parent</version>
+        <relativePath>/../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>structureboxes-api</artifactId>
-    <name>StructureBoxes-API</name>
-    <version>API</version>
+    <artifactId>structureboxes-core</artifactId>
+    <name>StructureBoxes-Core</name>
+    <version>Core</version>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>7</source>
-                    <target>7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

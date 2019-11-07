@@ -19,7 +19,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:3.2.3">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/Factions 3.2.3/MassiveCore.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/Factions 3.2.3/MassiveCore.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:Factions:3.2.3">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/Factions 3.2.3/Factions.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/Factions 3.2.3/Factions.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
