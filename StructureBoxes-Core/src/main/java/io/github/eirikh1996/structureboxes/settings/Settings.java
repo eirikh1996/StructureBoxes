@@ -10,7 +10,6 @@ public class Settings {
     public static boolean Debug;
     public static Object StructureBoxItem;
     public static String StructureBoxLore;
-    public static List<String> AlternativeDisplayNames;
     public static String StructureBoxPrefix;
     public static String StructureBoxInstruction;
     public static List<String> AlternativePrefixes;
@@ -24,4 +23,5 @@ public class Settings {
     public static boolean Metrics;
     public static long PlaceCooldownTime;
     public static boolean CheckFreeSpace;
+    public static boolean RestrictToRegionsEntireStructure;
 }

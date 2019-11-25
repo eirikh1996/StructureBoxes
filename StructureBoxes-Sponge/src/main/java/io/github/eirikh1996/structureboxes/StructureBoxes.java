@@ -8,13 +8,9 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import me.ryanhamshire.griefprevention.GriefPrevention;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.bstats.sponge.Metrics;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -25,8 +21,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.world.World;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -38,7 +33,8 @@ import java.util.logging.Logger;
                 @Dependency(id = "worldedit"),
                 @Dependency(id = "redprotect", optional = true),
                 @Dependency(id = "worldguard", optional = true),
-                @Dependency(id = "griefprevention", optional = true)})
+                @Dependency(id = "griefprevention", optional = true),
+                @Dependency(id = "plotsquared", optional = true)})
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
@@ -47,19 +43,12 @@ public class StructureBoxes implements SBMain {
     private Logger logger;
 
     @Inject
-    @NotNull
-    @DefaultConfig(sharedRoot = true)
-    private Path defaultConfig;
+    @DefaultConfig(sharedRoot = false)
+    private Path configDir;
 
-    @Inject
-    @DefaultConfig(sharedRoot = true)
-    private @NonNull YAMLConfigurationLoader configManager = YAMLConfigurationLoader.builder().setPath(defaultConfig).build();
-
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path privateConfigDir;
-
-
+    public Path getConfigDir() {
+        return configDir;
+    }
 
     @Inject private SpongeWorldEdit worldEditPlugin;
     WorldEditHandler worldEditHandler;
@@ -88,11 +77,16 @@ public class StructureBoxes implements SBMain {
         return null;
     }
 
+    @Override
+    public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
+        return false;
+    }
+
     public Platform getPlatform() {
         return Platform.SPONGE;
     }
 
-    public boolean isFreeSpace(UUID playerID, String schematicName, List<Location> locations) {
+    public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
         Player p = Sponge.getServer().getPlayer(playerID).get();
         for (Location loc : locations){
             org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
@@ -112,10 +106,30 @@ public class StructureBoxes implements SBMain {
         return logger;
     }
 
-    public void clearInterior(ArrayList<Location> interior) {
+    public void clearInterior(Collection<Location> interior) {
         for (Location loc : interior){
 
         }
+    }
+
+    @Override
+    public void addItemToPlayerInventory(UUID id, Object item) {
+
+    }
+
+    @Override
+    public void scheduleSyncTask(Runnable runnable) {
+
+    }
+
+    @Override
+    public void scheduleAsyncTask(Runnable runnable) {
+
+    }
+
+    @Override
+    public void broadcast(String s) {
+
     }
 
     public static synchronized StructureBoxes getInstance() {

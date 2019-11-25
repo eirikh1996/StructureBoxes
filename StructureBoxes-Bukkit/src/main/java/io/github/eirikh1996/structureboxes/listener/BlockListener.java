@@ -32,21 +32,19 @@ import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegi
 public class BlockListener implements Listener {
     private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent event){
         if (event.isCancelled()){
             return;
         }
         final UUID id = event.getPlayer().getUniqueId();
         if (!event.getBlockPlaced().getType().equals(Settings.StructureBoxItem) &&
+        event.getItemInHand().getItemMeta() == null ||
         !event.getItemInHand().getItemMeta().hasLore()){
             return;
         }
-        if (!event.getItemInHand().getItemMeta().getDisplayName().equals(Settings.StructureBoxLore) &&
-                !Settings.AlternativeDisplayNames.contains(ChatColor.stripColor(event.getItemInHand().getItemMeta().getDisplayName()))){
-            return;
-        }
         List<String> lore = event.getItemInHand().getItemMeta().getLore();
+        assert lore != null;
         String schematicID = ChatColor.stripColor(lore.get(0));
         if (!schematicID.startsWith(ChatColor.stripColor(Settings.StructureBoxPrefix))){
             boolean hasAlternativePrefix = false;

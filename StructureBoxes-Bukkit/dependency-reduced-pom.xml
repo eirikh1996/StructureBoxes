@@ -39,6 +39,7 @@
               <artifactSet>
                 <includes>
                   <include>io.github.eirikh1996:structureboxes*</include>
+                  <include>org.bstats:bstats-bukkit</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -121,12 +122,6 @@
       <artifactId>RedProtect-Spigot</artifactId>
       <version>LATEST</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.bstats</groupId>
-      <artifactId>bstats-bukkit</artifactId>
-      <version>1.5</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.sk89q.worldedit</groupId>

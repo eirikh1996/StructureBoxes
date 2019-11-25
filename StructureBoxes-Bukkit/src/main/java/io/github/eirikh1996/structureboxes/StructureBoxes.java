@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -90,12 +90,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
         Settings.StructureBoxInstruction = getConfig().getString("Structure Box Instruction Message", "§bPlace structure box in a free space to spawn a structure");
-        Settings.AlternativeDisplayNames = getConfig().getStringList("Alternative Display Names");
         Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
         Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
         Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
         ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
         Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
+        Settings.RestrictToRegionsEntireStructure = restrictToRegions.getBoolean("Entire structure", false);
         List<String> exceptions = restrictToRegions.getStringList("Exceptions");
         if (!exceptions.isEmpty()){
             Settings.RestrictToRegionsExceptions.addAll(exceptions);
@@ -268,19 +268,43 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     @Override
+    public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
+        boolean withinRegion = true;
+        for (Location loc : locations){
+            if (RegionUtils.isWithinRegion(MathUtils.sb2BukkitLoc(loc))){
+                continue;
+            }
+            withinRegion = false;
+        }
+        boolean exempt = false;
+        for (String exception : Settings.RestrictToRegionsExceptions){
+            if (!schematicID.contains(exception)){
+                continue;
+            }
+            exempt = true;
+        }
+        final Player player = getServer().getPlayer(playerID);
+        if (!withinRegion && !exempt && Settings.RestrictToRegionsEntireStructure && !player.hasPermission("structureboxes.bypassregionrestriction")){
+            player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Structure must be in region"));
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Platform getPlatform() {
         return Platform.BUKKIT;
     }
 
     @Override
-    public boolean isFreeSpace(UUID playerID, String schematicName, List<Location> locations) {
+    public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
         final HashMap<Location, Object> originalBlocks = new HashMap<>();
         @NotNull final Player p = getServer().getPlayer(playerID);
         for (Location location : locations){
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             if (Settings.Debug) {
-                world.spawnParticle(Particle.VILLAGER_ANGRY, bukkitLoc, 10);
+                world.spawnParticle(Particle.VILLAGER_ANGRY, bukkitLoc, 1);
             }
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
@@ -319,7 +343,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             if (!Settings.CheckFreeSpace){
                 continue;
             }
-            p.sendMessage(I18nSupport.getInternationalisedString("Place - No free space") );
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No free space") );
             return false;
         }
         StructureManager.getInstance().addStructureByPlayer(playerID, schematicName, originalBlocks);
@@ -342,7 +366,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     @Override
-    public void clearInterior(ArrayList<Location> interior) {
+    public void clearInterior(Collection<Location> interior) {
                 for (Location location : interior){
                     org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
                     //ignore air blocks
@@ -358,6 +382,21 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void addItemToPlayerInventory(UUID id, Object item) {
         Bukkit.getPlayer(id).getInventory().addItem((ItemStack) item);
+    }
+
+    @Override
+    public void scheduleSyncTask(final Runnable runnable) {
+        getServer().getScheduler().runTask(this, runnable);
+    }
+
+    @Override
+    public void scheduleAsyncTask(final Runnable runnable) {
+        getServer().getScheduler().runTaskAsynchronously(this, runnable);
+    }
+
+    @Override
+    public void broadcast(String s) {
+        getServer().broadcastMessage(s);
     }
 
 }

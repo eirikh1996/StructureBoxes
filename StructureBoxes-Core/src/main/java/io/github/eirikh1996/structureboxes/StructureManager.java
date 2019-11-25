@@ -7,14 +7,14 @@ import java.util.*;
 
 import static java.lang.System.currentTimeMillis;
 
-public class StructureManager implements Iterable<ArrayList<Location>> {
-    private final Set<ArrayList<Location>> locationSets = new HashSet<>();
-    protected Map<UUID, ArrayList<Location>> structurePlayerMap = new HashMap<>();
+public class StructureManager implements Iterable<Collection<Location>> {
+    private final Set<Collection<Location>> locationSets = new HashSet<>();
+    private Map<UUID, Collection<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
     private StructureManager() {}
 
     public boolean isPartOfStructure(Location location){
-        for (ArrayList<Location> locationSet : locationSets){
+        for (Collection<Location> locationSet : locationSets){
             if (!locationSet.contains(location)){
                 continue;
             }
@@ -55,28 +55,28 @@ public class StructureManager implements Iterable<ArrayList<Location>> {
 
     }
 
-    public void addStructure(ArrayList<Location> structure){
+    public void addStructure(Collection<Location> structure){
         locationSets.add(structure);
     }
 
-    public void removeStructure(ArrayList<Location> structure){
+    public void removeStructure(Collection<Location> structure){
         locationSets.remove(structure);
     }
 
     @Override
-    public Iterator<ArrayList<Location>> iterator() {
-        return Collections.unmodifiableSet(locationSets).iterator();
+    public Iterator<Collection<Location>> iterator() {
+        return Collections.unmodifiableCollection(locationSets).iterator();
     }
 
     public static synchronized StructureManager getInstance(){
         return StructureManagerHolder.instance;
     }
 
-    public ArrayList<Location> getStructureByPlayer(UUID id){
+    public Collection<Location> getStructureByPlayer(UUID id){
         return structurePlayerMap.get(id);
     }
 
-    public void addStructureByPlayer(UUID id, ArrayList<Location> structure){
+    public void addStructureByPlayer(UUID id, Collection<Location> structure){
         structurePlayerMap.put(id, structure);
     }
     private static class StructureManagerHolder{

@@ -14,6 +14,10 @@ Require permission per structure box: false #If enabled, players must have struc
 #Determines if the structure box must be placed inside of a region of supported anti-griefing plugins
 Restrict to regions:
   Enabled: false
+  #Determines if the entire structure or just the placement loc should be within a region
+  Entire structure: false
+  #If the schematic ID linked to a structure box contains any of the strings listed here,
+  #it can be placed outside regions if region restriction is enabled
   Exceptions:
     - Merchantman
     - MM

@@ -53,8 +53,8 @@
         <!--StructureBoxes API-->
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-api</artifactId>
-            <version>API</version>
+            <artifactId>structureboxes-core</artifactId>
+            <version>Core</version>
             <type>jar</type>
         </dependency>
         <dependency>

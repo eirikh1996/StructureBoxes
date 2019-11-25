@@ -27,8 +27,20 @@ public final class Location {
         return new Location(loc.getWorld(), getX() + loc.getX(), getY() + loc.getY(), getZ() + loc.getZ());
     }
 
+    public Location add(Vector loc){
+        return add(loc.getX(), loc.getY(), loc.getZ());
+    }
+
     public Location subtract(Location loc){
         return new Location(loc.getWorld(), getX() - loc.getX(), getY() - loc.getY(), getZ() - loc.getZ());
+    }
+
+    public Location subtract(Vector loc){
+        return subtract(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    private Location subtract(int x, int y, int z) {
+        return new Location(getWorld(), getX() - x, getY() - y, getZ() - z);
     }
 
     public UUID getWorld() {

@@ -16,6 +16,7 @@ import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
+import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
@@ -25,9 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.Math.PI;
 
@@ -92,6 +91,7 @@ public class IWorldEditHandler extends WorldEditHandler {
 
     @Override
     public boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
+        final long start = System.currentTimeMillis();
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard);
         AffineTransform transform = new AffineTransform();
@@ -101,7 +101,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         builder.ignoreAirBlocks(true);
         BlockVector3 to = BlockVector3.at(pasteLoc.getX(), pasteLoc.getY(), pasteLoc.getZ());
         builder.to(to);
-        final ArrayList<Location> structureLocs = new ArrayList<Location>();
+        final Set<Location> structureLocs = new HashSet<>();
         int minX = clipboard.getMinimumPoint().getBlockX();
         int minY = clipboard.getMinimumPoint().getBlockY();
         int minZ = clipboard.getMinimumPoint().getBlockZ();
@@ -111,35 +111,56 @@ public class IWorldEditHandler extends WorldEditHandler {
         BlockVector3 offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
         Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
-
+        final Set<Location> invertedStructure = new HashSet<>();
+        Location min = minPoint.rotate(theta, pasteLoc.toSBloc());
+        Location max = minPoint.add(xLength, yLength, zLength).rotate(theta, pasteLoc.toSBloc());
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
+                    Location loc = minPoint.add(x, y, z).rotate(theta, pasteLoc.toSBloc());
                     BaseBlock baseBlock = clipboard.getFullBlock(BlockVector3.at(minX + x, minY + y, minZ + z));
                     if (baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:cave_air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:void_air")){
+                        invertedStructure.add(loc);
                         continue;
                     }
-                    Location loc = minPoint.add(x, y, z);
 
-                    structureLocs.add(loc.rotate(theta, pasteLoc.toSBloc()));
+
+                    structureLocs.add(loc);
                 }
             }
         }
-        final ArrayList<Location> exterior = CollectionUtils.exterior(structureLocs);
-        final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
-        final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
-        if (!sbMain.isFreeSpace(playerID, schematicName, structureLocs)){
+        Collection<Location> exterior = CollectionUtils.exterior(min, max, invertedStructure, structureLocs);
 
+
+        final Collection<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
+        if (!sbMain.isFreeSpace(playerID, schematicName, structureLocs)){
+            return false;
+        }
+
+        if (!sbMain.structureWithinRegion(playerID, schematicName, structureLocs)){
             return false;
         }
         StructureManager.getInstance().addStructure(structureLocs);
-        try {
-            Operations.complete(builder.build());
-            sbMain.clearInterior(interior);
-        } catch (WorldEditException e) {
-            e.printStackTrace();
+        if (Settings.Debug){
+            final long end = System.currentTimeMillis();
+            sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
         }
-        StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
+        sbMain.scheduleSyncTask(() -> {
+            final long startTime = System.currentTimeMillis();
+            try {
+                Operations.complete(builder.build());
+                sbMain.clearInterior(interior);
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+            }
+            StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
+            if (Settings.Debug){
+                final long end = System.currentTimeMillis();
+                sbMain.broadcast("Structure placement took (ms): " + (end - startTime));
+            }
+        });
+
+
         return true;
     }
 
@@ -162,6 +183,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         }
         return count;
     }
+
 
 
 

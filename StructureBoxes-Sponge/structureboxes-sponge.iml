@@ -29,7 +29,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-math:1.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-noise:1.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm:5.2" level="project" />
-    <orderEntry type="library" name="Maven: io.github.eirikh1996:structureboxes-api:API" level="project" />
+    <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-yaml:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-core:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
@@ -58,7 +58,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.8.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
-    <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Sponge-56:7.6.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:spongeapi:javadoc:6.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-hocon:3.2" level="project" />

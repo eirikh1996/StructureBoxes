@@ -25,9 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.Math.PI;
 
@@ -94,36 +92,37 @@ public class IWorldEditHandler extends WorldEditHandler {
         builder.ignoreAirBlocks(true);
         Vector to = new Vector(pasteLoc.getX(), pasteLoc.getY(), pasteLoc.getZ());
         builder.to(to);
-        final ArrayList<Location> structureLocs = new ArrayList<Location>();
+        final Set<Location> structureLocs = new HashSet<>();
         int minX = clipboard.getMinimumPoint().getBlockX();
         int minY = clipboard.getMinimumPoint().getBlockY();
         int minZ = clipboard.getMinimumPoint().getBlockZ();
         int xLength = clipboard.getDimensions().getBlockX();
         int yLength = clipboard.getDimensions().getBlockY();
         int zLength = clipboard.getDimensions().getBlockZ();
-        Location min = new Location(pasteLoc.getWorldID(), minX, minY, minZ);
-        Location max = new Location(pasteLoc.getWorldID(), minX + xLength, minY + yLength, minZ + zLength);
 
+        Set<Location> invertedStructure = new HashSet<>();
         Vector offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
         Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
-
+        Location min = minPoint.add(0, 0, 0);
+        Location max = minPoint.add(xLength, yLength, zLength);
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
+                    Location loc = minPoint.add(x, y, z);
                     BaseBlock baseBlock = clipboard.getBlock(new Vector(minX + x, minY + y, minZ + z));
                     if (baseBlock.getType() == 0){
+                        invertedStructure.add(loc);
                         continue;
                     }
-                    Location loc = minPoint.add(x, y, z);
+
 
                     structureLocs.add(loc.rotate(theta, pasteLoc.toSBloc()));
                 }
             }
         }
-        final ArrayList<Location> exterior = CollectionUtils.exterior(structureLocs);
-        final ArrayList<Location> invertedStructure = CollectionUtils.invert(structureLocs);
-        final ArrayList<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
+        final Collection<Location> exterior = CollectionUtils.exterior(min, max, invertedStructure, structureLocs);
+        final Collection<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
         structureLocs.addAll(interior);
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
@@ -139,7 +138,7 @@ public class IWorldEditHandler extends WorldEditHandler {
             e.printStackTrace();
             return false;
         }
-        structurePlayerMap.put(playerID, structureLocs);
+        StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
 
         return true;
     }

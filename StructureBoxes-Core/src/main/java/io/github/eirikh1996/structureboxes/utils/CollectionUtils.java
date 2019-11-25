@@ -4,9 +4,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class CollectionUtils {
     public static ArrayList<Location> boundingBox(@NotNull final Location min, @NotNull final Location max){
@@ -29,23 +28,20 @@ public class CollectionUtils {
         return rotated;
     }
 
-    public static ArrayList<Location> filter(ArrayList<Location> locations, ArrayList<Location> filter){
-        final ArrayList<Location> filtered = new ArrayList<>();
-        for (final Location loc : locations){
-            if (filter.contains(loc)){
+    public static <E> Collection<E> filter(Collection<E> collection, Collection<E> filter){
+        final HashSet<E> filtered = new HashSet<>();
+        for (final E e : collection){
+            if (filter.contains(e)){
                 continue;
             }
-            filtered.add(loc);
+            filtered.add(e);
         }
         return filtered;
     }
 
     @Contract(pure = true)
-    public static synchronized ArrayList<Location> exterior(ArrayList<Location> structure){
+    public static ArrayList<Location> exterior(Location min, Location max, Collection<Location> invertedStructure, Collection<Location> structure){
         final ArrayList<Location> exterior = new ArrayList<>();
-        final Location min = Location.min(structure);
-        final Location max = Location.max(structure);
-        final ArrayList<Location> invertedStructure = filter(boundingBox(min, max), structure);
         for (int y = min.getY(); y <= max.getY() ; y++){
             for (int x = min.getX() ; x <= max.getX() ; x++){
                 Location minTest = new Location(min.getWorld(), x, y, min.getZ());
@@ -110,9 +106,24 @@ public class CollectionUtils {
         return exterior;
     }
 
-    public static synchronized ArrayList<Location> invert(ArrayList<Location> structure){
-        final Location min = Location.min(structure);
-        final Location max = Location.max(structure);
-        return filter(boundingBox(min, max), structure);
+    public static Collection<Location> neighbors(Collection<Location> structure, Location node){
+        final ArrayList<Location> ret = new ArrayList<>();
+        for (Vector shift : SHIFTS){
+            Location test = node.add(shift);
+            if (!structure.contains(test)){
+                continue;
+            }
+            ret.add(test);
+        }
+        return ret;
     }
+
+
+    private static final Vector[] SHIFTS = {
+            new Vector(0, -1, 0),
+            new Vector(1, 0, 0),
+            new Vector(-1, 0, 0),
+            new Vector(0, 0, 1),
+            new Vector(0, 0, -1)
+    };
 }
