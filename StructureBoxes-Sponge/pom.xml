@@ -84,8 +84,8 @@
             </dependency>
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-we7</artifactId>
-            <version>WE7</version>
+            <artifactId>structureboxes-we6</artifactId>
+            <version>WE6</version>
             <type>jar</type>
         </dependency>
             <dependency>
