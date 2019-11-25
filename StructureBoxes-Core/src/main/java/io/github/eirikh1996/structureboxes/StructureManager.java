@@ -7,7 +7,7 @@ import java.util.*;
 
 import static java.lang.System.currentTimeMillis;
 
-public class StructureManager implements Iterable<Collection<Location>> {
+public class StructureManager implements Iterable<Collection<Location>>, Runnable {
     private final Set<Collection<Location>> locationSets = new HashSet<>();
     private Map<UUID, Collection<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
@@ -22,15 +22,21 @@ public class StructureManager implements Iterable<Collection<Location>> {
         }
         return false;
     }
-    public void processRemovalOfSavedStructures(UUID id){
-        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> pairLinkedList = playerTimeStructureMap.get(id);
-        if (pairLinkedList == null || pairLinkedList.isEmpty()){
+    private void processRemovalOfSavedStructures(){
+        if (playerTimeStructureMap.isEmpty()){
             return;
         }
-        long timeStamp = pairLinkedList.getLast().getKey();
-        if (currentTimeMillis() - timeStamp > Settings.MaxSessionTime * 1000){
-            pairLinkedList.pollLast();
+        for (UUID id : playerTimeStructureMap.keySet()){
+            LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> pairLinkedList = playerTimeStructureMap.get(id);
+            if (pairLinkedList == null || pairLinkedList.isEmpty()){
+                return;
+            }
+            long timeStamp = pairLinkedList.getLast().getKey();
+            if (currentTimeMillis() - timeStamp > Settings.MaxSessionTime * 1000){
+                pairLinkedList.pollLast();
+            }
         }
+
     }
 
     public AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> getLatestStructure(UUID playerID){
@@ -79,6 +85,12 @@ public class StructureManager implements Iterable<Collection<Location>> {
     public void addStructureByPlayer(UUID id, Collection<Location> structure){
         structurePlayerMap.put(id, structure);
     }
+
+    @Override
+    public void run() {
+        processRemovalOfSavedStructures();
+    }
+
     private static class StructureManagerHolder{
         static StructureManager instance = new StructureManager();
     }

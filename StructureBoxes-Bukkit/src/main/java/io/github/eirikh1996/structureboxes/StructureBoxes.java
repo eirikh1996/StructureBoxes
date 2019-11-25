@@ -44,7 +44,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private Factions factionsPlugin;
     private RedProtect redProtectPlugin;
     private GriefPrevention griefPreventionPlugin;
-    private SessionTask sessionTask;
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
@@ -86,6 +85,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             saveDefaultConfig();
         }
         Settings.locale = getConfig().getString("Locale", "en");
+        Settings.Metrics = getConfig().getBoolean("Metrics", true);
         Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
@@ -212,14 +212,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().getScheduler().runTaskTimerAsynchronously(this, AsyncManager.getInstance(), 0, 1);
         getServer().getScheduler().runTaskTimer(this, UpdateCommandProcessor.getInstance(), 0, 1);
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
-        sessionTask = new SessionTask();
-        sessionTask.runTaskTimerAsynchronously(this, 0, 20);
+        getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
     }
 
     @Override
     public void onDisable(){
-        sessionTask.cancel();
+        getServer().getScheduler().cancelTasks(this);
     }
 
     public static StructureBoxes getInstance(){

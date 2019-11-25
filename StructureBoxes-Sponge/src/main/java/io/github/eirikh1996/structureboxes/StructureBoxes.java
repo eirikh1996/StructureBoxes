@@ -24,6 +24,7 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
 import java.io.IOException;
@@ -60,7 +61,8 @@ public class StructureBoxes implements SBMain {
     private WorldEditHandler worldEditHandler;
     @Inject(optional = true) private RedProtect redProtectPlugin;
     @Inject(optional = true) private GriefPrevention griefPreventionPlugin;
-    //private SessionTask sessionTask;
+
+    private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
     private Metrics metrics;
 
@@ -155,12 +157,12 @@ public class StructureBoxes implements SBMain {
 
     @Override
     public void scheduleSyncTask(Runnable runnable) {
-
+        taskBuilder.execute(runnable);
     }
 
     @Override
     public void scheduleAsyncTask(Runnable runnable) {
-
+        taskBuilder.async().execute(runnable);
     }
 
     @Override
