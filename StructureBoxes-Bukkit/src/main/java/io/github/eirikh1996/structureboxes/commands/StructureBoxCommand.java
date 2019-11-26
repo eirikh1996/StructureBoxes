@@ -6,12 +6,9 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.BlockUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import javafx.util.Pair;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -115,7 +112,7 @@ public class StructureBoxCommand implements TabExecutor {
         }
         final Player p = (Player) sender;
         if (!p.hasPermission("structureboxes.undo")){
-            sender.sendMessage(I18nSupport.getInternationalisedString("Command - No permission"));
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
         AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> stringStructurePair = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
@@ -134,7 +131,7 @@ public class StructureBoxCommand implements TabExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-
+                final long start = System.currentTimeMillis();
                 for (Location location : locationMaterialHashMap.keySet()){
                     final Material origType = (Material) locationMaterialHashMap.get(location);
                     Block b = MathUtils.sb2BukkitLoc(location).getBlock();
@@ -145,6 +142,10 @@ public class StructureBoxCommand implements TabExecutor {
                     b.setType(origType);
                 }
                 StructureManager.getInstance().removeStructure(structure);
+                if (Settings.Debug){
+                    final long end = System.currentTimeMillis();
+                    Bukkit.broadcastMessage("Undo took (ms): " + (end - start));
+                }
             }
         }.runTask(StructureBoxes.getInstance());
 
@@ -157,16 +158,18 @@ public class StructureBoxCommand implements TabExecutor {
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
-        boolean fullInventory = true;
-        for (ItemStack iStack : p.getInventory()){
-            if (iStack == null){
+        boolean fullInventory = p.getInventory().firstEmpty() == -1;;
+        Collection<? extends ItemStack> foundBoxes = p.getInventory().all(structureBox).values();
+        if (!foundBoxes.isEmpty()){
+            for (ItemStack box : foundBoxes){
+                if (box.getAmount() == structureBox.getMaxStackSize()){
+                    continue;
+                }
                 fullInventory = false;
-                break;
-            } else if (iStack.equals(structureBox) && iStack.getAmount() < structureBox.getMaxStackSize()){
-                fullInventory = false;
-                break;
             }
         }
+
+
         if (fullInventory){
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space"));
             p.getWorld().dropItem(p.getLocation(), structureBox);

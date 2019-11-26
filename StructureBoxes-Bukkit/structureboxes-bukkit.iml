@@ -100,6 +100,15 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: org.redcastlemedia.multitallented:Civs:1.5.8">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/civs-1.5.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />

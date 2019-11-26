@@ -136,6 +136,14 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/bukkit/Towny-0.95.0.0.jar</systemPath>
         </dependency>
+        <!--Civs-->
+        <dependency>
+            <groupId>org.redcastlemedia.multitallented</groupId>
+            <artifactId>Civs</artifactId>
+            <version>1.5.8</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/civs-1.5.8.jar</systemPath>
+        </dependency>
         <!--bStats-->
         <dependency>
             <groupId>org.bstats</groupId>

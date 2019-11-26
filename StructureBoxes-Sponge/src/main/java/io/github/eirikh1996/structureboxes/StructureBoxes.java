@@ -14,16 +14,19 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.bstats.sponge.Metrics;
+import org.bstats.sponge.Metrics2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
@@ -31,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -48,9 +52,8 @@ public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
 
-    @Inject
-    private Logger logger;
-    private Path configDir;
+    @Inject private Logger logger;
+    @Inject @DefaultConfig(sharedRoot = false) private Path configDir;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
 
     public Path getConfigDir() {
@@ -58,13 +61,15 @@ public class StructureBoxes implements SBMain {
     }
 
     @Inject private SpongeWorldEdit worldEditPlugin;
+    @Inject private PluginManager pluginManager;
+    @Inject private PluginContainer plugin;
     private WorldEditHandler worldEditHandler;
-    @Inject(optional = true) private RedProtect redProtectPlugin;
-    @Inject(optional = true) private GriefPrevention griefPreventionPlugin;
+    private Optional<RedProtect> redProtectPlugin;
+    private Optional<GriefPrevention> griefPreventionPlugin;
 
     private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
-    private Metrics metrics;
+    @Inject private Metrics2 metrics;
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) throws IOException {
@@ -72,9 +77,7 @@ public class StructureBoxes implements SBMain {
 
 
 
-        Sponge.getAssetManager().getAsset("structureboxes.conf").get().copyToDirectory(configDir, false, true);
-
-
+        plugin.getAsset("structureboxes.conf").get().copyToFile(configDir, false, true);
         loader = HoconConfigurationLoader.builder().setPath(getConfigDir()).build();
 
         final ConfigurationNode node = loader.load();
@@ -97,9 +100,10 @@ public class StructureBoxes implements SBMain {
             e.printStackTrace();
         }
 
-
-        if (redProtectPlugin != null){
+        Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
+        if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
             logger.info("RedProtect found");
+            redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
         }
         worldEditPlugin.getWorkingDir();
         worldEditHandler = new IWorldEditHandler(worldEditPlugin.getWorkingDir(), this);

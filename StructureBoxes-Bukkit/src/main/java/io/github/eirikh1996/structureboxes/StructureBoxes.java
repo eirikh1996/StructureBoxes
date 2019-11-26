@@ -5,12 +5,10 @@ import com.massivecraft.factions.Factions;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import io.github.eirikh1996.structureboxes.async.AsyncManager;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.updater.UpdateCommandProcessor;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
@@ -209,8 +207,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
         metrics = new Metrics(this);
-        getServer().getScheduler().runTaskTimerAsynchronously(this, AsyncManager.getInstance(), 0, 1);
-        getServer().getScheduler().runTaskTimer(this, UpdateCommandProcessor.getInstance(), 0, 1);
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
         getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
