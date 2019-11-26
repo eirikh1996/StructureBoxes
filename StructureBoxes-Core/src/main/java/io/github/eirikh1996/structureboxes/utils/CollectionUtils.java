@@ -42,7 +42,8 @@ public class CollectionUtils {
     @Contract(pure = true)
     public static ArrayList<Location> exterior(Location min, Location max, Collection<Location> invertedStructure, Collection<Location> structure){
         final ArrayList<Location> exterior = new ArrayList<>();
-        for (int y = min.getY(); y <= max.getY() ; y++){
+
+        /*for (int y = min.getY(); y <= max.getY() ; y++){
             for (int x = min.getX() ; x <= max.getX() ; x++){
                 Location minTest = new Location(min.getWorld(), x, y, min.getZ());
                 if (!invertedStructure.contains(minTest)){
@@ -102,12 +103,12 @@ public class CollectionUtils {
                     maxTest = maxTest.add(0, 0, -1);
                 }
             }
-        }
+        }*/
         return exterior;
     }
 
     public static Collection<Location> neighbors(Collection<Location> structure, Location node){
-        final ArrayList<Location> ret = new ArrayList<>();
+        final Collection<Location> ret = new HashSet<>();
         for (Vector shift : SHIFTS){
             Location test = node.add(shift);
             if (!structure.contains(test)){

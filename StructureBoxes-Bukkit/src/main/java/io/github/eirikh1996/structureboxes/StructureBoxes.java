@@ -27,10 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -206,7 +203,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
-        metrics = new Metrics(this);
+        if (Settings.Metrics) {
+            metrics = new Metrics(this);
+        }
+
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
         getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
@@ -279,6 +279,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             exempt = true;
         }
         final Player player = getServer().getPlayer(playerID);
+        if (Settings.Debug){
+            Bukkit.broadcastMessage("Within region: " + withinRegion);
+            Bukkit.broadcastMessage("Exempt: " + exempt);
+            Bukkit.broadcastMessage("Can bypass: " + player.hasPermission("structureboxes.bypassregionrestriction"));
+            Bukkit.broadcastMessage("Entire structure enabled: " + Settings.RestrictToRegionsEntireStructure);
+        }
         if (!withinRegion && !exempt && Settings.RestrictToRegionsEntireStructure && !player.hasPermission("structureboxes.bypassregionrestriction")){
             player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Structure must be in region"));
             return false;

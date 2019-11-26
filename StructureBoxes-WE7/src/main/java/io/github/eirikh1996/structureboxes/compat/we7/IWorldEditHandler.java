@@ -114,22 +114,59 @@ public class IWorldEditHandler extends WorldEditHandler {
         final Set<Location> invertedStructure = new HashSet<>();
         Location min = minPoint.rotate(theta, pasteLoc.toSBloc());
         Location max = minPoint.add(xLength, yLength, zLength).rotate(theta, pasteLoc.toSBloc());
+        final ArrayList<Collection<Location>> surfaces = new ArrayList<>(5);
+        for (int i = 0 ; i <= 4 ; i++){
+            surfaces.add(i, new HashSet<>());
+        }
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
                     Location loc = minPoint.add(x, y, z).rotate(theta, pasteLoc.toSBloc());
+                    if (x == 0){
+                        surfaces.get(0).add(loc);
+                    }
+                    if (x == xLength){
+                        surfaces.get(1).add(loc);
+                    }
+                    if (y == 0){
+                        surfaces.get(2).add(loc);
+                    }
+                    if (z == 0){
+                        surfaces.get(3).add(loc);
+                    }
+                    if (z == xLength){
+                        surfaces.get(4).add(loc);
+                    }
                     BaseBlock baseBlock = clipboard.getFullBlock(BlockVector3.at(minX + x, minY + y, minZ + z));
                     if (baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:cave_air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:void_air")){
                         invertedStructure.add(loc);
                         continue;
                     }
-
-
                     structureLocs.add(loc);
                 }
             }
         }
-        Collection<Location> exterior = CollectionUtils.exterior(min, max, invertedStructure, structureLocs);
+        final Collection<Location> exterior = new HashSet<>();
+        for (Collection<Location> surface : surfaces){
+            exterior.addAll(surface);
+        }
+        Collection<Location> confirmed = new HashSet<>();
+        for (Location exteriorLoc : exterior){
+            Collection<Location> visited = new HashSet<>();
+            Queue<Location> queue = new LinkedList<>();
+            queue.add(exteriorLoc);
+            while (!queue.isEmpty()){
+                Location node = queue.poll();
+                for (Location neighbor : CollectionUtils.neighbors(invertedStructure, node)){
+                    if (confirmed.contains(neighbor) || visited.contains(neighbor)){
+                        continue;
+                    }
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+            confirmed.addAll(visited);
+        }
 
 
         final Collection<Location> interior = CollectionUtils.filter(invertedStructure, exterior);
