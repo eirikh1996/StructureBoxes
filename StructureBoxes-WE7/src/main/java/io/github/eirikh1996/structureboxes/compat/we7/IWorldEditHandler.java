@@ -20,38 +20,27 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.PI;
 
 public class IWorldEditHandler extends WorldEditHandler {
-    private final File weDataFolder;
+    private final File schemDir;
     private final SBMain sbMain;
-    public IWorldEditHandler(File weDataFolder, SBMain sbMain){
-        this.weDataFolder = weDataFolder;
+    public IWorldEditHandler(File schemDir, SBMain sbMain){
+        this.schemDir = schemDir;
         this.sbMain = sbMain;
     }
     @Override
     public Clipboard loadClipboardFromSchematic(World world, String schematicName) {
-        File weConfig = new File(weDataFolder, "config.yml");
-        Yaml yaml = new Yaml();
-        final Map<String, Object> data;
-        try {
-            data = (Map<String, Object>) yaml.load(new FileInputStream(weConfig));
-        } catch (FileNotFoundException e) {
-            throw new WorldEditConfigException("Failed to load WorldEdit config", e);
-        }
-        String schematicDirectory = ((Map<String, String>) data.get("saving")).get("dir");
-        String path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
+        String path = schemDir.getAbsolutePath() + "/" + schematicName + ".schematic";
         File schematicFile = new File(path);
         if (!schematicFile.exists()){
-            path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schem";
+            path = schemDir.getAbsolutePath() + "/" + schematicName + ".schem";
             schematicFile = new File(path);
         }
         if (!schematicFile.exists()){

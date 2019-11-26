@@ -30,6 +30,7 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.World;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -106,12 +107,15 @@ public class StructureBoxes implements SBMain {
             redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
         }
         worldEditPlugin.getWorkingDir();
-        worldEditHandler = new IWorldEditHandler(worldEditPlugin.getWorkingDir(), this);
+
     }
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event){
-
+    public void onServerStart(GameStartedServerEvent event) throws IOException {
+        final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(worldEditPlugin.getWorkingDir().toPath()).build();
+        ConfigurationNode weNode = weLoader.load();
+        File schemDir = new File(worldEditPlugin.getWorkingDir(), weNode.getNode("saving").getNode("dir").getString());
+        worldEditHandler = new IWorldEditHandler(schemDir, this);
 
     }
 

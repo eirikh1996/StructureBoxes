@@ -23,8 +23,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -142,11 +145,24 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         int index = weVersion.indexOf(".");
 
         int versionNumber = Integer.parseInt(weVersion.substring(0, index));
+        final Map data;
+        try {
+            File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config.yml");
+            Yaml yaml = new Yaml();
+            data = yaml.load(new FileInputStream(weConfig));
+        } catch (IOException e){
+            getLogger().severe(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        File schemDir = new File(getWorldEditPlugin().getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
+
         //Check if there is a compatible version of WorldEdit
         try {
             final Class weHandler = Class.forName("io.github.eirikh1996.structureboxes.compat.we" + versionNumber + ".IWorldEditHandler");
             if (WorldEditHandler.class.isAssignableFrom(weHandler)){
-                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(File.class, SBMain.class).newInstance(getWorldEditPlugin().getDataFolder(), this);
+                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(File.class, SBMain.class).newInstance(schemDir , this);
             }
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             getLogger().severe(I18nSupport.getInternationalisedString("Startup - Unsupported WorldEdit"));

@@ -6,7 +6,6 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -16,39 +15,30 @@ import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
+import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.PI;
 
 public class IWorldEditHandler extends WorldEditHandler {
-    private final File weDataFolder;
+    private final File schemDir;
     private final SBMain sbMain;
-    public IWorldEditHandler(File weDataFolder, SBMain sbMain){
-        this.weDataFolder = weDataFolder;
+    public IWorldEditHandler(File schemDir, SBMain sbMain){
+        this.schemDir = schemDir;
         this.sbMain = sbMain;
     }
     @Override
     public Clipboard loadClipboardFromSchematic(World world, String schematicName) {
-        File weConfig = new File(weDataFolder, "config.yml");
-        Yaml yaml = new Yaml();
-        final Map<String, Object> data;
-        try {
-            data = (Map<String, Object>) yaml.load(new FileInputStream(weConfig));
-        } catch (FileNotFoundException e) {
-            throw new WorldEditConfigException("Failed to load WorldEdit config", e);
-        }
-        String schematicDirectory = ((Map<String, String>) data.get("saving")).get("dir");
-        String path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
-        File schematicFile = new File(path);
+
+        //String path = weDataFolder.getAbsolutePath() + "/" + schematicDirectory + "/" + schematicName + ".schematic";
+        File schematicFile = new File(schemDir, schematicName + ".schematic");
         Clipboard clipboard;
         ClipboardFormat format = ClipboardFormat.findByFile(schematicFile);
         try {
@@ -83,6 +73,7 @@ public class IWorldEditHandler extends WorldEditHandler {
 
     @Override
     public boolean pasteClipboard(UUID playerID, String schematicName, Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
+        final long start = System.currentTimeMillis();
         World world = pasteLoc.getWorld();
         ClipboardHolder holder = new ClipboardHolder(clipboard, world.getWorldData());
         AffineTransform transform = new AffineTransform();
@@ -172,15 +163,24 @@ public class IWorldEditHandler extends WorldEditHandler {
             return false;
         }
         StructureManager.getInstance().addStructure(structureLocs);
-        try {
-            Operation op = builder.build();
-            Operations.complete(op);
-            sbMain.clearInterior(interior);
-        } catch (WorldEditException e) {
-            e.printStackTrace();
-            return false;
+        if (Settings.Debug){
+            final long end = System.currentTimeMillis();
+            sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
         }
-        StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
+        sbMain.scheduleSyncTask(() -> {
+            final long startTime = System.currentTimeMillis();
+            try {
+                Operations.complete(builder.build());
+                sbMain.clearInterior(interior);
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+            }
+            StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
+            if (Settings.Debug){
+                final long end = System.currentTimeMillis();
+                sbMain.broadcast("Structure placement took (ms): " + (end - startTime));
+            }
+        });
 
         return true;
     }
