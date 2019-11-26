@@ -83,7 +83,7 @@ public class StructureBoxCommand implements TabExecutor {
             return true;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
-        if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
+        if (Settings.MaxStructureSize > -1 && StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
             return true;
         }

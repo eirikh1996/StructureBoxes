@@ -226,6 +226,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
         getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
+        getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
+        UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000);
     }
 
     @Override
