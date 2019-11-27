@@ -293,6 +293,9 @@ public class StructureBoxCommand implements TabExecutor {
                 || type.equals(Material.LADDER)
                 || type.name().endsWith("_DOOR")
                 || type.name().equals("TRAP_DOOR")
-                || type.name().endsWith("_TRAPDOOR");
+                || type.name().endsWith("_TRAPDOOR")
+                || type.name().endsWith("_BUTTON")
+                || type.name().endsWith("_PRESSURE_PLATE")
+                || type.equals(Material.LEVER);
     }
 }
