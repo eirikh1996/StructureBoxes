@@ -93,6 +93,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         } else if (object instanceof List) {
             List list = (List) object;
             for (Object i : list) {
+                if (i == null)
+                    continue;
                 Settings.StructureBoxInstruction.add((String) i);
             }
         }
@@ -246,6 +248,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void onDisable(){
         getServer().getScheduler().cancelTasks(this);
+        UpdateChecker.getInstance().cancel();
     }
 
     public static StructureBoxes getInstance(){

@@ -97,7 +97,7 @@ public class StructureBoxCommand implements TabExecutor {
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
-        lore.add(Settings.StructureBoxInstruction);
+        lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         player.getInventory().addItem(structureBox);
@@ -106,6 +106,7 @@ public class StructureBoxCommand implements TabExecutor {
     }
 
     private boolean undoCommand(CommandSender sender){
+        final long start = System.currentTimeMillis();
         if (!(sender instanceof Player)){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Must Be Player"));
             return true;
@@ -126,35 +127,70 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
-        final ArrayList<Location> structure = new ArrayList<>(locationMaterialHashMap.keySet());
-        StructureManager.getInstance().addStructure(structure);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                final long start = System.currentTimeMillis();
-                for (Location location : locationMaterialHashMap.keySet()){
-                    final Material origType = (Material) locationMaterialHashMap.get(location);
-                    Block b = MathUtils.sb2BukkitLoc(location).getBlock();
-                    if (b.getState() instanceof InventoryHolder){
-                        InventoryHolder holder = (InventoryHolder) b.getState();
-                        holder.getInventory().clear();
-                    }
-                    b.setType(origType);
-                }
-                StructureManager.getInstance().removeStructure(structure);
-                if (Settings.Debug){
-                    final long end = System.currentTimeMillis();
-                    Bukkit.broadcastMessage("Undo took (ms): " + (end - start));
-                }
+        final HashSet<Location> structure = new HashSet<>(locationMaterialHashMap.keySet());
+        final List<Collection<Location>> sections = new ArrayList<>();
+        for (int i = 0 ; i <= structure.size() / 12000; i++){
+            sections.add(new HashSet<>());
+        }
+        int index = 0;
+        int count = 0;
+        Collection<Location> fragileBlocks = new HashSet<>();
+        for (Location location : structure){
+            sections.get(index).add(location);
+            if (isFragileBlock(MathUtils.sb2BukkitLoc(location).getBlock().getType())) {
+                fragileBlocks.add(location);
+                continue;
             }
-        }.runTask(StructureBoxes.getInstance());
+            count++;
+            if (count >= 12000){
+                index++;
+                count = 0;
+            }
+
+        }
+        StructureManager.getInstance().addStructure(structure);
+
+        final Queue<Collection<Location>> locationQueue = new LinkedList<>(sections);
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!fragileBlocks.isEmpty()){
+                        for (Location location : fragileBlocks) {
+                            Block b = MathUtils.sb2BukkitLoc(location).getBlock();
+                            final Material origType = (Material) locationMaterialHashMap.get(location);
+                            b.setType(origType);
+                        }
+                    }
+                    Collection<Location> poll = locationQueue.poll();
+                    if (poll == null){
+                        return;
+                    }
+                    for (Location location : poll){
+                        final Material origType = (Material) locationMaterialHashMap.get(location);
+                        Block b = MathUtils.sb2BukkitLoc(location).getBlock();
+                        if (b.getState() instanceof InventoryHolder){
+                            InventoryHolder holder = (InventoryHolder) b.getState();
+                            holder.getInventory().clear();
+                        }
+                        b.setType(origType);
+
+                    }
+                    if (locationQueue.isEmpty()){
+                        cancel();
+                    }
+                }
+
+            }.runTaskTimer(StructureBoxes.getInstance(), 0, 3);
+
+
 
         ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
         List<String> lore = new ArrayList<>();
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
-        lore.add(Settings.StructureBoxInstruction);
+        lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
@@ -176,6 +212,11 @@ public class StructureBoxCommand implements TabExecutor {
             return true;
         }
         p.getInventory().addItem(structureBox);
+        StructureManager.getInstance().removeStructure(structure);
+        if (Settings.Debug){
+            final long end = System.currentTimeMillis();
+            Bukkit.broadcastMessage("Undo took (ms): " + (end - start));
+        }
         return true;
 
 
@@ -232,5 +273,26 @@ public class StructureBoxCommand implements TabExecutor {
             completions.add(arg);
         }
         return completions;
+    }
+
+    private boolean isFragileBlock(Material type) {
+        return type.name().endsWith("_TORCH")
+                || type.name().endsWith("_WALL_TORCH")
+                || type.name().endsWith("_TORCH_ON")
+                || type.name().endsWith("_TORCH_OFF")
+                || type.name().equalsIgnoreCase("DIODE")
+                || type.equals(Material.COMPARATOR)
+                || type.name().endsWith("_COMPARATOR_ON")
+                || type.name().endsWith("_COMPARATOR_OFF")
+                || type.equals(Material.REPEATER)
+                || type.equals(Material.REDSTONE_WIRE)
+                || type.name().endsWith("CARPET")
+                || type.name().endsWith("LAVA")
+                || type.name().endsWith("WATER")
+                || type.name().endsWith("SIGN")
+                || type.equals(Material.LADDER)
+                || type.name().endsWith("_DOOR")
+                || type.name().equals("TRAP_DOOR")
+                || type.name().endsWith("_TRAPDOOR");
     }
 }
