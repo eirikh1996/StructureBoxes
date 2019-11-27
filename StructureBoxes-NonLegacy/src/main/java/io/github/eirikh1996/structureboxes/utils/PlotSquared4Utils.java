@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class PlotSquared4Utils {
-    public static boolean canBuild(Player player, Location location){
+    private static Map<String, Object> worlds;
+
+    public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
         final File worldsFile = new File(ps.getDirectory(), "config/worlds.yml");
         Yaml yaml = new Yaml();
@@ -27,7 +29,11 @@ public class PlotSquared4Utils {
         } catch (FileNotFoundException e) {
             throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
-        final Map<String, Object> worlds = (Map<String, Object>) data.get("worlds");
+        worlds = (Map<String, Object>) data.get("worlds");
+    }
+
+    public static boolean canBuild(Player player, Location location){
+
         if (worlds == null || !worlds.containsKey(location.getWorld().getName())){
             return true;
         }
@@ -47,16 +53,6 @@ public class PlotSquared4Utils {
     }
 
     public static boolean withinPlot(Location location){
-        final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
-        final File worldsFile = new File(ps.getDirectory(), "config/worlds.yml");
-        Yaml yaml = new Yaml();
-        final Map data;
-        try {
-            data = yaml.load(new FileInputStream(worldsFile));
-        } catch (FileNotFoundException e) {
-            throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
-        }
-        final Map<String, Object> worlds = (Map<String, Object>) data.get("worlds");
         if (worlds == null || !worlds.containsKey(location.getWorld().getName())){
             return false;
         }

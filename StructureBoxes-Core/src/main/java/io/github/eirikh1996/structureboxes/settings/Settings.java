@@ -13,7 +13,7 @@ public class Settings {
     public static Object StructureBoxItem;
     public static String StructureBoxLore;
     public static String StructureBoxPrefix;
-    public static String StructureBoxInstruction;
+    public static List<String> StructureBoxInstruction;
     public static List<String> AlternativePrefixes;
     public static boolean RestrictToRegionsEnabled;
     public static boolean RequirePermissionPerStructureBox;

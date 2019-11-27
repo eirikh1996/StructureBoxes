@@ -87,7 +87,15 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
-        Settings.StructureBoxInstruction = getConfig().getString("Structure Box Instruction Message", "§bPlace structure box in a free space to spawn a structure");
+        Object object = getConfig().get("Structure Box Instruction Message");
+        if (object instanceof String){
+            Settings.StructureBoxInstruction.add((String) object);
+        } else if (object instanceof List) {
+            List list = (List) object;
+            for (Object i : list) {
+                Settings.StructureBoxInstruction.add((String) i);
+            }
+        }
         Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
         Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
         Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
@@ -199,6 +207,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
         if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
+            if (Settings.IsLegacy) {
+                PlotSquaredUtils.initialize();
+            } else {
+                PlotSquared4Utils.initialize();
+            }
             plotSquaredInstalled = true;
         }
         //Check for landClaiming

@@ -5,6 +5,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
+import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
@@ -21,6 +22,8 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
@@ -73,15 +76,20 @@ public class StructureBoxes implements SBMain {
     @Inject private Metrics2 metrics;
 
     @Listener
-    public void onServerStarting(GameStartingServerEvent event) throws IOException {
+    public void onGameLoaded(GameLoadCompleteEvent event) throws IOException {
         instance = this;
 
 
-
+        final String[] LOCALES = {"en", "no", "it"};
+        for (String locale : LOCALES){
+            plugin.getAsset("localisation/lang_" + locale + ".properties").get().copyToDirectory(configDir, false, true);
+        }
         plugin.getAsset("structureboxes.conf").get().copyToFile(configDir, false, true);
         loader = HoconConfigurationLoader.builder().setPath(getConfigDir()).build();
 
         final ConfigurationNode node = loader.load();
+        Settings.locale = node.getNode("Locale").getString("en");
+        Settings.Metrics = node.getNode("Metrics").getBoolean(false);
         //Read free space
         final ConfigurationNode freeSpaceNode = node.getNode("Free space");
         Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
@@ -93,20 +101,33 @@ public class StructureBoxes implements SBMain {
 
         //Read restrict to regions section
         final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
-            Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
-            Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
+        Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
+        Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
         try {
             Settings.RestrictToRegionsExceptions = restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList());
         } catch (ObjectMappingException e) {
             e.printStackTrace();
         }
+    }
+
+    @Listener
+    public void onServerAboutToStart(GameAboutToStartServerEvent event) {
+        I18nSupport.initialize(getConfigDir().toFile());
+    }
+
+
+    @Listener
+    public void onServerStarting(GameStartingServerEvent event) {
+
 
         Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
         if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
             logger.info("RedProtect found");
             redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
         }
-        worldEditPlugin.getWorkingDir();
+        Optional<PluginContainer> griefprevention = pluginManager.getPlugin("griefprevention");
+        if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent())
+            griefPreventionPlugin = (Optional<GriefPrevention>) griefprevention.get().getInstance();
 
     }
 
