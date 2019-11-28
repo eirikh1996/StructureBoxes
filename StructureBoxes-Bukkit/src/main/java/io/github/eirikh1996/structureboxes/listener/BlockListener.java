@@ -107,7 +107,10 @@ public class BlockListener implements Listener {
         }
         final String schemID = schematicID;
 
-        StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed));
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed))) {
+            event.setCancelled(true);
+            return;
+        }
 
 
 

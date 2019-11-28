@@ -19,6 +19,7 @@ import org.bstats.sponge.Metrics2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -67,6 +68,7 @@ public class StructureBoxes implements SBMain {
     @Inject private SpongeWorldEdit worldEditPlugin;
     @Inject private PluginManager pluginManager;
     @Inject private PluginContainer plugin;
+    @Inject private ConfigManager configManager;
     private WorldEditHandler worldEditHandler;
     private Optional<RedProtect> redProtectPlugin;
     private Optional<GriefPrevention> griefPreventionPlugin;
@@ -76,38 +78,47 @@ public class StructureBoxes implements SBMain {
     @Inject private Metrics2 metrics;
 
     @Listener
-    public void onGameLoaded(GameLoadCompleteEvent event) throws IOException {
+    public void onGameLoaded(GameLoadCompleteEvent event) {
         instance = this;
 
 
         final String[] LOCALES = {"en", "no", "it"};
         for (String locale : LOCALES){
-            plugin.getAsset("localisation/lang_" + locale + ".properties").get().copyToDirectory(configDir, false, true);
+            try {
+                plugin.getAsset("localisation/lang_" + locale + ".properties").get().copyToDirectory(configDir, false, true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        plugin.getAsset("structureboxes.conf").get().copyToFile(configDir, false, true);
+        try {
+            plugin.getAsset("structureboxes.conf").get().copyToFile(configDir, false, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         loader = HoconConfigurationLoader.builder().setPath(getConfigDir()).build();
 
-        final ConfigurationNode node = loader.load();
-        Settings.locale = node.getNode("Locale").getString("en");
-        Settings.Metrics = node.getNode("Metrics").getBoolean(false);
-        //Read free space
-        final ConfigurationNode freeSpaceNode = node.getNode("Free space");
-        Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
+        final ConfigurationNode node;
         try {
+            node = loader.load();
+            Settings.locale = node.getNode("Locale").getString("en");
+            Settings.Metrics = node.getNode("Metrics").getBoolean(false);
+            //Read free space
+            final ConfigurationNode freeSpaceNode = node.getNode("Free space");
+            Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
+
             Settings.blocksToIgnore.addAll(freeSpaceNode.getNode("Blocks to ignore").getList(TypeToken.of(BlockType.class), Collections.emptyList()));
-        } catch (ObjectMappingException e) {
+
+
+            //Read restrict to regions section
+            final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
+            Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
+            Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
+            Settings.RestrictToRegionsExceptions = restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList());
+        } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
 
-        //Read restrict to regions section
-        final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
-        Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
-        Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
-        try {
-            Settings.RestrictToRegionsExceptions = restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList());
-        } catch (ObjectMappingException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Listener
@@ -133,7 +144,7 @@ public class StructureBoxes implements SBMain {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) throws IOException {
-        final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(worldEditPlugin.getWorkingDir().toPath()).build();
+        final ConfigurationLoader<CommentedConfigurationNode> weLoader = configManager.getPluginConfig(worldEditPlugin).getConfig();
         ConfigurationNode weNode = weLoader.load();
         File schemDir = new File(worldEditPlugin.getWorkingDir(), weNode.getNode("saving").getNode("dir").getString());
         worldEditHandler = new IWorldEditHandler(schemDir, this);

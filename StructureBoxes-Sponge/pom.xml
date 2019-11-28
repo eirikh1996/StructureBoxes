@@ -29,6 +29,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
+                                    <include>org.bstats:bstats-sponge</include>
                                     <include>io.github.eirikh1996:structureboxes*</include>
                                 </includes>
                             </artifactSet>

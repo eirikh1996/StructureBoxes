@@ -129,7 +129,7 @@ public class StructureBoxCommand implements TabExecutor {
         }
         final HashSet<Location> structure = new HashSet<>(locationMaterialHashMap.keySet());
         final List<Collection<Location>> sections = new ArrayList<>();
-        for (int i = 0 ; i <= structure.size() / 12000; i++){
+        for (int i = 0 ; i <= structure.size() / 30000; i++){
             sections.add(new HashSet<>());
         }
         int index = 0;
@@ -142,7 +142,7 @@ public class StructureBoxCommand implements TabExecutor {
                 continue;
             }
             count++;
-            if (count >= 12000){
+            if (count >= 30000){
                 index++;
                 count = 0;
             }
@@ -155,13 +155,6 @@ public class StructureBoxCommand implements TabExecutor {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!fragileBlocks.isEmpty()){
-                        for (Location location : fragileBlocks) {
-                            Block b = MathUtils.sb2BukkitLoc(location).getBlock();
-                            final Material origType = (Material) locationMaterialHashMap.get(location);
-                            b.setType(origType);
-                        }
-                    }
                     Collection<Location> poll = locationQueue.poll();
                     if (poll == null){
                         return;
@@ -177,6 +170,7 @@ public class StructureBoxCommand implements TabExecutor {
 
                     }
                     if (locationQueue.isEmpty()){
+                        StructureManager.getInstance().removeStructure(structure);
                         cancel();
                     }
                 }
@@ -212,7 +206,7 @@ public class StructureBoxCommand implements TabExecutor {
             return true;
         }
         p.getInventory().addItem(structureBox);
-        StructureManager.getInstance().removeStructure(structure);
+
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
             Bukkit.broadcastMessage("Undo took (ms): " + (end - start));

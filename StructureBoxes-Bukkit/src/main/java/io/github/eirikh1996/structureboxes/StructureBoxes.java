@@ -46,6 +46,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
     private Metrics metrics;
+    private boolean startup = true;
 
     private static Method GET_MATERIAL;
 
@@ -239,16 +240,19 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
-        getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
+
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
-        UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000);
+        if (startup){
+            getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
+            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000);
+            startup = false;
+        }
+
     }
 
     @Override
     public void onDisable(){
-        getServer().getScheduler().cancelTasks(this);
-        UpdateChecker.getInstance().cancel();
     }
 
     public static StructureBoxes getInstance(){
