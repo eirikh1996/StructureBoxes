@@ -196,5 +196,12 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/../libs/bukkit/civs-1.5.8.jar</systemPath>
     </dependency>
+    <dependency>
+      <groupId>me.angeschossen</groupId>
+      <artifactId>LandsAPI</artifactId>
+      <version>LATEST</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../libs/bukkit/LandsAPI.jar</systemPath>
+    </dependency>
   </dependencies>
 </project>

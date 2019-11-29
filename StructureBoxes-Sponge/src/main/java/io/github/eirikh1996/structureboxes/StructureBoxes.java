@@ -4,7 +4,6 @@ import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
-import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
@@ -19,6 +18,7 @@ import org.bstats.sponge.Metrics2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
@@ -58,7 +58,8 @@ public class StructureBoxes implements SBMain {
     private static StructureBoxes instance;
 
     @Inject private Logger logger;
-    @Inject @DefaultConfig(sharedRoot = false) private Path configDir;
+    @Inject @DefaultConfig(sharedRoot = false) private Path defaultConfig;
+    @Inject @ConfigDir(sharedRoot = false) private Path configDir;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
 
     public Path getConfigDir() {
@@ -84,18 +85,21 @@ public class StructureBoxes implements SBMain {
 
         final String[] LOCALES = {"en", "no", "it"};
         for (String locale : LOCALES){
+            if (!new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
+                continue;
+            }
             try {
-                plugin.getAsset("localisation/lang_" + locale + ".properties").get().copyToDirectory(configDir, false, true);
+                plugin.getAsset("/localisation/lang_" + locale + ".properties").get().copyToFile(configDir, false, true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         try {
-            plugin.getAsset("structureboxes.conf").get().copyToFile(configDir, false, true);
+            plugin.getAsset("structureboxes.conf").get().copyToFile(defaultConfig, false, true);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        loader = HoconConfigurationLoader.builder().setPath(getConfigDir()).build();
+        loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
 
         final ConfigurationNode node;
         try {
@@ -143,11 +147,16 @@ public class StructureBoxes implements SBMain {
     }
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event) throws IOException {
-        final ConfigurationLoader<CommentedConfigurationNode> weLoader = configManager.getPluginConfig(worldEditPlugin).getConfig();
+    public void onServerStart(GameStartedServerEvent event)  {
+        logger.info("Structure Boxes config path");
+        logger.info(configDir.getParent().toString());
+        logger.info(configDir.toString());
+
+        /*final ConfigurationLoader<CommentedConfigurationNode> weLoader = configManager.getPluginConfig(worldEditPlugin).getConfig();
         ConfigurationNode weNode = weLoader.load();
+
         File schemDir = new File(worldEditPlugin.getWorkingDir(), weNode.getNode("saving").getNode("dir").getString());
-        worldEditHandler = new IWorldEditHandler(schemDir, this);
+        worldEditHandler = new IWorldEditHandler(schemDir, this);*/
 
     }
 
@@ -212,6 +221,10 @@ public class StructureBoxes implements SBMain {
 
     public static synchronized StructureBoxes getInstance() {
         return instance;
+    }
+
+    private void readConfig() throws Exception {
+
     }
 
 }

@@ -134,13 +134,8 @@ public class StructureBoxCommand implements TabExecutor {
         }
         int index = 0;
         int count = 0;
-        Collection<Location> fragileBlocks = new HashSet<>();
         for (Location location : structure){
             sections.get(index).add(location);
-            if (isFragileBlock(MathUtils.sb2BukkitLoc(location).getBlock().getType())) {
-                fragileBlocks.add(location);
-                continue;
-            }
             count++;
             if (count >= 30000){
                 index++;
@@ -267,29 +262,5 @@ public class StructureBoxCommand implements TabExecutor {
             completions.add(arg);
         }
         return completions;
-    }
-
-    private boolean isFragileBlock(Material type) {
-        return type.name().endsWith("_TORCH")
-                || type.name().endsWith("_WALL_TORCH")
-                || type.name().endsWith("_TORCH_ON")
-                || type.name().endsWith("_TORCH_OFF")
-                || type.name().equalsIgnoreCase("DIODE")
-                || type.equals(Material.COMPARATOR)
-                || type.name().endsWith("_COMPARATOR_ON")
-                || type.name().endsWith("_COMPARATOR_OFF")
-                || type.equals(Material.REPEATER)
-                || type.equals(Material.REDSTONE_WIRE)
-                || type.name().endsWith("CARPET")
-                || type.name().endsWith("LAVA")
-                || type.name().endsWith("WATER")
-                || type.name().endsWith("SIGN")
-                || type.equals(Material.LADDER)
-                || type.name().endsWith("_DOOR")
-                || type.name().equals("TRAP_DOOR")
-                || type.name().endsWith("_TRAPDOOR")
-                || type.name().endsWith("_BUTTON")
-                || type.name().endsWith("_PRESSURE_PLATE")
-                || type.equals(Material.LEVER);
     }
 }

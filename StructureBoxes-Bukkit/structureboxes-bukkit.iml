@@ -109,6 +109,15 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: me.angeschossen:LandsAPI:LATEST">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/LandsAPI.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.10" level="project" />
