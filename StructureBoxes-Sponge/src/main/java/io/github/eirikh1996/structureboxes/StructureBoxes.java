@@ -4,6 +4,7 @@ import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
+import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
@@ -16,8 +17,10 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bstats.sponge.Metrics2;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
@@ -37,6 +40,7 @@ import org.spongepowered.api.world.World;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -85,11 +89,13 @@ public class StructureBoxes implements SBMain {
 
         final String[] LOCALES = {"en", "no", "it"};
         for (String locale : LOCALES){
-            if (!new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
+            if (new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
                 continue;
             }
             try {
-                plugin.getAsset("/localisation/lang_" + locale + ".properties").get().copyToFile(configDir, false, true);
+                final Optional<Asset> asset = plugin.getAsset("localisation/lang_" + locale + ".properties");
+                logger.info("Locale " + locale + " present: " + asset.isPresent());
+                asset.get().copyToDirectory(Paths.get(configDir.toString(), "localisation"), false, true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -101,27 +107,41 @@ public class StructureBoxes implements SBMain {
         }
         loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
 
-        final ConfigurationNode node;
+
         try {
-            node = loader.load();
+            final ConfigurationNode node = loader.load();
+            //Read general config
             Settings.locale = node.getNode("Locale").getString("en");
             Settings.Metrics = node.getNode("Metrics").getBoolean(false);
-            //Read free space
-            final ConfigurationNode freeSpaceNode = node.getNode("Free space");
-            Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
-
-            Settings.blocksToIgnore.addAll(freeSpaceNode.getNode("Blocks to ignore").getList(TypeToken.of(BlockType.class), Collections.emptyList()));
-
+            Settings.StructureBoxItem = node.getNode("Structure Box Item").getValue(TypeToken.of(BlockType.class), BlockTypes.CHEST);
+            Settings.StructureBoxLore = node.getNode("Structure Box Display Name").getString("§6Structure Box");
+            Settings.MaxStructureSize = node.getNode("Max Structure Size").getInt(10000);
+            Settings.MaxSessionTime = node.getNode("Max Session Time").getInt(300);
+            Settings.PlaceCooldownTime = node.getNode("Place Cooldown Time").getInt(30);
+            Settings.StructureBoxPrefix = node.getNode("Structure Box Prefix").getString("§6Structure Box: ");
+            Settings.AlternativePrefixes.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
+            Settings.StructureBoxInstruction.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
+            Settings.RequirePermissionPerStructureBox = node.getNode("Require permission per structure box").getBoolean(false);
 
             //Read restrict to regions section
             final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
             Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
             Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
-            Settings.RestrictToRegionsExceptions = restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList());
+            Settings.RestrictToRegionsExceptions.addAll(restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList()));
+
+            //Read free space
+            final ConfigurationNode freeSpaceNode = node.getNode("Free space");
+            Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
+            Settings.blocksToIgnore.addAll(freeSpaceNode.getNode("Blocks to ignore").getList(TypeToken.of(BlockType.class), Collections.emptyList()));
+
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
 
+        CommandSpec structureBoxCommand = CommandSpec.builder()
+                .executor(new StructureBoxCommand())
+                .build();
+        Sponge.getCommandManager().register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
 
     }
 

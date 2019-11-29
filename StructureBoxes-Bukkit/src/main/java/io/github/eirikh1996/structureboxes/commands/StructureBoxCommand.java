@@ -178,8 +178,9 @@ public class StructureBoxCommand implements TabExecutor {
         List<String> lore = new ArrayList<>();
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
-        lore.add(Settings.StructureBoxPrefix + schematicName);
-        lore.addAll(Settings.StructureBoxInstruction);
+            lore.add(Settings.StructureBoxPrefix + schematicName);
+        if (!lore.containsAll(Settings.StructureBoxInstruction))
+            lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));

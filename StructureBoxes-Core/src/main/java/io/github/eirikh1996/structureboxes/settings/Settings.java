@@ -14,7 +14,7 @@ public class Settings {
     public static String StructureBoxLore;
     public static String StructureBoxPrefix;
     public static List<String> StructureBoxInstruction = new ArrayList<>();
-    public static List<String> AlternativePrefixes;
+    public static List<String> AlternativePrefixes = new ArrayList<>();
     public static boolean RestrictToRegionsEnabled;
     public static boolean RequirePermissionPerStructureBox;
     public static List<String> RestrictToRegionsExceptions = new ArrayList<>();
