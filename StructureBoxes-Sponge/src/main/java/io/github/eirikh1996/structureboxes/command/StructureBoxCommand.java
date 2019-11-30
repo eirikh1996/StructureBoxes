@@ -6,10 +6,18 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 
+import java.util.Optional;
+
 public class StructureBoxCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        if (args.hasAny("create")) {
+            createCommand(src, args.getOne("create"));
+        }
+        return null;
+    }
 
+    private CommandResult createCommand(CommandSource src, Optional arg) {
         return null;
     }
 }
