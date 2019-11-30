@@ -20,6 +20,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
@@ -35,6 +36,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import java.io.File;
@@ -140,8 +142,12 @@ public class StructureBoxes implements SBMain {
 
         CommandSpec structureBoxCommand = CommandSpec.builder()
                 .executor(new StructureBoxCommand())
+                .arguments(GenericArguments.firstParsing(GenericArguments.string(Text.of("create"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("undo"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("reload"))))
                 .build();
         Sponge.getCommandManager().register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
+
 
     }
 
@@ -211,6 +217,10 @@ public class StructureBoxes implements SBMain {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public SpongeWorldEdit getWorldEditPlugin() {
+        return worldEditPlugin;
     }
 
     public void clearInterior(Collection<Location> interior) {
