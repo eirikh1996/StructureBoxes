@@ -5,6 +5,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
+import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
@@ -20,7 +21,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
@@ -36,7 +37,6 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import java.io.File;
@@ -51,6 +51,7 @@ import java.util.logging.Logger;
 
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
+        description = "A plugin that adds placable blocks that turn into pre-made structures",
         version = "1.0",
         authors = {"eirikh1996"},
         dependencies = {
@@ -87,64 +88,38 @@ public class StructureBoxes implements SBMain {
     @Listener
     public void onGameLoaded(GameLoadCompleteEvent event) {
         instance = this;
-
-
-        final String[] LOCALES = {"en", "no", "it"};
-        for (String locale : LOCALES){
-            if (new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
-                continue;
-            }
-            try {
-                final Optional<Asset> asset = plugin.getAsset("localisation/lang_" + locale + ".properties");
-                logger.info("Locale " + locale + " present: " + asset.isPresent());
-                asset.get().copyToDirectory(Paths.get(configDir.toString(), "localisation"), false, true);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         try {
-            plugin.getAsset("structureboxes.conf").get().copyToFile(defaultConfig, false, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
-
-
-        try {
-            final ConfigurationNode node = loader.load();
-            //Read general config
-            Settings.locale = node.getNode("Locale").getString("en");
-            Settings.Metrics = node.getNode("Metrics").getBoolean(false);
-            Settings.StructureBoxItem = node.getNode("Structure Box Item").getValue(TypeToken.of(BlockType.class), BlockTypes.CHEST);
-            Settings.StructureBoxLore = node.getNode("Structure Box Display Name").getString("§6Structure Box");
-            Settings.MaxStructureSize = node.getNode("Max Structure Size").getInt(10000);
-            Settings.MaxSessionTime = node.getNode("Max Session Time").getInt(300);
-            Settings.PlaceCooldownTime = node.getNode("Place Cooldown Time").getInt(30);
-            Settings.StructureBoxPrefix = node.getNode("Structure Box Prefix").getString("§6Structure Box: ");
-            Settings.AlternativePrefixes.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
-            Settings.StructureBoxInstruction.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
-            Settings.RequirePermissionPerStructureBox = node.getNode("Require permission per structure box").getBoolean(false);
-
-            //Read restrict to regions section
-            final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
-            Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
-            Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
-            Settings.RestrictToRegionsExceptions.addAll(restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList()));
-
-            //Read free space
-            final ConfigurationNode freeSpaceNode = node.getNode("Free space");
-            Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
-            Settings.blocksToIgnore.addAll(freeSpaceNode.getNode("Blocks to ignore").getList(TypeToken.of(BlockType.class), Collections.emptyList()));
-
+            final Optional<Asset> config = plugin.getAsset("structureboxes.conf");
+            assert config.isPresent();
+            config.get().copyToFile(defaultConfig, false, true);
+            readConfig();
+            loadLocales();
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
+        CommandExecutor executor = new StructureBoxCommand();
+        CommandSpec createCommand = CommandSpec.builder()
+                .permission("structureboxes.create")
+                .executor(executor)
+                .build();
+
+        CommandSpec undoCommand = CommandSpec.builder()
+                .permission("structureboxes.undo")
+                .executor(executor)
+                .build();
+
+
+
+        CommandSpec reloadCommand = CommandSpec.builder()
+                .permission("structureboxes.reload")
+                .executor(executor)
+                .build();
 
         CommandSpec structureBoxCommand = CommandSpec.builder()
-                .executor(new StructureBoxCommand())
-                .arguments(GenericArguments.firstParsing(GenericArguments.string(Text.of("create"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("undo"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("reload"))))
+                .executor(executor)
+                .child(createCommand, "create", "cr", "c")
+                .child(undoCommand, "undo", "u" , "ud")
+                .child(reloadCommand, "reload", "r", "rl")
                 .build();
         Sponge.getCommandManager().register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
 
@@ -170,6 +145,15 @@ public class StructureBoxes implements SBMain {
         if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent())
             griefPreventionPlugin = (Optional<GriefPrevention>) griefprevention.get().getInstance();
 
+        final Path weDir = Paths.get(configDir.getParent().toString(), "worldedit");
+        final Path weConfig = Paths.get(weDir.toString(), "worldedit.conf");
+        final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(weConfig).build();
+        try {
+            final String schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
+            worldEditHandler = new IWorldEditHandler(weDir.toFile(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Listener
@@ -253,7 +237,48 @@ public class StructureBoxes implements SBMain {
         return instance;
     }
 
-    private void readConfig() throws Exception {
+    private void readConfig() throws ObjectMappingException, IOException {
+        loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
+        final ConfigurationNode node = loader.load();
+        //Read general config
+        Settings.locale = node.getNode("Locale").getString("en");
+        Settings.Metrics = node.getNode("Metrics").getBoolean(false);
+        Settings.StructureBoxItem = node.getNode("Structure Box Item").getValue(TypeToken.of(BlockType.class), BlockTypes.CHEST);
+        Settings.StructureBoxLore = node.getNode("Structure Box Display Name").getString("§6Structure Box");
+        Settings.MaxStructureSize = node.getNode("Max Structure Size").getInt(10000);
+        Settings.MaxSessionTime = node.getNode("Max Session Time").getInt(300);
+        Settings.PlaceCooldownTime = node.getNode("Place Cooldown Time").getInt(30);
+        Settings.StructureBoxPrefix = node.getNode("Structure Box Prefix").getString("§6Structure Box: ");
+        Settings.AlternativePrefixes.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
+        Settings.StructureBoxInstruction.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
+        Settings.RequirePermissionPerStructureBox = node.getNode("Require permission per structure box").getBoolean(false);
+
+        //Read restrict to regions section
+        final ConfigurationNode restrictToRegionsNode = node.getNode("Restrict to regions");
+        Settings.RestrictToRegionsEnabled = restrictToRegionsNode.getNode("Enabled").getBoolean(false);
+        Settings.RestrictToRegionsEntireStructure = restrictToRegionsNode.getNode("Entire structure").getBoolean(false);
+        Settings.RestrictToRegionsExceptions.addAll(restrictToRegionsNode.getNode("Exceptions").getList(TypeToken.of(String.class), Collections.emptyList()));
+
+        //Read free space
+        final ConfigurationNode freeSpaceNode = node.getNode("Free space");
+        Settings.CheckFreeSpace = freeSpaceNode.getNode("Enabled").getBoolean(true);
+        Settings.blocksToIgnore.addAll(freeSpaceNode.getNode("Blocks to ignore").getList(TypeToken.of(BlockType.class), Collections.emptyList()));
+
+    }
+
+    private void loadLocales() throws IOException {
+        final String[] LOCALES = {"en", "no", "it"};
+        for (String locale : LOCALES){
+            if (new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
+                continue;
+            }
+
+            final Optional<Asset> asset = plugin.getAsset("localisation/lang_" + locale + ".properties");
+            logger.info("Locale " + locale + " present: " + asset.isPresent());
+            asset.get().copyToDirectory(Paths.get(configDir.toString(), "localisation"), false, true);
+
+        }
+
 
     }
 

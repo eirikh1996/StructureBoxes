@@ -11,10 +11,8 @@ import java.util.Optional;
 public class StructureBoxCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        if (args.hasAny("create")) {
-            createCommand(src, args.getOne("create"));
-        }
-        return null;
+
+        return CommandResult.empty();
     }
 
     private CommandResult createCommand(CommandSource src, Optional arg) {

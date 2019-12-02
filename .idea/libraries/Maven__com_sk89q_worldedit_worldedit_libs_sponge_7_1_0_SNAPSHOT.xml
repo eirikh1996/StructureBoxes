@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.sk89q.worldedit.worldedit-libs:sponge:7.1.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191115.020748-29.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191128.043409-30.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191115.020748-29-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191128.043409-30-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191115.020748-29-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/sk89q/worldedit/worldedit-libs/sponge/7.1.0-SNAPSHOT/sponge-7.1.0-20191128.043409-30-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
