@@ -154,6 +154,14 @@
             <version>4.3.3.0</version>
             <scope>provided</scope>
         </dependency>
+        <!--Movecraft-->
+        <dependency>
+            <groupId>net.countercraft</groupId>
+            <artifactId>Movecraft</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/Movecraft.jar</systemPath>
+        </dependency>
         <!--bStats-->
         <dependency>
             <groupId>org.bstats</groupId>

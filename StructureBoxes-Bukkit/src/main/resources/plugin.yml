@@ -8,10 +8,13 @@ softdepend:
   - WorldGuard
   - RedProtect
   - Factions
+  - Civs
+  - Lands
   - LandClaiming
   - GriefPrevention
   - Kingdoms
   - Towny
+  - Movecraft
 commands:
   structurebox:
     aliases:

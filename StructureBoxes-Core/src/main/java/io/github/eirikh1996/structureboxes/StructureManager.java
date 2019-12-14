@@ -61,6 +61,10 @@ public class StructureManager implements Iterable<Collection<Location>>, Runnabl
 
     }
 
+    public LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> getSessions(UUID playerID) {
+        return playerTimeStructureMap.getOrDefault(playerID, new LinkedList<>());
+    }
+
     public void addStructure(Collection<Location> structure){
         locationSets.add(structure);
     }

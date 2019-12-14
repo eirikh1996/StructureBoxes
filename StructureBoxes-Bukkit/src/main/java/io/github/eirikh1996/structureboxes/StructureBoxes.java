@@ -7,11 +7,13 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
+import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
+import net.countercraft.movecraft.Movecraft;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -48,6 +51,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private boolean plotSquaredInstalled = false;
     private Civs civsPlugin;
     private Plugin landsPlugin;
+    private Movecraft movecraftPlugin;
     private Metrics metrics;
     private boolean startup = true;
 
@@ -256,6 +260,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Lands detected"));
             landsPlugin = lands;
         }
+        //Check for Movecraft
+        Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
+        if (movecraft instanceof Movecraft) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
+            getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
+            movecraftPlugin = (Movecraft) movecraft;
+        }
         //If no compatible protection plugin is found, disable region restriction if it is on
         if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null && !plotSquaredInstalled && landClaimingPlugin == null){
             getLogger().warning(I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin"));
@@ -264,6 +275,52 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         if (Settings.Metrics) {
             metrics = new Metrics(this);
+            metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<Map<String, Integer>>() {
+                @Override
+                public Map<String, Integer> call() throws Exception {
+                    Map<String, Integer> valueMap = new HashMap<>();
+                    if (getFactionsPlugin() != null) {
+                        valueMap.put("Factions", 1);
+                    }
+                    if (getTownyPlugin() != null) {
+                        valueMap.put("Towny", 1);
+                    }
+                    if (getWorldGuardPlugin() != null) {
+                        valueMap.put("WorldGuard", 1);
+                    }
+                    if (isPlotSquaredInstalled()) {
+                        valueMap.put("PlotSquared", 1);
+                    }
+                    if (getRedProtectPlugin() != null) {
+                        valueMap.put("RedProtect", 1);
+                    }
+                    if (getGriefPreventionPlugin() != null) {
+                        valueMap.put("GriefPrevention", 1);
+                    }
+                    if (getLandClaimingPlugin() != null) {
+                        valueMap.put("LandClaiming", 1);
+                    }
+                    if (getCivsPlugin() != null) {
+                        valueMap.put("Civs", 1);
+                    }
+                    if (getLandsPlugin() != null) {
+                        valueMap.put("Lands", 1);
+                    }
+                    if (getFactionsPlugin() == null &&
+                            getTownyPlugin() == null &&
+                            getWorldGuardPlugin() == null &&
+                            !isPlotSquaredInstalled() &&
+                            getRedProtectPlugin() == null &&
+                            getGriefPreventionPlugin() == null &&
+                            getLandClaimingPlugin() == null &&
+                            getCivsPlugin() == null &&
+                            getLandsPlugin() == null) {
+                        valueMap.put("None", 1);
+                    }
+                    return valueMap;
+                }
+            }));
+            metrics.addCustomChart(new Metrics.SimplePie("localisation", () -> Settings.locale));
         }
 
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
@@ -272,7 +329,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
-            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000);
+            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000000);
             startup = false;
         }
 
