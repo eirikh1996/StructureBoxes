@@ -1,5 +1,8 @@
 package io.github.eirikh1996.structureboxes.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import org.bukkit.entity.Player;
@@ -8,9 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -75,13 +75,14 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             conn.setDoOutput(true);
             final BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             final String response = reader.readLine();
-            final JSONArray jsonArray = (JSONArray) JSONValue.parse(response);
+            final Gson gson = new Gson();
+            final JsonArray jsonArray = gson.fromJson(response, JsonArray.class);
             if (jsonArray.size() == 0) {
                 StructureBoxes.getInstance().getLogger().warning("No files found, or Feed URL is bad.");
                 return currentVersion;
             }
-            JSONObject jsonObject = (JSONObject) jsonArray.get(jsonArray.size() - 1);
-            String versionName = ((String) jsonObject.get("name"));
+            JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
+            String versionName = jsonObj.get("name").getAsString();
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
             return Double.parseDouble(newVersion);
         } catch (Exception e) {
