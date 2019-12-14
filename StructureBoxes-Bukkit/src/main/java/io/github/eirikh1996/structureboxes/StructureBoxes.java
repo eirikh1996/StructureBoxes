@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.redcastlemedia.multitallented.civs.Civs;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -45,6 +46,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
+    private Civs civsPlugin;
+    private Plugin landsPlugin;
     private Metrics metrics;
     private boolean startup = true;
 
@@ -151,6 +154,15 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        //if on 1.13 and up, Check if FAWE is installed
+        if (!Settings.IsLegacy) {
+            try {
+                Class.forName("com.boydti.fawe.bukkit.FaweBukkit");
+                Settings.FAWE = true;
+            } catch (ClassNotFoundException e) {
+                Settings.FAWE = false;
+            }
+        }
 
         String weVersion = worldEditPlugin.getDescription().getVersion();
         int index = weVersion.indexOf(".");
@@ -158,7 +170,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         int versionNumber = Integer.parseInt(weVersion.substring(0, index));
         final Map data;
         try {
-            File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config.yml");
+            File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
             Yaml yaml = new Yaml();
             data = yaml.load(new FileInputStream(weConfig));
         } catch (IOException e){
@@ -167,7 +179,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        File schemDir = new File(getWorldEditPlugin().getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
+
+        File schemDir = new File(worldEditPlugin.getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
 
         //Check if there is a compatible version of WorldEdit
         try {
@@ -182,6 +195,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -228,6 +243,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         if (tp instanceof Towny){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Towny detected"));
             townyPlugin = (Towny) tp;
+        }
+        //Check for Civs
+        Plugin cp = getServer().getPluginManager().getPlugin("Civs");
+        if (cp instanceof Civs) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Civs detected"));
+            civsPlugin = (Civs) cp;
+        }
+        //Check for Lands
+        Plugin lands = getServer().getPluginManager().getPlugin("Lands");
+        if (lands != null) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Lands detected"));
+            landsPlugin = lands;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
         if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null && !plotSquaredInstalled && landClaimingPlugin == null){
@@ -291,6 +318,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return plotSquaredInstalled;
     }
 
+    public Civs getCivsPlugin() {
+        return civsPlugin;
+    }
+
+    public Plugin getLandsPlugin() {
+        return landsPlugin;
+    }
+
     public Metrics getMetrics() {
         return metrics;
     }
@@ -339,6 +374,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
         final HashMap<Location, Object> originalBlocks = new HashMap<>();
         @NotNull final Player p = getServer().getPlayer(playerID);
+        assert p != null;
         for (Location location : locations){
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
@@ -374,6 +410,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             }
             if (getLandClaimingPlugin() != null && !LandClaimingUtils.canBuild(p, bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "LandClaiming"));
+                return false;
+            }
+            if (getCivsPlugin() != null && !CivsUtils.allowBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Civs"));
+                return false;
+            }
+            if (getLandsPlugin() != null && !LandsUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Lands"));
                 return false;
             }
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){

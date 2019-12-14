@@ -109,6 +109,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.3.3.0" level="project" />
     <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.10" level="project" />

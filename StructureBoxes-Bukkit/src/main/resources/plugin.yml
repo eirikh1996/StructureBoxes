@@ -8,6 +8,7 @@ softdepend:
   - WorldGuard
   - RedProtect
   - Factions
+  - LandClaiming
   - GriefPrevention
   - Kingdoms
   - Towny

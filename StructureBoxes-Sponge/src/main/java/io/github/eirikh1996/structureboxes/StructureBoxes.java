@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
@@ -57,7 +58,6 @@ import java.util.logging.Logger;
         dependencies = {
                 @Dependency(id = "worldedit"),
                 @Dependency(id = "redprotect", optional = true),
-                @Dependency(id = "worldguard", optional = true),
                 @Dependency(id = "griefprevention", optional = true),
                 @Dependency(id = "plotsquared", optional = true)})
 public class StructureBoxes implements SBMain {
@@ -171,7 +171,7 @@ public class StructureBoxes implements SBMain {
     }
 
     public WorldEditHandler getWorldEditHandler() {
-        return null;
+        return worldEditHandler;
     }
 
     @Override
@@ -205,6 +205,14 @@ public class StructureBoxes implements SBMain {
 
     public SpongeWorldEdit getWorldEditPlugin() {
         return worldEditPlugin;
+    }
+
+    public Optional<GriefPrevention> getGriefPreventionPlugin() {
+        return griefPreventionPlugin;
+    }
+
+    public Optional<RedProtect> getRedProtectPlugin() {
+        return redProtectPlugin;
     }
 
     public void clearInterior(Collection<Location> interior) {

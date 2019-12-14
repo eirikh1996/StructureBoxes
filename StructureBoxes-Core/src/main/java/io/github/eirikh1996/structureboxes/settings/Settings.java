@@ -8,6 +8,7 @@ import java.util.Set;
 
 public class Settings {
     public static String locale;
+    public static boolean FAWE;
     public static boolean IsLegacy;
     public static boolean Debug;
     public static Object StructureBoxItem;
