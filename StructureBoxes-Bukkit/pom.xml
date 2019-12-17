@@ -10,7 +10,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
-    <version>2.3</version>
+    <name>StructureBoxes-Bukkit</name>
+    <version>2.4</version>
 <repositories>
     <repository>
         <id>spigot-repo</id>
