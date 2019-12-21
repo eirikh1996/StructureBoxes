@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.fabricmc.fabric-api:fabric-networking-blockentity-v0:0.2.1+da5bc0bb14">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-networking-blockentity-v0/0.2.1+da5bc0bb14/fabric-networking-blockentity-v0-0.2.1+da5bc0bb14.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-networking-blockentity-v0/0.2.1+da5bc0bb14/fabric-networking-blockentity-v0-0.2.1+da5bc0bb14-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-networking-blockentity-v0/0.2.1+da5bc0bb14/fabric-networking-blockentity-v0-0.2.1+da5bc0bb14-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

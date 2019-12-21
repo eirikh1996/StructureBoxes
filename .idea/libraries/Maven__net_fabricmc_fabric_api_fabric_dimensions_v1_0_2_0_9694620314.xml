@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.fabricmc.fabric-api:fabric-dimensions-v1:0.2.0+9694620314">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-dimensions-v1/0.2.0+9694620314/fabric-dimensions-v1-0.2.0+9694620314.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-dimensions-v1/0.2.0+9694620314/fabric-dimensions-v1-0.2.0+9694620314-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-dimensions-v1/0.2.0+9694620314/fabric-dimensions-v1-0.2.0+9694620314-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

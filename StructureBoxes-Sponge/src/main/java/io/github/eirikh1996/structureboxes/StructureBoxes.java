@@ -5,6 +5,9 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
+import io.github.eirikh1996.structureboxes.command.StructureBoxCreateCommand;
+import io.github.eirikh1996.structureboxes.command.StructureBoxReloadCommand;
+import io.github.eirikh1996.structureboxes.command.StructureBoxUndoCommand;
 import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
@@ -17,11 +20,12 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bstats.sponge.Metrics2;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
@@ -37,6 +41,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import java.io.File;
@@ -65,15 +70,17 @@ public class StructureBoxes implements SBMain {
     private static StructureBoxes instance;
 
     @Inject private Logger logger;
+    @Inject private Game game;
     @Inject @DefaultConfig(sharedRoot = false) private Path defaultConfig;
     @Inject @ConfigDir(sharedRoot = false) private Path configDir;
+
     private ConfigurationLoader<CommentedConfigurationNode> loader;
 
     public Path getConfigDir() {
         return configDir;
     }
 
-    @Inject private SpongeWorldEdit worldEditPlugin;
+    private SpongeWorldEdit worldEditPlugin;
     @Inject private PluginManager pluginManager;
     @Inject private PluginContainer plugin;
     @Inject private ConfigManager configManager;
@@ -97,26 +104,28 @@ public class StructureBoxes implements SBMain {
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
-        CommandExecutor executor = new StructureBoxCommand();
+        //Create command
         CommandSpec createCommand = CommandSpec.builder()
                 .permission("structureboxes.create")
-                .executor(executor)
+                .arguments(GenericArguments.string(Text.of()))
+                .executor(new StructureBoxCreateCommand())
                 .build();
 
+        //undo command
         CommandSpec undoCommand = CommandSpec.builder()
+                .executor(new StructureBoxUndoCommand())
                 .permission("structureboxes.undo")
-                .executor(executor)
                 .build();
 
 
-
+        //reload command
         CommandSpec reloadCommand = CommandSpec.builder()
+                .executor(new StructureBoxReloadCommand())
                 .permission("structureboxes.reload")
-                .executor(executor)
                 .build();
 
         CommandSpec structureBoxCommand = CommandSpec.builder()
-                .executor(executor)
+                .executor(new StructureBoxCommand())
                 .child(createCommand, "create", "cr", "c")
                 .child(undoCommand, "undo", "u" , "ud")
                 .child(reloadCommand, "reload", "r", "rl")
@@ -135,6 +144,7 @@ public class StructureBoxes implements SBMain {
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
 
+        worldEditPlugin = (SpongeWorldEdit) pluginManager.getPlugin("worldedit").get().getInstance().get();
 
         Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
         if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
@@ -153,6 +163,9 @@ public class StructureBoxes implements SBMain {
             worldEditHandler = new IWorldEditHandler(weDir.toFile(), this);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (Sponge.getMetricsConfigManager().areMetricsEnabled(plugin)) {
+
         }
     }
 

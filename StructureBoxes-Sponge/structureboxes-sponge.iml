@@ -34,8 +34,7 @@
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-core:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.18" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-sponge:7.1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:sponge:7.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
         <CLASSES>

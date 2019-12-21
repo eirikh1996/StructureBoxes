@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.fabricmc.fabric-api:fabric-api:0.4.3+build.247-1.15">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-api/0.4.3+build.247-1.15/fabric-api-0.4.3+build.247-1.15.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-api/0.4.3+build.247-1.15/fabric-api-0.4.3+build.247-1.15-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-api/0.4.3+build.247-1.15/fabric-api-0.4.3+build.247-1.15-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

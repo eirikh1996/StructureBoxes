@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: net.fabricmc.fabric-api:fabric-textures-v0:0.1.5+9c45b1ef14">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-textures-v0/0.1.5+9c45b1ef14/fabric-textures-v0-0.1.5+9c45b1ef14.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-textures-v0/0.1.5+9c45b1ef14/fabric-textures-v0-0.1.5+9c45b1ef14-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/fabricmc/fabric-api/fabric-textures-v0/0.1.5+9c45b1ef14/fabric-textures-v0-0.1.5+9c45b1ef14-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

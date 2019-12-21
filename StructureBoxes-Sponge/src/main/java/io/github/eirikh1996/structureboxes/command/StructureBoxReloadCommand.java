@@ -6,9 +6,9 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 
-public class StructureBoxCommand implements CommandExecutor {
+public class StructureBoxReloadCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        return CommandResult.empty();
+        return CommandResult.success();
     }
 }
