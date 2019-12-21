@@ -3,7 +3,9 @@ package io.github.eirikh1996.structureboxes;
 import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import com.intellectualcrafters.plot.IPlotMain;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
+import io.github.aquerr.eaglefactions.common.EagleFactionsPlugin;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCreateCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxReloadCommand;
@@ -34,7 +36,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -87,6 +88,8 @@ public class StructureBoxes implements SBMain {
     private WorldEditHandler worldEditHandler;
     private Optional<RedProtect> redProtectPlugin;
     private Optional<GriefPrevention> griefPreventionPlugin;
+    private Optional<EagleFactionsPlugin> eagleFactionsPlugin;
+    private Optional<IPlotMain> plotSquaredPlugin;
 
     private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
@@ -141,20 +144,37 @@ public class StructureBoxes implements SBMain {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
 
         worldEditPlugin = (SpongeWorldEdit) pluginManager.getPlugin("worldedit").get().getInstance().get();
 
+        //Check for RedProtect
         Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
         if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
-            logger.info("RedProtect found");
+            logger.info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
             redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
         }
+        //Check for GriefPrevention
         Optional<PluginContainer> griefprevention = pluginManager.getPlugin("griefprevention");
-        if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent())
+        if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent()) {
+            logger.info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
             griefPreventionPlugin = (Optional<GriefPrevention>) griefprevention.get().getInstance();
-
+        }
+        //Check for EagleFactions
+        Optional<PluginContainer> eagleFactions = pluginManager.getPlugin("eaglefactions");
+        if (eagleFactions.isPresent() && eagleFactions.get().getInstance().isPresent()) {
+            logger.info(I18nSupport.getInternationalisedString("Startup - EagleFactions detected"));
+            eagleFactionsPlugin = (Optional<EagleFactionsPlugin>) eagleFactions.get().getInstance();
+        }
+        //Check for PlotSquared
+        Optional<PluginContainer> plotsquared = pluginManager.getPlugin("plotsquared");
+        if (plotsquared.isPresent() && plotsquared.get().getInstance().isPresent()) {
+            logger.info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
+            plotSquaredPlugin = (Optional<IPlotMain>) plotsquared.get().getInstance();
+        }
+        //Now read WorldEdit config
         final Path weDir = Paths.get(configDir.getParent().toString(), "worldedit");
         final Path weConfig = Paths.get(weDir.toString(), "worldedit.conf");
         final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(weConfig).build();
@@ -167,20 +187,6 @@ public class StructureBoxes implements SBMain {
         if (Sponge.getMetricsConfigManager().areMetricsEnabled(plugin)) {
 
         }
-    }
-
-    @Listener
-    public void onServerStart(GameStartedServerEvent event)  {
-        logger.info("Structure Boxes config path");
-        logger.info(configDir.getParent().toString());
-        logger.info(configDir.toString());
-
-        /*final ConfigurationLoader<CommentedConfigurationNode> weLoader = configManager.getPluginConfig(worldEditPlugin).getConfig();
-        ConfigurationNode weNode = weLoader.load();
-
-        File schemDir = new File(worldEditPlugin.getWorkingDir(), weNode.getNode("saving").getNode("dir").getString());
-        worldEditHandler = new IWorldEditHandler(schemDir, this);*/
-
     }
 
     public WorldEditHandler getWorldEditHandler() {
@@ -226,6 +232,10 @@ public class StructureBoxes implements SBMain {
 
     public Optional<RedProtect> getRedProtectPlugin() {
         return redProtectPlugin;
+    }
+
+    public Optional<EagleFactionsPlugin> getEagleFactionsPlugin() {
+        return eagleFactionsPlugin;
     }
 
     public void clearInterior(Collection<Location> interior) {

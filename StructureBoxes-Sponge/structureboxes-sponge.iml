@@ -56,6 +56,24 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-yaml:3.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.dynmap:DynmapCoreAPI:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.bstats:bstats-sponge:1.5" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: io.github.aquerr:EagleFactions:LATEST">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/sponge/EagleFactions-v0.13.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.plotsquared:plotsquared-api:latest">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />

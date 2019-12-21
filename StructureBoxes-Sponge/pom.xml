@@ -122,6 +122,20 @@
             <artifactId>bstats-sponge</artifactId>
             <version>1.5</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.aquerr</groupId>
+            <artifactId>EagleFactions</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/sponge/EagleFactions-v0.13.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.plotsquared</groupId>
+            <artifactId>plotsquared-api</artifactId>
+            <version>latest</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
