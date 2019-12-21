@@ -8,7 +8,7 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -16,11 +16,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
@@ -45,7 +41,6 @@ public class StructureBoxCreateCommand implements CommandExecutor {
         final Player player = (Player) src;
         @NotNull final WorldEditHandler weHandler = StructureBoxes.getInstance().getWorldEditHandler();
         World world = player.getWorld();
-        Sponge.getServer().getBroadcastChannel().send(Text.of(world));
         SpongeWorld spongeWorld = StructureBoxes.getInstance().getWorldEditPlugin().getWorld(world);
         @Nullable Clipboard clipboard = weHandler.loadClipboardFromSchematic(spongeWorld, arg);
         if (clipboard == null) {
@@ -57,9 +52,7 @@ public class StructureBoxCreateCommand implements CommandExecutor {
             return CommandResult.empty();
         }
 
-        Inventory emptySlots = player.getInventory().query(QueryOperationTypes.ITEM_TYPE.of(ItemTypes.AIR));
-
-        final ItemStack structureBox = ItemStack.builder().itemType((ItemType) Settings.StructureBoxItem).build();
+        final ItemStack structureBox = ItemStack.builder().fromBlockState(((BlockType) Settings.StructureBoxItem).getDefaultState()).build();
         structureBox.offer(Keys.DISPLAY_NAME, Text.of(Settings.StructureBoxLore));
         List<Text> lore = new ArrayList<>();
         lore.add(0, Text.of(Settings.StructureBoxPrefix + arg));

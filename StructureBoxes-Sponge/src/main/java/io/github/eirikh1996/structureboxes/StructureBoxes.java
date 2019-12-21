@@ -160,7 +160,7 @@ public class StructureBoxes implements SBMain {
         final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(weConfig).build();
         try {
             final String schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
-            worldEditHandler = new IWorldEditHandler(weDir.toFile(), this);
+            worldEditHandler = new IWorldEditHandler(new File(weDir.toFile(), schematicDir), this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -270,8 +270,8 @@ public class StructureBoxes implements SBMain {
         Settings.MaxSessionTime = node.getNode("Max Session Time").getInt(300);
         Settings.PlaceCooldownTime = node.getNode("Place Cooldown Time").getInt(30);
         Settings.StructureBoxPrefix = node.getNode("Structure Box Prefix").getString("§6Structure Box: ");
-        Settings.AlternativePrefixes.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
-        Settings.StructureBoxInstruction.addAll(node.getList(TypeToken.of(String.class), Collections.emptyList()));
+        Settings.AlternativePrefixes.addAll(node.getNode("Alternative Prefixes").getList(TypeToken.of(String.class), Collections.emptyList()));
+        Settings.StructureBoxInstruction.addAll(node.getNode("Structure Box Instruction Message").getList(TypeToken.of(String.class), Collections.emptyList()));
         Settings.RequirePermissionPerStructureBox = node.getNode("Require permission per structure box").getBoolean(false);
 
         //Read restrict to regions section
