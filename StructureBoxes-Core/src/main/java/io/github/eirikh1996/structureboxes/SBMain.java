@@ -14,7 +14,6 @@ public interface SBMain {
     void sendMessageToPlayer(UUID recipient, String message);
     Logger getLogger();
     void clearInterior(Collection<Location> interior);
-    void addItemToPlayerInventory(UUID id, Object item);
     void scheduleSyncTask(final Runnable runnable);
     void scheduleAsyncTask(final Runnable runnable);
     void broadcast(String s);

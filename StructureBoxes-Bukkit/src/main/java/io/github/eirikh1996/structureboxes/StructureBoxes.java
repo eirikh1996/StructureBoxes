@@ -21,7 +21,6 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -519,10 +518,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     }
 
-    @Override
-    public void addItemToPlayerInventory(UUID id, Object item) {
-        Bukkit.getPlayer(id).getInventory().addItem((ItemStack) item);
-    }
+
 
     @Override
     public void scheduleSyncTask(final Runnable runnable) {

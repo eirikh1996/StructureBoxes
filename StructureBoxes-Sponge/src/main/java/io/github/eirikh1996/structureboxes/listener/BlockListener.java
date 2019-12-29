@@ -21,10 +21,12 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -35,15 +37,17 @@ public class BlockListener {
         if (event.isCancelled()) {
             return;
         }
-        if (!player.getItemInHand(HandTypes.MAIN_HAND).isPresent()){
+        final Optional<ItemStack> optionalItemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (!optionalItemInHand.isPresent()){
             return;
         }
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND).get();
-        if (!itemInHand.get(Keys.ITEM_LORE).isPresent()){
+        final ItemStack itemInHand = optionalItemInHand.get();
+        final Optional<List<Text>> optionalLore = itemInHand.get(Keys.ITEM_LORE);
+        if (!optionalLore.isPresent()){
             return;
         }
-        final List<Text> lore = itemInHand.get(Keys.ITEM_LORE).get();
-        final String loreID = lore.get(0).toString();
+        final List<Text> lore = optionalLore.get();
+        final String loreID = TextSerializers.LEGACY_FORMATTING_CODE.serialize(lore.get(0));
         String schematicID = "";
         if (!loreID.startsWith(Settings.StructureBoxPrefix)){
             boolean hasAlternativePrefix = false;
@@ -61,7 +65,6 @@ public class BlockListener {
         } else {
              schematicID = loreID.replace(Settings.StructureBoxPrefix, "");
         }
-
         if (Settings.RequirePermissionPerStructureBox && !player.hasPermission("structureboxes.place." + schematicID)) {
             player.sendMessage(Text.of(I18nSupport.getInternationalisedString("Place - No permission for this ID")));
             return;
@@ -79,7 +82,7 @@ public class BlockListener {
             if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
                 continue;
             }
-            snapshot = transaction.getDefault();
+            snapshot = transaction.getFinal();
         }
         if (snapshot == null) {
             return;
@@ -107,12 +110,12 @@ public class BlockListener {
             event.setCancelled(true);
             return;
         }
-        if (weHandler.pasteClipboard(player.getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
+        if (!weHandler.pasteClipboard(player.getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
+            event.setCancelled(true);
             return;
         }
-        Runnable runnable = () -> {
+        StructureBoxes.getInstance().scheduleSyncTask(() -> {
             placed.setBlockType(BlockTypes.AIR);
-        };
-        StructureBoxes.getInstance().scheduleSyncTask(runnable);
+        });
     }
 }

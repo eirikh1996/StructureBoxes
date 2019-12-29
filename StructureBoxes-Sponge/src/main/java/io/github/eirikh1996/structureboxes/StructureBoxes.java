@@ -11,10 +11,12 @@ import io.github.eirikh1996.structureboxes.command.StructureBoxCreateCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxReloadCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxUndoCommand;
 import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
+import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -22,6 +24,7 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bstats.sponge.Metrics2;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
@@ -49,11 +52,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
+
+import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 
 @Plugin(id = "structureboxes",
@@ -86,10 +88,10 @@ public class StructureBoxes implements SBMain {
     @Inject private PluginContainer plugin;
     @Inject private ConfigManager configManager;
     private WorldEditHandler worldEditHandler;
-    private Optional<RedProtect> redProtectPlugin;
-    private Optional<GriefPrevention> griefPreventionPlugin;
-    private Optional<EagleFactionsPlugin> eagleFactionsPlugin;
-    private Optional<IPlotMain> plotSquaredPlugin;
+    @NotNull private Optional<RedProtect> redProtectPlugin = Optional.empty();
+    @NotNull private Optional<GriefPrevention> griefPreventionPlugin = Optional.empty();
+    @NotNull private Optional<EagleFactionsPlugin> eagleFactionsPlugin = Optional.empty();
+    @NotNull private Optional<IPlotMain> plotSquaredPlugin = Optional.empty();
 
     private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
@@ -187,6 +189,9 @@ public class StructureBoxes implements SBMain {
         if (Sponge.getMetricsConfigManager().areMetricsEnabled(plugin)) {
 
         }
+
+        //Register listener
+        Sponge.getEventManager().registerListeners(this, new BlockListener());
     }
 
     public WorldEditHandler getWorldEditHandler() {
@@ -195,18 +200,11 @@ public class StructureBoxes implements SBMain {
 
     @Override
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
-        return false;
-    }
-
-    public Platform getPlatform() {
-        return Platform.SPONGE;
-    }
-
-    public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
-        Player p = Sponge.getServer().getPlayer(playerID).get();
-        for (Location loc : locations){
-            org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
-            if (spongeLoc.getBlockType().equals(BlockTypes.AIR) || Settings.blocksToIgnore.contains(spongeLoc.getBlockType())){
+        if (!Settings.RestrictToRegionsEntireStructure && Sponge.getServer().getPlayer(playerID).get().hasPermission("structureboxes.bypassregionrestriction")) {
+            return true;
+        }
+        for (Location location : locations) {
+            if (RegionUtils.isWithinRegion(MathUtils.sbToSpongeLoc(location))) {
                 continue;
             }
             return false;
@@ -214,8 +212,40 @@ public class StructureBoxes implements SBMain {
         return true;
     }
 
-    public void sendMessageToPlayer(UUID recipient, String message) {
+    public Platform getPlatform() {
+        return Platform.SPONGE;
+    }
 
+    public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
+        final HashMap<Location, Object> originalBlocks = new HashMap<>();
+        Player p = Sponge.getServer().getPlayer(playerID).get();
+        for (Location loc : locations){
+            org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
+            originalBlocks.put(loc, spongeLoc.getBlockType());
+            if (!spongeLoc.getBlockType().equals(BlockTypes.AIR) && !Settings.blocksToIgnore.contains(spongeLoc.getBlockType())){
+                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No free space")));
+                return false;
+            }
+            if (redProtectPlugin.isPresent()) {
+
+            }
+            if (griefPreventionPlugin.isPresent()) {
+
+            }
+            if (plotSquaredPlugin.isPresent()) {
+
+            }
+            if (eagleFactionsPlugin.isPresent()) {
+
+            }
+
+        }
+        StructureManager.getInstance().addStructureByPlayer(playerID, schematicName, originalBlocks);
+        return true;
+    }
+
+    public void sendMessageToPlayer(UUID recipient, String message) {
+        Sponge.getServer().getPlayer(recipient).get().sendMessage(Text.of(message));
     }
 
     public Logger getLogger() {
@@ -240,28 +270,23 @@ public class StructureBoxes implements SBMain {
 
     public void clearInterior(Collection<Location> interior) {
         for (Location loc : interior){
-
+            MathUtils.sbToSpongeLoc(loc).setBlockType(BlockTypes.AIR);
         }
     }
 
     @Override
-    public void addItemToPlayerInventory(UUID id, Object item) {
-
-    }
-
-    @Override
     public void scheduleSyncTask(Runnable runnable) {
-        taskBuilder.execute(runnable);
+        taskBuilder.execute(runnable).submit(this);
     }
 
     @Override
     public void scheduleAsyncTask(Runnable runnable) {
-        taskBuilder.async().execute(runnable);
+        taskBuilder.async().execute(runnable).submit(this);
     }
 
     @Override
     public void broadcast(String s) {
-
+        Sponge.getServer().getBroadcastChannel().send(Text.of(s));
     }
 
     public static synchronized StructureBoxes getInstance() {
