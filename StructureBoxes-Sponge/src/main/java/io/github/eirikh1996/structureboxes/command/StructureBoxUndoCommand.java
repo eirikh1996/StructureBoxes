@@ -98,6 +98,7 @@ public class StructureBoxUndoCommand implements CommandExecutor {
             p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space")));
             final Entity item = p.getWorld().createEntity(EntityTypes.ITEM, p.getPosition());
             item.offer(Keys.REPRESENTED_ITEM, structureBox.createSnapshot());
+            p.getWorld().spawnEntity(item);
             return CommandResult.success();
         }
         p.getInventory().offer(structureBox);

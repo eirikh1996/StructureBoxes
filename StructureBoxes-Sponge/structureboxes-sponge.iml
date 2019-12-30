@@ -68,7 +68,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.plotsquared:plotsquared-api:latest">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/sponge/PlotSquared-Sponge-19.12.10-b4c257b-788.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

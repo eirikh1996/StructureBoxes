@@ -122,7 +122,7 @@
             <artifactId>plotsquared-api</artifactId>
             <version>latest</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
+            <systemPath>${project.basedir}/../libs/bukkit/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
         </dependency>
         <!--LandClaiming-->
         <dependency>

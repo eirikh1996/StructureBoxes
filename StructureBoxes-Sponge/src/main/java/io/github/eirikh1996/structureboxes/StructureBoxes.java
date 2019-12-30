@@ -1,10 +1,16 @@
 package io.github.eirikh1996.structureboxes;
 
+import br.net.fabiozumbi12.RedProtect.Sponge.API.RedProtectAPI;
 import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
+import br.net.fabiozumbi12.RedProtect.Sponge.Region;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.intellectualcrafters.plot.IPlotMain;
+import com.intellectualcrafters.plot.PS;
+import com.intellectualcrafters.plot.object.Plot;
+import com.intellectualcrafters.plot.object.PlotArea;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
+import io.github.aquerr.eaglefactions.api.entities.Faction;
 import io.github.aquerr.eaglefactions.common.EagleFactionsPlugin;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCreateCommand;
@@ -18,6 +24,7 @@ import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import me.ryanhamshire.griefprevention.GriefPrevention;
+import me.ryanhamshire.griefprevention.api.claim.Claim;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -31,13 +38,13 @@ import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
@@ -97,9 +104,12 @@ public class StructureBoxes implements SBMain {
     private boolean plotSquaredInstalled = false;
     @Inject private Metrics2 metrics;
 
+    private ConsoleSource console = Sponge.getServer().getConsole();
+
     @Listener
     public void onGameLoaded(GameLoadCompleteEvent event) {
         instance = this;
+
         try {
             final Optional<Asset> config = plugin.getAsset("structureboxes.conf");
             assert config.isPresent();
@@ -109,6 +119,7 @@ public class StructureBoxes implements SBMain {
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
+        I18nSupport.initialize(getConfigDir().toFile());
         //Create command
         CommandSpec createCommand = CommandSpec.builder()
                 .permission("structureboxes.create")
@@ -140,10 +151,6 @@ public class StructureBoxes implements SBMain {
 
     }
 
-    @Listener
-    public void onServerAboutToStart(GameAboutToStartServerEvent event) {
-        I18nSupport.initialize(getConfigDir().toFile());
-    }
 
 
     @SuppressWarnings("unchecked")
@@ -155,25 +162,25 @@ public class StructureBoxes implements SBMain {
         //Check for RedProtect
         Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
         if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
-            logger.info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
+            console.sendMessage(Text.of(I18nSupport.getInternationalisedString("Startup - RedProtect detected")));
             redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
         }
         //Check for GriefPrevention
         Optional<PluginContainer> griefprevention = pluginManager.getPlugin("griefprevention");
         if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent()) {
-            logger.info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - GriefPrevention detected")));
             griefPreventionPlugin = (Optional<GriefPrevention>) griefprevention.get().getInstance();
         }
         //Check for EagleFactions
         Optional<PluginContainer> eagleFactions = pluginManager.getPlugin("eaglefactions");
         if (eagleFactions.isPresent() && eagleFactions.get().getInstance().isPresent()) {
-            logger.info(I18nSupport.getInternationalisedString("Startup - EagleFactions detected"));
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - EagleFactions detected")));
             eagleFactionsPlugin = (Optional<EagleFactionsPlugin>) eagleFactions.get().getInstance();
         }
         //Check for PlotSquared
         Optional<PluginContainer> plotsquared = pluginManager.getPlugin("plotsquared");
         if (plotsquared.isPresent() && plotsquared.get().getInstance().isPresent()) {
-            logger.info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - PlotSquared detected")));
             plotSquaredPlugin = (Optional<IPlotMain>) plotsquared.get().getInstance();
         }
         //Now read WorldEdit config
@@ -227,16 +234,54 @@ public class StructureBoxes implements SBMain {
                 return false;
             }
             if (redProtectPlugin.isPresent()) {
-
+                RedProtectAPI api = redProtectPlugin.get().getAPI();
+                Region region = api.getRegion(spongeLoc);
+                if (region == null) {
+                    continue;
+                } else if (region.canBuild(p)) {
+                    continue;
+                }
+                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect")));
+                return false;
             }
             if (griefPreventionPlugin.isPresent()) {
-
+                final Claim claim = GriefPrevention.getApi().getClaimManager(p.getWorld()).getClaimAt(p.getLocation());
+                if (claim == null) {
+                    continue;
+                } else if (claim.isTrusted(p.getUniqueId())) {
+                    continue;
+                }
+                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention")));
+                return false;
             }
             if (plotSquaredPlugin.isPresent()) {
-
+                final PS ps = PS.get();
+                final com.intellectualcrafters.plot.object.Location psLoc = new com.intellectualcrafters.plot.object.Location(p.getWorld().getName(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
+                final PlotArea pArea = ps.getApplicablePlotArea(psLoc);
+                if (pArea == null) {
+                    continue;
+                }
+                Plot plot = pArea.getPlot(psLoc);
+                if (plot == null) {
+                    continue;
+                }
+                if (plot.isOwner(p.getUniqueId()) || plot.isAdded(p.getUniqueId())) {
+                    continue;
+                }
+                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared")));
+                return false;
             }
             if (eagleFactionsPlugin.isPresent()) {
-
+                final Optional<Faction> optionalFaction = eagleFactionsPlugin.get().getFactionLogic().getFactionByChunk(p.getWorld().getUniqueId(), p.getLocation().getChunkPosition());
+                if (!optionalFaction.isPresent()) {
+                    continue;
+                }
+                Faction faction = optionalFaction.get();
+                if (faction.containsPlayer(p.getUniqueId())) {
+                    continue;
+                }
+                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "EagleFactions")));
+                return false;
             }
 
         }
@@ -293,7 +338,7 @@ public class StructureBoxes implements SBMain {
         return instance;
     }
 
-    private void readConfig() throws ObjectMappingException, IOException {
+    public void readConfig() throws ObjectMappingException, IOException {
         loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
         final ConfigurationNode node = loader.load();
         //Read general config
@@ -322,7 +367,7 @@ public class StructureBoxes implements SBMain {
 
     }
 
-    private void loadLocales() throws IOException {
+    public void loadLocales() throws IOException {
         final String[] LOCALES = {"en", "no", "it"};
         for (String locale : LOCALES){
             if (new File(configDir.toString() + "/localisation/lang_" + locale + ".properties").exists()){
@@ -330,7 +375,6 @@ public class StructureBoxes implements SBMain {
             }
 
             final Optional<Asset> asset = plugin.getAsset("localisation/lang_" + locale + ".properties");
-            logger.info("Locale " + locale + " present: " + asset.isPresent());
             asset.get().copyToDirectory(Paths.get(configDir.toString(), "localisation"), false, true);
 
         }
