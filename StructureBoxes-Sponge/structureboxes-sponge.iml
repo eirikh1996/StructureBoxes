@@ -74,6 +74,15 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.universeguard:UniverseGuard:LATEST">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/sponge/UniverseGuard-2.20.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />

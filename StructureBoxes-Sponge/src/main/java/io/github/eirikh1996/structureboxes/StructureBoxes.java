@@ -10,6 +10,12 @@ import com.intellectualcrafters.plot.PS;
 import com.intellectualcrafters.plot.object.Plot;
 import com.intellectualcrafters.plot.object.PlotArea;
 import com.sk89q.worldedit.sponge.SpongeWorldEdit;
+import com.universeguard.UniverseGuard;
+import com.universeguard.region.GlobalRegion;
+import com.universeguard.region.LocalRegion;
+import com.universeguard.region.components.RegionMember;
+import com.universeguard.region.enums.EnumRegionFlag;
+import com.universeguard.region.enums.RegionRole;
 import io.github.aquerr.eaglefactions.api.entities.Faction;
 import io.github.aquerr.eaglefactions.common.EagleFactionsPlugin;
 import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
@@ -74,7 +80,9 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
                 @Dependency(id = "worldedit"),
                 @Dependency(id = "redprotect", optional = true),
                 @Dependency(id = "griefprevention", optional = true),
-                @Dependency(id = "plotsquared", optional = true)})
+                @Dependency(id = "plotsquared", optional = true),
+                @Dependency(id = "eaglefactions", optional = true),
+                @Dependency(id = "universeguard", optional = true)})
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
@@ -90,7 +98,7 @@ public class StructureBoxes implements SBMain {
         return configDir;
     }
 
-    private SpongeWorldEdit worldEditPlugin;
+    @NotNull private SpongeWorldEdit worldEditPlugin;
     @Inject private PluginManager pluginManager;
     @Inject private PluginContainer plugin;
     @Inject private ConfigManager configManager;
@@ -99,6 +107,7 @@ public class StructureBoxes implements SBMain {
     @NotNull private Optional<GriefPrevention> griefPreventionPlugin = Optional.empty();
     @NotNull private Optional<EagleFactionsPlugin> eagleFactionsPlugin = Optional.empty();
     @NotNull private Optional<IPlotMain> plotSquaredPlugin = Optional.empty();
+    @NotNull private Optional<UniverseGuard> universeGuardPlugin = Optional.empty();
 
     private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
@@ -158,30 +167,48 @@ public class StructureBoxes implements SBMain {
     public void onServerStarting(GameStartingServerEvent event) {
 
         worldEditPlugin = (SpongeWorldEdit) pluginManager.getPlugin("worldedit").get().getInstance().get();
-
+        boolean regionProviderFound = false;
         //Check for RedProtect
         Optional<PluginContainer> redprotect = pluginManager.getPlugin("redprotect");
         if (redprotect.isPresent() && redprotect.get().getInstance().isPresent()){
             console.sendMessage(Text.of(I18nSupport.getInternationalisedString("Startup - RedProtect detected")));
             redProtectPlugin = (Optional<RedProtect>) redprotect.get().getInstance();
+            regionProviderFound = true;
         }
         //Check for GriefPrevention
         Optional<PluginContainer> griefprevention = pluginManager.getPlugin("griefprevention");
         if (griefprevention.isPresent() && griefprevention.get().getInstance().isPresent()) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - GriefPrevention detected")));
             griefPreventionPlugin = (Optional<GriefPrevention>) griefprevention.get().getInstance();
+            regionProviderFound = true;
         }
         //Check for EagleFactions
         Optional<PluginContainer> eagleFactions = pluginManager.getPlugin("eaglefactions");
         if (eagleFactions.isPresent() && eagleFactions.get().getInstance().isPresent()) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - EagleFactions detected")));
             eagleFactionsPlugin = (Optional<EagleFactionsPlugin>) eagleFactions.get().getInstance();
+            regionProviderFound = true;
         }
         //Check for PlotSquared
         Optional<PluginContainer> plotsquared = pluginManager.getPlugin("plotsquared");
         if (plotsquared.isPresent() && plotsquared.get().getInstance().isPresent()) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - PlotSquared detected")));
             plotSquaredPlugin = (Optional<IPlotMain>) plotsquared.get().getInstance();
+            regionProviderFound = true;
+        }
+        //Check for UniverseGuard
+        Optional<PluginContainer> universeGuard = pluginManager.getPlugin("universeguard");
+        if (universeGuard.isPresent() && universeGuard.get().getInstance().isPresent()) {
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - UniverseGuard detected")));
+            universeGuardPlugin = (Optional<UniverseGuard>) universeGuard.get().getInstance();
+            regionProviderFound = true;
+        }
+        if ((Settings.RestrictToRegionsEnabled || Settings.RestrictToRegionsEntireStructure) && !regionProviderFound) {
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin")));
+            Settings.RestrictToRegionsEnabled = false;
+            Settings.RestrictToRegionsEntireStructure = false;
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false")));
+
         }
         //Now read WorldEdit config
         final Path weDir = Paths.get(configDir.getParent().toString(), "worldedit");
@@ -193,12 +220,33 @@ public class StructureBoxes implements SBMain {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (Sponge.getMetricsConfigManager().areMetricsEnabled(plugin)) {
-
-        }
+        metrics.addCustomChart(new Metrics2.AdvancedPie("region_providers", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
+            if (getEagleFactionsPlugin().isPresent()) {
+                valueMap.put("Factions", 1);
+            }
+            if (plotSquaredInstalled) {
+                valueMap.put("PlotSquared", 1);
+            }
+            if (getRedProtectPlugin().isPresent()) {
+                valueMap.put("RedProtect", 1);
+            }
+            if (getGriefPreventionPlugin().isPresent()) {
+                valueMap.put("GriefPrevention", 1);
+            }
+            if (!plotSquaredInstalled && !getRedProtectPlugin().isPresent() &&
+                    !getGriefPreventionPlugin().isPresent() &&
+                    !getEagleFactionsPlugin().isPresent()) {
+                valueMap.put("None", 1);
+            }
+            return valueMap;
+        }));
+        metrics.addCustomChart(new Metrics2.SimplePie("localisation", () -> Settings.locale));
 
         //Register listener
         Sponge.getEventManager().registerListeners(this, new BlockListener());
+
+
     }
 
     public WorldEditHandler getWorldEditHandler() {
@@ -245,7 +293,7 @@ public class StructureBoxes implements SBMain {
                 return false;
             }
             if (griefPreventionPlugin.isPresent()) {
-                final Claim claim = GriefPrevention.getApi().getClaimManager(p.getWorld()).getClaimAt(p.getLocation());
+                final Claim claim = GriefPrevention.getApi().getClaimManager(p.getWorld()).getClaimAt(spongeLoc);
                 if (claim == null) {
                     continue;
                 } else if (claim.isTrusted(p.getUniqueId())) {
@@ -256,7 +304,7 @@ public class StructureBoxes implements SBMain {
             }
             if (plotSquaredPlugin.isPresent()) {
                 final PS ps = PS.get();
-                final com.intellectualcrafters.plot.object.Location psLoc = new com.intellectualcrafters.plot.object.Location(p.getWorld().getName(), p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
+                final com.intellectualcrafters.plot.object.Location psLoc = new com.intellectualcrafters.plot.object.Location(spongeLoc.getExtent().getName(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
                 final PlotArea pArea = ps.getApplicablePlotArea(psLoc);
                 if (pArea == null) {
                     continue;
@@ -272,7 +320,7 @@ public class StructureBoxes implements SBMain {
                 return false;
             }
             if (eagleFactionsPlugin.isPresent()) {
-                final Optional<Faction> optionalFaction = eagleFactionsPlugin.get().getFactionLogic().getFactionByChunk(p.getWorld().getUniqueId(), p.getLocation().getChunkPosition());
+                final Optional<Faction> optionalFaction = eagleFactionsPlugin.get().getFactionLogic().getFactionByChunk(spongeLoc.getExtent().getUniqueId(), spongeLoc.getChunkPosition());
                 if (!optionalFaction.isPresent()) {
                     continue;
                 }
@@ -282,6 +330,33 @@ public class StructureBoxes implements SBMain {
                 }
                 p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "EagleFactions")));
                 return false;
+            }
+            if (universeGuardPlugin.isPresent()) {
+                final com.universeguard.region.Region region = com.universeguard.utils.RegionUtils.getRegion(spongeLoc);
+                if (region == null) {
+                    continue;
+                }
+                boolean forbidden = false;
+                if (region instanceof GlobalRegion) {
+                    GlobalRegion globalRegion = (GlobalRegion) region;
+                    if (globalRegion.getFlag(EnumRegionFlag.PLACE)) {
+                        continue;
+                    }
+                    forbidden = true;
+                }
+                if (region instanceof LocalRegion) {
+                    LocalRegion localRegion = (LocalRegion) region;
+                    RegionMember owner = new RegionMember(p, RegionRole.OWNER);
+                    RegionMember member = new RegionMember(p, RegionRole.MEMBER);
+                    if (localRegion.getOwner().equals(owner) || localRegion.getMembers().contains(member)) {
+                        continue;
+                    }
+                    forbidden = true;
+                }
+                if (forbidden) {
+                    p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "UniverseGuard")));
+                    return false;
+                }
             }
 
         }
@@ -297,20 +372,34 @@ public class StructureBoxes implements SBMain {
         return logger;
     }
 
+    @NotNull
     public SpongeWorldEdit getWorldEditPlugin() {
         return worldEditPlugin;
     }
 
+    @NotNull
     public Optional<GriefPrevention> getGriefPreventionPlugin() {
         return griefPreventionPlugin;
     }
 
+    @NotNull
     public Optional<RedProtect> getRedProtectPlugin() {
         return redProtectPlugin;
     }
 
+    @NotNull
     public Optional<EagleFactionsPlugin> getEagleFactionsPlugin() {
         return eagleFactionsPlugin;
+    }
+
+    @NotNull
+    public Optional<IPlotMain> getPlotSquaredPlugin() {
+        return plotSquaredPlugin;
+    }
+
+    @NotNull
+    public Optional<UniverseGuard> getUniverseGuardPlugin() {
+        return universeGuardPlugin;
     }
 
     public void clearInterior(Collection<Location> interior) {
@@ -382,4 +471,7 @@ public class StructureBoxes implements SBMain {
 
     }
 
+    public PluginContainer getPlugin() {
+        return plugin;
+    }
 }

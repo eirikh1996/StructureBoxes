@@ -17,7 +17,7 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
@@ -60,11 +60,12 @@ public class StructureBoxCreateCommand implements CommandExecutor {
             lore.add(i + 1, Text.of(Settings.StructureBoxInstruction.get(i)));
         }
         structureBox.offer(Keys.ITEM_LORE, lore);
-
-        if (player.getInventory().offer(structureBox) == InventoryTransactionResult.failNoTransactions()) {
+        PlayerInventory pInv = (PlayerInventory) player.getInventory();
+        if (!pInv.getMain().canFit(structureBox) && !pInv.getHotbar().canFit(structureBox)) {
             player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Insufficient inventory space")));
             return CommandResult.empty();
         }
+        player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - New structure box created")));
         return CommandResult.success();
     }
 }

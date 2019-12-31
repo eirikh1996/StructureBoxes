@@ -136,6 +136,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/sponge/PlotSquared-Sponge-19.12.10-b4c257b-788.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.universeguard</groupId>
+            <artifactId>UniverseGuard</artifactId>
+            <version>LATEST</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/sponge/UniverseGuard-2.20.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
