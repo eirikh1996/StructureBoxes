@@ -5,6 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
@@ -41,6 +44,7 @@ public class UpdateManager implements Runnable {
                     return;
                 }
                 StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"))));
+                StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
             }
         }).submit(StructureBoxes.getInstance());
     }
@@ -63,6 +67,22 @@ public class UpdateManager implements Runnable {
         String versionName = jsonObj.get("name").getAsString();
         String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
         return Double.parseDouble(newVersion);
+    }
+
+    public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player p) {
+        final double newVersion;
+        final double currentVersion = Double.parseDouble(StructureBoxes.getInstance().getPlugin().getVersion().get());
+        try {
+            newVersion = getNewVersion(currentVersion);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        if (newVersion <= currentVersion) {
+            return;
+        }
+        p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"))));
+        p.sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
     }
 
     public static synchronized UpdateManager getInstance() {

@@ -246,6 +246,9 @@ public class StructureBoxes implements SBMain {
         }));
         metrics.addCustomChart(new Metrics2.SimplePie("localisation", () -> Settings.locale));
 
+        if (!Settings.Metrics) {
+            metrics.cancel();
+        }
         //Register listener
         Sponge.getEventManager().registerListeners(this, new BlockListener());
 
