@@ -29,6 +29,7 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
+import io.github.eirikh1996.structureboxes.utils.UpdateManager;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import me.ryanhamshire.griefprevention.api.claim.Claim;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -52,6 +53,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
@@ -66,6 +68,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
@@ -109,7 +112,6 @@ public class StructureBoxes implements SBMain {
     @NotNull private Optional<IPlotMain> plotSquaredPlugin = Optional.empty();
     @NotNull private Optional<UniverseGuard> universeGuardPlugin = Optional.empty();
 
-    private Task.Builder taskBuilder = Task.builder();
     private boolean plotSquaredInstalled = false;
     @Inject private Metrics2 metrics;
 
@@ -218,6 +220,7 @@ public class StructureBoxes implements SBMain {
             final String schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
             worldEditHandler = new IWorldEditHandler(new File(weDir.toFile(), schematicDir), this);
         } catch (IOException e) {
+            logger.severe(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
             e.printStackTrace();
         }
         metrics.addCustomChart(new Metrics2.AdvancedPie("region_providers", () -> {
@@ -249,19 +252,26 @@ public class StructureBoxes implements SBMain {
 
     }
 
+    @Listener
+    public void onServerStarted(GameStartedServerEvent event) {
+        Task.builder().async().execute(UpdateManager.getInstance()).interval(1, TimeUnit.HOURS).submit(this);
+    }
+
     public WorldEditHandler getWorldEditHandler() {
         return worldEditHandler;
     }
 
     @Override
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
-        if (!Settings.RestrictToRegionsEntireStructure && Sponge.getServer().getPlayer(playerID).get().hasPermission("structureboxes.bypassregionrestriction")) {
+        final Player p = Sponge.getServer().getPlayer(playerID).get();
+        if (!Settings.RestrictToRegionsEntireStructure && p.hasPermission("structureboxes.bypassregionrestriction")) {
             return true;
         }
         for (Location location : locations) {
             if (RegionUtils.isWithinRegion(MathUtils.sbToSpongeLoc(location))) {
                 continue;
             }
+            p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Structure must be in region")));
             return false;
         }
         return true;
@@ -410,12 +420,12 @@ public class StructureBoxes implements SBMain {
 
     @Override
     public void scheduleSyncTask(Runnable runnable) {
-        taskBuilder.execute(runnable).submit(this);
+        Task.builder().execute(runnable).submit(this);
     }
 
     @Override
     public void scheduleAsyncTask(Runnable runnable) {
-        taskBuilder.async().execute(runnable).submit(this);
+        Task.builder().async().execute(runnable).submit(this);
     }
 
     @Override
@@ -473,5 +483,9 @@ public class StructureBoxes implements SBMain {
 
     public PluginContainer getPlugin() {
         return plugin;
+    }
+
+    public ConsoleSource getConsole() {
+        return console;
     }
 }
