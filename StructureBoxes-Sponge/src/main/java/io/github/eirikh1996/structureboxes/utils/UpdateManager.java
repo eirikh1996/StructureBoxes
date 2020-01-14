@@ -65,8 +65,7 @@ public class UpdateManager implements Runnable {
         }
         JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
         String versionName = jsonObj.get("name").getAsString();
-        String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
-        return Double.parseDouble(newVersion);
+        return Double.parseDouble(versionName);
     }
 
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player p) {

@@ -65,6 +65,7 @@ public class StructureBoxCreateCommand implements CommandExecutor {
             player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Insufficient inventory space")));
             return CommandResult.empty();
         }
+        pInv.offer(structureBox);
         player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - New structure box created")));
         return CommandResult.success();
     }

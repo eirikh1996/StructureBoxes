@@ -77,7 +77,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "1.0",
+        version = "1.1",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),
@@ -115,7 +115,7 @@ public class StructureBoxes implements SBMain {
     private boolean plotSquaredInstalled = false;
     @Inject private Metrics2 metrics;
 
-    private ConsoleSource console = Sponge.getServer().getConsole();
+    private ConsoleSource console;
 
     @Listener
     public void onGameLoaded(GameLoadCompleteEvent event) {
@@ -158,7 +158,7 @@ public class StructureBoxes implements SBMain {
                 .child(reloadCommand, "reload", "r", "rl")
                 .build();
         Sponge.getCommandManager().register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
-
+        console = Sponge.getServer().getConsole();
 
     }
 
