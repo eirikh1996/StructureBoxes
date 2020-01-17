@@ -1,12 +1,17 @@
 package io.github.eirikh1996.structureboxes.utils;
 
+import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class RedProtectUtils {
     public static boolean canBuild(Player player, Location location){
-        return StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location).canBuild(player);
+        final Region region = StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location);
+        if (region == null) {
+            return true;
+        }
+        return region.canBuild(player);
     }
 
     public static boolean withinRegion(Location location) {
