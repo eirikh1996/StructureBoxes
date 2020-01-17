@@ -63,7 +63,7 @@ public class UpdateManager implements Runnable {
             StructureBoxes.getInstance().getLogger().warning("No files found, or Feed URL is bad.");
             return currentVersion;
         }
-        JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
+        JsonObject jsonObj = (JsonObject) jsonArray.get(0);
         String versionName = jsonObj.get("name").getAsString();
         return Double.parseDouble(versionName);
     }
