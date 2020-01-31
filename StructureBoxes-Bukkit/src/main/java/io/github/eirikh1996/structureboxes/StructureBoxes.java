@@ -297,7 +297,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
             getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
             movecraftPlugin = (Movecraft) movecraft;
-            foundRegionProvider = true;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
         if (Settings.RestrictToRegionsEnabled && !foundRegionProvider){
@@ -307,6 +306,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         if (Settings.Metrics) {
             metrics = new Metrics(this);
+            final boolean noRegionProvider = !foundRegionProvider;
             metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<Map<String, Integer>>() {
                 @Override
                 public Map<String, Integer> call() throws Exception {
@@ -338,15 +338,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     if (getLandsPlugin() != null) {
                         valueMap.put("Lands", 1);
                     }
-                    if (getFactionsPlugin() == null &&
-                            getTownyPlugin() == null &&
-                            getWorldGuardPlugin() == null &&
-                            !isPlotSquaredInstalled() &&
-                            getRedProtectPlugin() == null &&
-                            getGriefPreventionPlugin() == null &&
-                            getLandClaimingPlugin() == null &&
-                            getCivsPlugin() == null &&
-                            getLandsPlugin() == null) {
+                    if (noRegionProvider) {
                         valueMap.put("None", 1);
                     }
                     return valueMap;
