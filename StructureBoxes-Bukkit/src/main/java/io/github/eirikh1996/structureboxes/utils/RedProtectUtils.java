@@ -17,4 +17,12 @@ public class RedProtectUtils {
     public static boolean withinRegion(Location location) {
         return StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location) != null;
     }
+
+    public static boolean canPlaceStructureBox(Location location) {
+        final Region region = StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location);
+        if (region == null) {
+            return true;
+        }
+        return region.getFlagBool("structurebox");
+    }
 }

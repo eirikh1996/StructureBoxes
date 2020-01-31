@@ -6,11 +6,10 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
-import io.github.eirikh1996.structureboxes.settings.Settings;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,6 +21,8 @@ public class WorldGuardUtils {
     private static final Method CAN_BUILD = ReflectionUtils.getMethod(WorldGuardPlugin.class, "canBuild", Player.class, Location.class);
     private static final Method GET_REGION_MANAGER = ReflectionUtils.getMethod(WorldGuardPlugin.class,"getRegionManager", World.class);
     private static final Method GET_APPLICABLE_REGIONS = ReflectionUtils.getMethod(RegionManager.class, "getApplicableRegions", Location.class);
+
+    public static StateFlag STRUCTUREBOX_FLAG = new StateFlag("structurebox", false);
 
     public static boolean allowBuild(Player player, Location location){
         if (CAN_BUILD != null){
@@ -52,5 +53,28 @@ public class WorldGuardUtils {
         } else {
             return WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(location.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ())).size() > 0;
         }
+    }
+
+    public static boolean canPlaceStructureBox(Location loc) {
+        final ApplicableRegionSet regions;
+        if (GET_REGION_MANAGER != null && GET_APPLICABLE_REGIONS != null){
+            try {
+                RegionManager manager = (RegionManager) GET_REGION_MANAGER.invoke(StructureBoxes.getInstance().getWorldGuardPlugin(), loc.getWorld());
+                regions = (ApplicableRegionSet) GET_APPLICABLE_REGIONS.invoke(manager, loc);
+
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(loc.getWorld())).getApplicableRegions(BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        }
+        for (ProtectedRegion region : regions) {
+            if (region.getFlag(STRUCTUREBOX_FLAG) != StateFlag.State.ALLOW) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 }

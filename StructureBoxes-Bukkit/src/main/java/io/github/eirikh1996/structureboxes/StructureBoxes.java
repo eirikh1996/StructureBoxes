@@ -2,9 +2,12 @@ package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
@@ -67,6 +70,24 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void onLoad() {
         instance = this;
+        Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
+        //Check for WorldGuard
+        if (wg instanceof WorldGuardPlugin){
+            worldGuardPlugin = (WorldGuardPlugin) wg;
+            FlagRegistry flags;
+            if (Settings.IsLegacy) {
+                try {
+                    final Method getFlagRegistry = WorldGuardPlugin.class.getDeclaredMethod("getFlagRegistry");
+                    flags = (FlagRegistry) getFlagRegistry.invoke(worldGuardPlugin);
+                } catch (Exception e) {
+                    flags = null;
+                }
+
+            } else {
+                flags = WorldGuard.getInstance().getFlagRegistry();
+            }
+            flags.register(WorldGuardUtils.STRUCTUREBOX_FLAG);
+        }
     }
 
     @Override
@@ -199,30 +220,34 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             return;
         }
 
-
-        Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
+        boolean foundRegionProvider = false;
         //Check for WorldGuard
-        if (wg instanceof WorldGuardPlugin){
+        if (worldGuardPlugin != null){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - WorldGuard detected"));
-            worldGuardPlugin = (WorldGuardPlugin) wg;
+            foundRegionProvider = true;
         }
         Plugin f = getServer().getPluginManager().getPlugin("Factions");
         //Check for Factions
         if (f instanceof Factions){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             factionsPlugin = (Factions) f;
+            MFlag.getCreative(16000, "structurebox", "structurebox", "Can players place structure boxes in this faction's territory?", "Players can place structure boxes", "Players cannot place structure boxes", false, false, true);
+            foundRegionProvider = true;
         }
         //Check for RedProtect
         Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
         if (rp instanceof RedProtect){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
             redProtectPlugin = (RedProtect) rp;
+            foundRegionProvider = true;
+            redProtectPlugin.getAPI().addFlag("structurebox", false, true);
         }
         //Check for GriefPrevention
         Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
         if (gp instanceof GriefPrevention){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
             griefPreventionPlugin = (GriefPrevention) gp;
+            foundRegionProvider = true;
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
@@ -230,34 +255,41 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
             if (Settings.IsLegacy) {
                 PlotSquaredUtils.initialize();
+                PlotSquaredUtils.registerFlag();
             } else {
                 PlotSquared4Utils.initialize();
+                PlotSquared4Utils.registerFlag();
             }
             plotSquaredInstalled = true;
+            foundRegionProvider = true;
         }
         //Check for landClaiming
         Plugin lp = getServer().getPluginManager().getPlugin("LandClaiming");
         if (lp instanceof LandClaiming){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - LandClaiming detected"));
             landClaimingPlugin = (LandClaiming) lp;
+            foundRegionProvider = true;
         }
         //Check for Towny
         Plugin tp = getServer().getPluginManager().getPlugin("Towny");
         if (tp instanceof Towny){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Towny detected"));
             townyPlugin = (Towny) tp;
+            foundRegionProvider = true;
         }
         //Check for Civs
         Plugin cp = getServer().getPluginManager().getPlugin("Civs");
         if (cp instanceof Civs) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Civs detected"));
             civsPlugin = (Civs) cp;
+            foundRegionProvider = true;
         }
         //Check for Lands
         Plugin lands = getServer().getPluginManager().getPlugin("Lands");
         if (lands != null) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Lands detected"));
             landsPlugin = lands;
+            foundRegionProvider = true;
         }
         //Check for Movecraft
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
@@ -265,9 +297,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
             getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
             movecraftPlugin = (Movecraft) movecraft;
+            foundRegionProvider = true;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
-        if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null && !plotSquaredInstalled && landClaimingPlugin == null){
+        if (Settings.RestrictToRegionsEnabled && !foundRegionProvider){
             getLogger().warning(I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin"));
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
