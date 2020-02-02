@@ -8,6 +8,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.songoda.kingdoms.main.Kingdoms;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
@@ -54,6 +55,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private Civs civsPlugin;
     private Plugin landsPlugin;
     private Movecraft movecraftPlugin;
+    private Kingdoms kingdomsPlugin;
     private Metrics metrics;
     private boolean startup = true;
 
@@ -291,6 +293,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             landsPlugin = lands;
             foundRegionProvider = true;
         }
+        //Check for FabledKingdoms
+        Plugin fk = getServer().getPluginManager().getPlugin("FabledKingdoms");
+        if (fk instanceof Kingdoms) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - FabledKingdoms detected"));
+            kingdomsPlugin = (Kingdoms) fk;
+        }
         //Check for Movecraft
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
         if (movecraft instanceof Movecraft) {
@@ -405,6 +413,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public Plugin getLandsPlugin() {
         return landsPlugin;
+    }
+
+    public Movecraft getMovecraftPlugin() {
+        return movecraftPlugin;
+    }
+
+    public Kingdoms getKingdomsPlugin() {
+        return kingdomsPlugin;
     }
 
     public Metrics getMetrics() {

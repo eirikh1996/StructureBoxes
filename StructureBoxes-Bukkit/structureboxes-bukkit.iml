@@ -110,6 +110,15 @@
     </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.3.3.0" level="project" />
     <orderEntry type="module-library">
+      <library name="Maven: com.songoda:Kingdoms:LATEST">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/libs/FabledKingdoms.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="Maven: net.countercraft:Movecraft:LATEST">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/bukkit/Movecraft.jar!/" />

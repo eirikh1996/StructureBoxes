@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>structureboxes-bukkit</artifactId>
   <name>StructureBoxes-Bukkit</name>
-  <version>2.5</version>
+  <version>3.0</version>
   <build>
     <resources>
       <resource>
@@ -206,6 +206,13 @@
       <version>1.5.8</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/../libs/bukkit/civs-1.5.8.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.songoda</groupId>
+      <artifactId>Kingdoms</artifactId>
+      <version>LATEST</version>
+      <scope>system</scope>
+      <systemPath>C:/Users/eirik/libs/FabledKingdoms.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>net.countercraft</groupId>

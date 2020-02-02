@@ -6,7 +6,6 @@ import org.bukkit.Location;
 
 public class RegionUtils {
 
-
     public static boolean isWithinRegion(Location location){
         boolean worldguard = false;
         boolean factions = false;
@@ -17,6 +16,7 @@ public class RegionUtils {
         boolean towny = false;
         boolean civs = false;
         boolean lands = false;
+        boolean kingdoms = false;
         StructureBoxes structureBoxes = StructureBoxes.getInstance();
         if (structureBoxes.getWorldGuardPlugin() != null){
             worldguard = WorldGuardUtils.insideRegion(location);
@@ -45,7 +45,19 @@ public class RegionUtils {
         if (structureBoxes.getLandsPlugin() != null) {
             lands = LandsUtils.isWithinRegion(location);
         }
-        return worldguard || factions || redprotect || griefprevention || plotSquared || landClaiming || towny || civs || lands;
+        if (structureBoxes.getKingdomsPlugin() != null) {
+            kingdoms = FabledKingdomsUtils.isWithinRegion(location);
+        }
+        return worldguard ||
+                factions ||
+                redprotect ||
+                griefprevention ||
+                plotSquared ||
+                landClaiming ||
+                towny ||
+                civs ||
+                lands ||
+                kingdoms;
     }
 
     public static boolean canPlaceStructure(Location loc) {
