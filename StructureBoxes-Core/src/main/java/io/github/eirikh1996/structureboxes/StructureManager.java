@@ -59,6 +59,7 @@ public class StructureManager implements Iterable<Collection<Location>>, Runnabl
             playerTimeStructureMap.put(id, pairLinkedList);
         }
 
+
     }
 
     public LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> getSessions(UUID playerID) {

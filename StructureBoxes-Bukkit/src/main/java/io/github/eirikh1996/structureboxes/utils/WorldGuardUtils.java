@@ -7,9 +7,11 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
+import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -76,5 +78,21 @@ public class WorldGuardUtils {
             return true;
         }
         return false;
+    }
+
+    public static void registerFlag() {
+        FlagRegistry flags;
+        if (Settings.IsLegacy) {
+            try {
+                final Method getFlagRegistry = WorldGuardPlugin.class.getDeclaredMethod("getFlagRegistry");
+                flags = (FlagRegistry) getFlagRegistry.invoke(StructureBoxes.getInstance().getWorldGuardPlugin());
+            } catch (Exception e) {
+                return;
+            }
+
+        } else {
+            flags = WorldGuard.getInstance().getFlagRegistry();
+        }
+        flags.register(STRUCTUREBOX_FLAG);
     }
 }

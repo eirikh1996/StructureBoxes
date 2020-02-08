@@ -5,9 +5,7 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.songoda.kingdoms.main.Kingdoms;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
@@ -76,19 +74,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
             worldGuardPlugin = (WorldGuardPlugin) wg;
-            FlagRegistry flags;
-            if (Settings.IsLegacy) {
-                try {
-                    final Method getFlagRegistry = WorldGuardPlugin.class.getDeclaredMethod("getFlagRegistry");
-                    flags = (FlagRegistry) getFlagRegistry.invoke(worldGuardPlugin);
-                } catch (Exception e) {
-                    flags = null;
-                }
-
-            } else {
-                flags = WorldGuard.getInstance().getFlagRegistry();
-            }
-            flags.register(WorldGuardUtils.STRUCTUREBOX_FLAG);
+            WorldGuardUtils.registerFlag();
         }
     }
 

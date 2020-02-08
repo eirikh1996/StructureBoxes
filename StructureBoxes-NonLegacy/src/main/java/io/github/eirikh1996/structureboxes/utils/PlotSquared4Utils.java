@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class PlotSquared4Utils {
     private static Map<String, Object> worlds;
-    private static Flag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
+    private static FlagHolder flagHolder;
 
     public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
@@ -76,7 +76,8 @@ public class PlotSquared4Utils {
     }
 
     public static void registerFlag() {
-        new PlotAPI().addFlag(STRUCTUREBOX_FLAG);
+        flagHolder = new FlagHolder();
+        new PlotAPI().addFlag(flagHolder.getStructureBoxFlag());
     }
 
     public static boolean canPlaceStructureBox(Location loc) {
@@ -92,7 +93,7 @@ public class PlotSquared4Utils {
         if (plot == null) {
             return true;
         }
-        return (boolean) plot.getFlag(STRUCTUREBOX_FLAG).get();
+        return (boolean) plot.getFlag(flagHolder.getStructureBoxFlag()).get();
     }
 
     private static com.github.intellectualsites.plotsquared.plot.object.Location bukkitToPSLoc(Location location){
@@ -102,6 +103,14 @@ public class PlotSquared4Utils {
     private static class PlotSquaredWorldsConfigException extends RuntimeException {
         public PlotSquaredWorldsConfigException(String message, Throwable cause){
             super(message, cause);
+        }
+    }
+
+    private static class FlagHolder {
+        private  Flag StructureBoxFlag = new BooleanFlag("structurebox");
+
+        public Flag getStructureBoxFlag() {
+            return StructureBoxFlag;
         }
     }
 }
