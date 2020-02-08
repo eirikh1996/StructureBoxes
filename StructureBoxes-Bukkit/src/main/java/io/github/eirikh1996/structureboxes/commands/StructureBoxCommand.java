@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,16 @@ public class StructureBoxCommand implements TabExecutor {
             return false;
         }
         if (strings.length == 0){
-            return false;
+            PluginDescriptionFile desc = StructureBoxes.getInstance().getDescription();
+            final String[] page = new String[4];
+            page[0] = "§5==================[§6StructureBoxes§5]==================";
+            page[1] = "§6Author: " + String.join(",", desc.getAuthors());
+            page[2] = "§6/sb create <schematic ID> - Creates new structure box";
+            page[3] = "§6/sb undo - Undoes the last undo session";
+            page[4] = "§6/sb reload - Reloads the plugin";
+            page[5] = "§5========================================================";
+            commandSender.sendMessage(page);
+            return true;
         }
         if (strings[0].equalsIgnoreCase("create")){
             String schematicName;
@@ -211,6 +221,7 @@ public class StructureBoxCommand implements TabExecutor {
 
     }
 
+
     private boolean reloadCommand(CommandSender sender){
         if (!sender.hasPermission("structureboxes.reload")){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
@@ -236,25 +247,19 @@ public class StructureBoxCommand implements TabExecutor {
             }
         } else if (strings[0].equalsIgnoreCase("create")){
             File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
-            //Bukkit.broadcastMessage(String.valueOf(schemFolder.list().length));
             if (!schemFolder.exists()){
                 return Collections.emptyList();
             }
-            for (File schem : schemFolder.listFiles()){
-                if (schem == null){
+            for (String schem : schemFolder.list()){
+                if (!schem.endsWith(".schematic") && !schem.endsWith(".schem")){
                     continue;
                 }
-                if (schem.getName().endsWith(".schematic")){
-                    subCmds.add(schem.getName().replace(".schematic", ""));
-                }
-                if (schem.getName().endsWith(".schem")){
-                    subCmds.add(schem.getName().replace(".schem", ""));
-                }
+                subCmds.add(schem.replace(".schematic", "").replace(".schem", ""));
             }
         }
         List<String> completions = new ArrayList<>();
         for (String arg : subCmds){
-            if (!arg.startsWith(strings[0])){
+            if (!arg.startsWith(strings[strings.length - 1])){
                 continue;
             }
             completions.add(arg);
