@@ -18,13 +18,12 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
@@ -138,5 +137,22 @@ public class BlockListener implements Listener {
         event.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BlockBreakEvent event) {
+        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> sessions = StructureManager.getInstance().getSessions(event.getPlayer().getUniqueId());
+        if (sessions == null) {
+            return;
+        }
+        Iterator<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> iter = sessions.iterator();
+        while (iter.hasNext()) {
+            AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>> next = iter.next();
+            if (!next.getValue().getValue().containsKey(MathUtils.bukkit2SBLoc(event.getBlock().getLocation()))){
+                continue;
+            }
+            iter.remove();
+            event.getPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken"));
+            break;
+        }
+    }
 
 }
