@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -217,10 +216,7 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
-        StructureBoxes sb = StructureBoxes.getInstance();
-        PluginManager plugMan = sb.getServer().getPluginManager();
-        plugMan.disablePlugin(sb);
-        plugMan.enablePlugin(sb);
+        StructureBoxes.getInstance().readConfig();
         sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Reload successful"));
         return true;
     }
@@ -240,6 +236,7 @@ public class StructureBoxCommand implements TabExecutor {
             }
         } else if (strings[0].equalsIgnoreCase("create")){
             File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
+            //Bukkit.broadcastMessage(String.valueOf(schemFolder.list().length));
             if (!schemFolder.exists()){
                 return Collections.emptyList();
             }

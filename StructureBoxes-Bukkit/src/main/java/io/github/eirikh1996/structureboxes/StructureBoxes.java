@@ -89,62 +89,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         } else {
             saveDefaultConfig();
         }
-        Settings.locale = getConfig().getString("Locale", "en");
-        Settings.Metrics = getConfig().getBoolean("Metrics", true);
-        Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
-        Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
-        Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
-        Object object = getConfig().get("Structure Box Instruction Message");
-        if (object instanceof String){
-            Settings.StructureBoxInstruction.add((String) object);
-        } else if (object instanceof List) {
-            List list = (List) object;
-            for (Object i : list) {
-                if (i == null)
-                    continue;
-                Settings.StructureBoxInstruction.add((String) i);
-            }
-        }
-        Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
-        Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
-        Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
-        ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
-        Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
-        Settings.RestrictToRegionsEntireStructure = restrictToRegions.getBoolean("Entire structure", false);
-        List<String> exceptions = restrictToRegions.getStringList("Exceptions");
-        if (!exceptions.isEmpty()){
-            Settings.RestrictToRegionsExceptions.addAll(exceptions);
-        }
-        Settings.MaxSessionTime = getConfig().getLong("Max Session Time", 60);
-        Settings.MaxStructureSize = getConfig().getInt("Max Structure Size", 10000);
-        Settings.Debug = getConfig().getBoolean("Debug", false);
-        ConfigurationSection freeSpace = getConfig().getConfigurationSection("Free space");
-        List materials = freeSpace.getList("Blocks to ignore");
-        for (Object obj : materials) {
-            Material type = null;
-            if (obj == null){
-                continue;
-            }
-            else if (obj instanceof Integer) {
-                int id = (int) obj;
-                if (GET_MATERIAL == null){
-                    throw new IllegalArgumentException("Numerical block IDs are not supported by this server version: " + getServer().getVersion());
-                }
-                try {
-                    type = (Material) GET_MATERIAL.invoke(Material.class, id);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            } else if (obj instanceof String){
-                String str = (String) obj;
-                type = Material.getMaterial(str.toUpperCase());
-            }
-            if (type == null){
-                continue;
-            }
-            Settings.blocksToIgnore.add(type);
-        }
-        Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
+        readConfig();
         if (!I18nSupport.initialize(getDataFolder())){
             return;
         }
@@ -535,4 +480,65 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().broadcastMessage(s);
     }
 
+    public void readConfig() {
+        Settings.locale = getConfig().getString("Locale", "en");
+        Settings.Metrics = getConfig().getBoolean("Metrics", true);
+        Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
+        Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
+        Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
+        Object object = getConfig().get("Structure Box Instruction Message");
+        Settings.StructureBoxInstruction.clear();
+        if (object instanceof String){
+            Settings.StructureBoxInstruction.add((String) object);
+        } else if (object instanceof List) {
+            List list = (List) object;
+            for (Object i : list) {
+                if (i == null)
+                    continue;
+                Settings.StructureBoxInstruction.add((String) i);
+            }
+        }
+        Settings.StructureBoxPrefix = getConfig().getString("Structure Box Prefix");
+        Settings.AlternativePrefixes = getConfig().getStringList("Alternative Prefixes");
+        Settings.RequirePermissionPerStructureBox = getConfig().getBoolean("Require permission per structure box", false);
+        ConfigurationSection restrictToRegions = getConfig().getConfigurationSection("Restrict to regions");
+        Settings.RestrictToRegionsEnabled = restrictToRegions.getBoolean("Enabled", false);
+        Settings.RestrictToRegionsEntireStructure = restrictToRegions.getBoolean("Entire structure", false);
+        Settings.RestrictToRegionsExceptions.clear();
+        List<String> exceptions = restrictToRegions.getStringList("Exceptions");
+        if (!exceptions.isEmpty()){
+            Settings.RestrictToRegionsExceptions.addAll(exceptions);
+        }
+        Settings.MaxSessionTime = getConfig().getLong("Max Session Time", 60);
+        Settings.MaxStructureSize = getConfig().getInt("Max Structure Size", 10000);
+        Settings.Debug = getConfig().getBoolean("Debug", false);
+        ConfigurationSection freeSpace = getConfig().getConfigurationSection("Free space");
+        List materials = freeSpace.getList("Blocks to ignore");
+        for (Object obj : materials) {
+            Material type = null;
+            if (obj == null){
+                continue;
+            }
+            else if (obj instanceof Integer) {
+                int id = (int) obj;
+                if (GET_MATERIAL == null){
+                    throw new IllegalArgumentException("Numerical block IDs are not supported by this server version: " + getServer().getVersion());
+                }
+                try {
+                    type = (Material) GET_MATERIAL.invoke(Material.class, id);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            } else if (obj instanceof String){
+                String str = (String) obj;
+                type = Material.getMaterial(str.toUpperCase());
+            }
+            if (type == null){
+                continue;
+            }
+            Settings.blocksToIgnore.add(type);
+        }
+        Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
+
+    }
 }
