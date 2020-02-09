@@ -40,7 +40,7 @@ public class StructureBoxCommand implements TabExecutor {
         }
         if (strings.length == 0){
             PluginDescriptionFile desc = StructureBoxes.getInstance().getDescription();
-            final String[] page = new String[4];
+            final String[] page = new String[6];
             page[0] = "§5==================[§6StructureBoxes§5]==================";
             page[1] = "§6Author: " + String.join(",", desc.getAuthors());
             page[2] = "§6/sb create <schematic ID> - Creates new structure box";
