@@ -20,26 +20,33 @@ import java.net.URLConnection;
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class UpdateChecker extends BukkitRunnable implements Listener {
-    public static UpdateChecker instance;
+    private static UpdateChecker instance;
+    private int secondCooldown = 0;
+    private int delayBeforeCheckingUpdate = 0;
 
     private UpdateChecker(){}
 
     @Override
     public void run() {
+        secondCooldown++;
+        if (secondCooldown < 3600) {
+            return;
+        }
         StructureBoxes sb = StructureBoxes.getInstance();
-        sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Checking for updates"));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                final double newVersion = getNewVersion(getCurrentVersion());
-                if (newVersion <= getCurrentVersion()){
-                    sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
-                    return;
-                }
-                sb.getLogger().warning(String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
-                sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
+        if (delayBeforeCheckingUpdate == 0) {
+            sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Checking for updates"));
+        } else if (delayBeforeCheckingUpdate >= 5) {
+            delayBeforeCheckingUpdate = 0;
+            secondCooldown = 0;
+            final double newVersion = getNewVersion(getCurrentVersion());
+            if (newVersion <= getCurrentVersion()){
+                sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
+                return;
             }
-        }.runTaskLaterAsynchronously(sb, 120);
+            sb.getLogger().warning(String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
+            sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
+        }
+        delayBeforeCheckingUpdate++;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -90,4 +97,4 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             return currentVersion;
         }
     }
-        }
+}
