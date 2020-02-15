@@ -46,14 +46,21 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event){
         final Player player = event.getPlayer();
         final double newVersion = getNewVersion(getCurrentVersion());
-        if (newVersion <= getCurrentVersion()){
-            return;
-        }
-        if (!player.hasPermission("structureboxes.update")){
-            return;
-        }
-        player.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
-        player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
+        final double currentVersion = getCurrentVersion();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (newVersion <= currentVersion){
+                    return;
+                }
+                if (!player.hasPermission("structureboxes.update")){
+                    return;
+                }
+                player.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
+                player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
+            }
+        }.runTaskAsynchronously(StructureBoxes.getInstance());
+
     }
 
     public static synchronized UpdateChecker getInstance() {

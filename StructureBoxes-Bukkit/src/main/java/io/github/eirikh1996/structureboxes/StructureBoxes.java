@@ -144,30 +144,34 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             return;
         }
 
-
+        boolean foundRegionProvider = false;
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - WorldGuard detected"));
             worldGuardPlugin = (WorldGuardPlugin) wg;
+            foundRegionProvider = true;
         }
         Plugin f = getServer().getPluginManager().getPlugin("Factions");
         //Check for Factions
         if (f instanceof Factions){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             factionsPlugin = (Factions) f;
+            foundRegionProvider = true;
         }
         //Check for RedProtect
         Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
         if (rp instanceof RedProtect){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
             redProtectPlugin = (RedProtect) rp;
+            foundRegionProvider = true;
         }
         //Check for GriefPrevention
         Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
         if (gp instanceof GriefPrevention){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
             griefPreventionPlugin = (GriefPrevention) gp;
+            foundRegionProvider = true;
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
@@ -179,30 +183,35 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 PlotSquared4Utils.initialize();
             }
             plotSquaredInstalled = true;
+            foundRegionProvider = true;
         }
         //Check for landClaiming
         Plugin lp = getServer().getPluginManager().getPlugin("LandClaiming");
         if (lp instanceof LandClaiming){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - LandClaiming detected"));
             landClaimingPlugin = (LandClaiming) lp;
+            foundRegionProvider = true;
         }
         //Check for Towny
         Plugin tp = getServer().getPluginManager().getPlugin("Towny");
         if (tp instanceof Towny){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Towny detected"));
             townyPlugin = (Towny) tp;
+            foundRegionProvider = true;
         }
         //Check for Civs
         Plugin cp = getServer().getPluginManager().getPlugin("Civs");
         if (cp instanceof Civs) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Civs detected"));
             civsPlugin = (Civs) cp;
+            foundRegionProvider = true;
         }
         //Check for Lands
         Plugin lands = getServer().getPluginManager().getPlugin("Lands");
         if (lands != null) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Lands detected"));
             landsPlugin = lands;
+            foundRegionProvider = true;
         }
         //Check for Movecraft
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
@@ -210,14 +219,16 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
             getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
             movecraftPlugin = (Movecraft) movecraft;
+            foundRegionProvider = true;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
-        if (Settings.RestrictToRegionsEnabled && worldGuardPlugin == null && factionsPlugin == null && griefPreventionPlugin == null && redProtectPlugin == null && !plotSquaredInstalled && landClaimingPlugin == null){
+        if (!foundRegionProvider){
             getLogger().warning(I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin"));
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
         if (Settings.Metrics) {
+            final boolean noRegionProvider = !foundRegionProvider;
             metrics = new Metrics(this);
             metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<Map<String, Integer>>() {
                 @Override
@@ -250,15 +261,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     if (getLandsPlugin() != null) {
                         valueMap.put("Lands", 1);
                     }
-                    if (getFactionsPlugin() == null &&
-                            getTownyPlugin() == null &&
-                            getWorldGuardPlugin() == null &&
-                            !isPlotSquaredInstalled() &&
-                            getRedProtectPlugin() == null &&
-                            getGriefPreventionPlugin() == null &&
-                            getLandClaimingPlugin() == null &&
-                            getCivsPlugin() == null &&
-                            getLandsPlugin() == null) {
+                    if (noRegionProvider) {
                         valueMap.put("None", 1);
                     }
                     return valueMap;
@@ -273,7 +276,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
-            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 10000000);
+            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 20000);
             startup = false;
         }
 
