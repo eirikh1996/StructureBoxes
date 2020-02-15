@@ -44,10 +44,11 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event){
-        final Player player = event.getPlayer();
-        final double newVersion = getNewVersion(getCurrentVersion());
-        final double currentVersion = getCurrentVersion();
         new BukkitRunnable() {
+            final Player player = event.getPlayer();
+            final double newVersion = getNewVersion(getCurrentVersion());
+            final double currentVersion = getCurrentVersion();
+
             @Override
             public void run() {
                 if (newVersion <= currentVersion){
@@ -59,7 +60,7 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
                 player.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
                 player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
             }
-        }.runTaskAsynchronously(StructureBoxes.getInstance());
+        }.runTaskLaterAsynchronously(StructureBoxes.getInstance(), 120);
 
     }
 
@@ -97,4 +98,4 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             return currentVersion;
         }
     }
-        }
+}
