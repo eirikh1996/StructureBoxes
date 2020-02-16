@@ -140,7 +140,7 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        Set<Structure> sessions = StructureManager.getInstance().getSessions(event.getPlayer().getUniqueId());
+        Set<Structure> sessions = StructureManager.getInstance().getStructures();
         if (sessions == null || sessions.isEmpty()) {
             return;
         }

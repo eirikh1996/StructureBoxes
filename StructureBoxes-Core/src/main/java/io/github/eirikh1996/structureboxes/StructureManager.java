@@ -75,6 +75,10 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         return playerStructures;
     }
 
+    public Set<Structure> getStructures() {
+        return structures;
+    }
+
     public Structure getStructureAt(Location loc) {
         for (Structure structure : structures) {
             if (!structure.getStructure().contains(loc)) {

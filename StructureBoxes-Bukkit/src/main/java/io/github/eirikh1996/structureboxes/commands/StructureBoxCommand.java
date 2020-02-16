@@ -9,8 +9,10 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import io.github.eirikh1996.structureboxes.utils.TopicPaginator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -41,14 +43,15 @@ public class StructureBoxCommand implements TabExecutor {
         }
         if (strings.length == 0){
             PluginDescriptionFile desc = StructureBoxes.getInstance().getDescription();
-            commandSender.sendMessage("§5==================[§6StructureBoxes§5]==================");
-            commandSender.sendMessage("§6Author: " + String.join(",", desc.getAuthors()));
-            commandSender.sendMessage("§6Version: v" + desc.getVersion());
-            commandSender.sendMessage("§6/sb create <schematic ID> [-m] - Creates new structure box");
-            commandSender.sendMessage("§6If using FAWE, -m will move schematic to global directory");
-            commandSender.sendMessage("§6/sb undo - Undoes the last undo session");
-            commandSender.sendMessage("§6/sb reload - Reloads the plugin");
-            commandSender.sendMessage("§5========================================================");
+            commandSender.sendMessage("§5 ==================[§6StructureBoxes§5]==================");
+            commandSender.sendMessage("§6 Author: " + String.join(",", desc.getAuthors()));
+            commandSender.sendMessage("§6 Version: v" + desc.getVersion());
+            commandSender.sendMessage("§6 /sb create <schematic ID> [-m] - Creates new structure box");
+            commandSender.sendMessage("§6 If using FAWE, -m will move schematic to global directory");
+            commandSender.sendMessage("§6 /sb undo - Undoes the last undo session");
+            commandSender.sendMessage("§6 /sb reload - Reloads the plugin");
+            commandSender.sendMessage("§6 /sb sessions [player|-a|you] [page] - Shows active sessions");
+            commandSender.sendMessage("§5 ========================================================");
             return true;
         }
         if (strings[0].equalsIgnoreCase("create")){
@@ -69,6 +72,8 @@ public class StructureBoxCommand implements TabExecutor {
             return undoCommand(commandSender);
         } else if (strings[0].equalsIgnoreCase("reload")){
             return reloadCommand(commandSender);
+        } else if (strings[0].equalsIgnoreCase("sessions")) {
+            return sessionsCommand(commandSender, strings);
         }
         return false;
     }
@@ -152,6 +157,9 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
+        if (!structure.isProcessing()) {
+            structure.setProcessing(true);
+        }
         String schematicName = structure.getSchematicName();
         Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
         if (locationMaterialHashMap == null) {
@@ -196,6 +204,9 @@ public class StructureBoxCommand implements TabExecutor {
                     }
                     if (locationQueue.isEmpty()){
                         StructureManager.getInstance().removeStructure(structure);
+                        if (structure.isProcessing()) {
+                            structure.setProcessing(false);
+                        }
                         cancel();
                     }
                 }
@@ -214,29 +225,18 @@ public class StructureBoxCommand implements TabExecutor {
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
-        boolean fullInventory = p.getInventory().firstEmpty() == -1;;
-        Collection<? extends ItemStack> foundBoxes = p.getInventory().all(structureBox).values();
-        if (!foundBoxes.isEmpty()){
-            for (ItemStack box : foundBoxes){
-                if (box.getAmount() == structureBox.getMaxStackSize()){
-                    continue;
-                }
-                fullInventory = false;
-            }
-        }
-
-
-        if (fullInventory){
+        @NotNull HashMap<Integer, ItemStack> notFitting = p.getInventory().addItem(structureBox);
+        if (!notFitting.isEmpty()){
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space"));
             p.getWorld().dropItem(p.getLocation(), structureBox);
-            return true;
         }
-        p.getInventory().addItem(structureBox);
+
 
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
             Bukkit.broadcastMessage("Undo took (ms): " + (end - start));
         }
+
         return true;
 
 
@@ -253,6 +253,61 @@ public class StructureBoxCommand implements TabExecutor {
         return true;
     }
 
+    private boolean sessionsCommand(CommandSender sender, String[] args) {
+        if (args.length == 1 && !(sender instanceof Player)) {
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Sessions - Must supply player"));
+            return true;
+        }
+        Player p = (Player) sender;
+        int page;
+        try {
+            page = Integer.parseInt(args[1]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            page = 1;
+        } catch (NumberFormatException e) {
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Usage") + " /structurebox sessions [page] [player|-a|you]");
+            return true;
+        }
+        OfflinePlayer sessionOwner = args.length == 3 && !args[2].equalsIgnoreCase("-a") ? Bukkit.getOfflinePlayer(args[2]) : p;
+        if (!p.equals(sessionOwner) && !p.hasPermission("structurebox.sessions.others")) {
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Sessions - No permission to view others"));
+            return true;
+        } else if (args.length == 3 && args[2].equalsIgnoreCase("-a") && !p.hasPermission("structurebox.sessions.all")) {
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Sessions - No permission to view all"));
+            return true;
+        }
+        if (sessionOwner == null) {
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Sessions - Invalid player name"));
+            return true;
+        }
+        Collection<Structure> sessions;
+        String title = "";
+        if (args.length == 3 && args[2].equalsIgnoreCase("-a")) {
+            sessions = StructureManager.getInstance().getStructures();
+            title += "All ";
+        } else {
+            sessions = StructureManager.getInstance().getSessions(sessionOwner.getUniqueId());
+            title += sessionOwner.getName() + "'s ";
+        }
+        title += " sessions";
+        if (sessions.isEmpty()) {
+            p.sendMessage(COMMAND_PREFIX + (p.equals(sessionOwner) ? I18nSupport.getInternationalisedString("Sessions - You") : sessionOwner.getName()) +I18nSupport.getInternationalisedString("Command - Sessions - No sessions for") );
+            return true;
+        }
+        final TopicPaginator paginator = new TopicPaginator(title);
+        for (Structure structure : sessions) {
+            paginator.addLine((title.startsWith("All") ? Bukkit.getOfflinePlayer(structure.getOwner()).getName()+ " " : "") + structure.getSchematicName() + ": " + (Settings.MaxSessionTime - (System.currentTimeMillis() - structure.getPlacementTime())/1000) + " seconds left");
+        }
+        if (!paginator.isInBounds(page)) {
+            p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Pagination - Invalid page") + page);
+            return true;
+        }
+        for (String line : paginator.getPage(page)) {
+            p.sendMessage(line);
+        }
+        return true;
+    }
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         List<String> subCmds = new ArrayList<>();
@@ -265,6 +320,9 @@ public class StructureBoxCommand implements TabExecutor {
             }
             if (commandSender.hasPermission("structureboxes.reload")) {
                 subCmds.add("reload");
+            }
+            if (commandSender.hasPermission("structureboxes.sessions")) {
+                subCmds.add("sessions");
             }
         } else if (strings[0].equalsIgnoreCase("create") && strings.length < 3){
             File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
