@@ -40,13 +40,15 @@ public class StructureBoxCommand implements TabExecutor {
         }
         if (strings.length == 0){
             PluginDescriptionFile desc = StructureBoxes.getInstance().getDescription();
-            final String[] page = new String[6];
+            final String[] page = new String[8];
             page[0] = "§5==================[§6StructureBoxes§5]==================";
             page[1] = "§6Author: " + String.join(",", desc.getAuthors());
-            page[2] = "§6/sb create <schematic ID> - Creates new structure box";
-            page[3] = "§6/sb undo - Undoes the last undo session";
-            page[4] = "§6/sb reload - Reloads the plugin";
-            page[5] = "§5========================================================";
+            page[2] = "§6Version: v" + desc.getVersion();
+            page[3] = "§6/sb create <schematic ID> [-m] - Creates new structure box";
+            page[4] = "§6If using FAWE, -m will move schematic to global directory";
+            page[5] = "§6/sb undo - Undoes the last undo session";
+            page[6] = "§6/sb reload - Reloads the plugin";
+            page[7] = "§5========================================================";
             commandSender.sendMessage(page);
             return true;
         }
@@ -57,7 +59,13 @@ public class StructureBoxCommand implements TabExecutor {
             } catch (ArrayIndexOutOfBoundsException e){
                 schematicName = "";
             }
-            return createStructureBox(commandSender, schematicName);
+            boolean moveSchem;
+            try {
+                moveSchem = strings[2].equalsIgnoreCase("-m");
+            } catch (ArrayIndexOutOfBoundsException e) {
+                moveSchem = false;
+            }
+            return createStructureBox(commandSender, schematicName, moveSchem);
         } else if (strings[0].equalsIgnoreCase("undo")){
             return undoCommand(commandSender);
         } else if (strings[0].equalsIgnoreCase("reload")){
@@ -68,7 +76,7 @@ public class StructureBoxCommand implements TabExecutor {
 
 
 
-    private boolean createStructureBox(CommandSender sender, String schematicName){
+    private boolean createStructureBox(CommandSender sender, String schematicName, boolean moveSchem){
         if (!(sender instanceof Player)){
 
             return true;
@@ -87,9 +95,24 @@ public class StructureBoxCommand implements TabExecutor {
         if (!schematicFile.exists()){
             schematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + schematicName + ".schem");
         }
-        if (!schematicFile.exists()){
+        File playerSchematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + player.getUniqueId() + "/" + schematicName + ".schematic");
+
+        if (!playerSchematicFile.exists()) {
+            playerSchematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + player.getUniqueId() + "/" + schematicName + ".schem");
+        }
+        if (!schematicFile.exists() && !playerSchematicFile.exists()){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No schematic"));
             return true;
+        }
+        if (moveSchem) {
+            if (!player.hasPermission("structurebox.moveschematic")) {
+                player.sendMessage(I18nSupport.getInternationalisedString("Command - No permission to move"));
+                return true;
+            }
+            final File globalSchemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
+            playerSchematicFile.renameTo(new File(globalSchemDir, playerSchematicFile.getName()));
+        } else {
+            schematicName = player.getUniqueId() + "/" + schematicName;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
         if (Settings.MaxStructureSize > -1 && StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
@@ -245,16 +268,27 @@ public class StructureBoxCommand implements TabExecutor {
             if (commandSender.hasPermission("structureboxes.reload")) {
                 subCmds.add("reload");
             }
-        } else if (strings[0].equalsIgnoreCase("create")){
+        } else if (strings[0].equalsIgnoreCase("create") && strings.length < 3){
             File schemFolder = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
-            if (!schemFolder.exists()){
+
+            if (!schemFolder.exists() || !(commandSender instanceof Player)){
                 return Collections.emptyList();
             }
+            Player p = (Player) commandSender;
+            File playerFolder = new File(schemFolder, p.getUniqueId().toString());
             for (String schem : schemFolder.list()){
                 if (!schem.endsWith(".schematic") && !schem.endsWith(".schem")){
                     continue;
                 }
                 subCmds.add(schem.replace(".schematic", "").replace(".schem", ""));
+            }
+            if (playerFolder.exists()) {
+                for (String schem : playerFolder.list()) {
+                    if (!schem.endsWith(".schematic") && !schem.endsWith(".schem")){
+                        continue;
+                    }
+                    subCmds.add(schem.replace(".schematic", "").replace(".schem", ""));
+                }
             }
         }
         List<String> completions = new ArrayList<>();
