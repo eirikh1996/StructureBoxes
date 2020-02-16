@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes.command;
 
+import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -43,25 +44,25 @@ public class StructureBoxUndoCommand implements CommandExecutor {
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission")));
             return CommandResult.success();
         }
-        AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> stringStructurePair = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
-        if (stringStructurePair == null){
+        Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
+        if (structure == null){
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
-        String schematicName = stringStructurePair.getKey();
-        HashMap<Location, Object> locationMaterialHashMap = stringStructurePair.getValue();
+        String schematicName = structure.getSchematicName();
+        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
         if (locationMaterialHashMap == null) {
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
-        final HashSet<Location> structure = new HashSet<>(locationMaterialHashMap.keySet());
+        final HashSet<Location> structureLocs = new HashSet<>(locationMaterialHashMap.keySet());
         final List<Collection<Location>> sections = new ArrayList<>();
-        for (int i = 0 ; i <= structure.size() / 30000; i++){
+        for (int i = 0 ; i <= structureLocs.size() / 30000; i++){
             sections.add(new HashSet<>());
         }
         int index = 0;
         int count = 0;
-        for (Location location : structure){
+        for (Location location : structureLocs){
             sections.get(index).add(location);
             count++;
             if (count >= 30000){
@@ -70,7 +71,6 @@ public class StructureBoxUndoCommand implements CommandExecutor {
             }
 
         }
-        StructureManager.getInstance().addStructure(structure);
 
         final Queue<Collection<Location>> locationQueue = new LinkedList<>(sections);
 
@@ -91,7 +91,7 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         structureBox.offer(Keys.ITEM_LORE, lore);
         p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo")));
         PlayerInventory pInv = (PlayerInventory) p.getInventory();
-        Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap, structure)).submit(StructureBoxes.getInstance());
+        Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap, structureLocs)).submit(StructureBoxes.getInstance());
 
 
         if (!pInv.getMain().canFit(structureBox)){
@@ -112,10 +112,10 @@ public class StructureBoxUndoCommand implements CommandExecutor {
 
     private static class StructureUndoTask implements Consumer<Task> {
         private final Queue<Collection<Location>> locationQueue;
-        private final HashMap<Location, Object> locationMaterialHashMap;
+        private final Map<Location, Object> locationMaterialHashMap;
         private final HashSet<Location> structure;
 
-        private StructureUndoTask(Queue<Collection<Location>> locationQueue, HashMap<Location, Object> locationMaterialHashMap, HashSet<Location> structure) {
+        private StructureUndoTask(Queue<Collection<Location>> locationQueue, Map<Location, Object> locationMaterialHashMap, HashSet<Location> structure) {
             this.locationQueue = locationQueue;
             this.locationMaterialHashMap = locationMaterialHashMap;
             this.structure = structure;
@@ -139,7 +139,8 @@ public class StructureBoxUndoCommand implements CommandExecutor {
 
             }
             if (locationQueue.isEmpty()){
-                StructureManager.getInstance().removeStructure(structure);
+
+                StructureManager.getInstance().removeStructure(StructureManager.getInstance().getCorrespondingStructure(structure));
                 task.cancel();
             }
         }

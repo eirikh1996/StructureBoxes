@@ -12,10 +12,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import io.github.eirikh1996.structureboxes.Direction;
-import io.github.eirikh1996.structureboxes.SBMain;
-import io.github.eirikh1996.structureboxes.StructureManager;
-import io.github.eirikh1996.structureboxes.WorldEditHandler;
+import io.github.eirikh1996.structureboxes.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
@@ -143,7 +140,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         if (!sbMain.structureWithinRegion(playerID, schematicName, structureLocs)){
             return false;
         }
-        StructureManager.getInstance().addStructure(structureLocs);
+        final Structure structure = StructureManager.getInstance().getCorrespondingStructure(structureLocs);
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
             sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
@@ -155,6 +152,9 @@ public class IWorldEditHandler extends WorldEditHandler {
                 sbMain.clearInterior(interior);
             } catch (WorldEditException e) {
                 e.printStackTrace();
+            }
+            if (structure != null) {
+                structure.setProcessing(false);
             }
             StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
             if (Settings.Debug){

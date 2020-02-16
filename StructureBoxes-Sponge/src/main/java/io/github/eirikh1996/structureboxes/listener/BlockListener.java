@@ -2,10 +2,7 @@ package io.github.eirikh1996.structureboxes.listener;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.sponge.SpongeWorld;
-import io.github.eirikh1996.structureboxes.Direction;
-import io.github.eirikh1996.structureboxes.StructureBoxes;
-import io.github.eirikh1996.structureboxes.StructureManager;
-import io.github.eirikh1996.structureboxes.WorldEditHandler;
+import io.github.eirikh1996.structureboxes.*;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
@@ -121,7 +118,7 @@ public class BlockListener {
 
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
-        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> sessions = StructureManager.getInstance().getSessions(player.getUniqueId());
+        Set<Structure> sessions = StructureManager.getInstance().getSessions(player.getUniqueId());
         if (sessions == null) {
             return;
         }
@@ -135,10 +132,10 @@ public class BlockListener {
         if (snapshot == null || !snapshot.getLocation().isPresent()) {
             return;
         }
-        Iterator<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> iter = sessions.iterator();
+        Iterator<Structure> iter = sessions.iterator();
         while (iter.hasNext()) {
-            AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>> next = iter.next();
-            if (!next.getValue().getValue().containsKey(MathUtils.spongeToSBLoc(snapshot.getLocation().get()))){
+            Structure next = iter.next();
+            if (!next.getStructure().contains(MathUtils.spongeToSBLoc(snapshot.getLocation().get()))){
                 continue;
             }
             iter.remove();

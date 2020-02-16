@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes.commands;
 
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -40,16 +41,14 @@ public class StructureBoxCommand implements TabExecutor {
         }
         if (strings.length == 0){
             PluginDescriptionFile desc = StructureBoxes.getInstance().getDescription();
-            final String[] page = new String[8];
-            page[0] = "§5==================[§6StructureBoxes§5]==================";
-            page[1] = "§6Author: " + String.join(",", desc.getAuthors());
-            page[2] = "§6Version: v" + desc.getVersion();
-            page[3] = "§6/sb create <schematic ID> [-m] - Creates new structure box";
-            page[4] = "§6If using FAWE, -m will move schematic to global directory";
-            page[5] = "§6/sb undo - Undoes the last undo session";
-            page[6] = "§6/sb reload - Reloads the plugin";
-            page[7] = "§5========================================================";
-            commandSender.sendMessage(page);
+            commandSender.sendMessage("§5==================[§6StructureBoxes§5]==================");
+            commandSender.sendMessage("§6Author: " + String.join(",", desc.getAuthors()));
+            commandSender.sendMessage("§6Version: v" + desc.getVersion());
+            commandSender.sendMessage("§6/sb create <schematic ID> [-m] - Creates new structure box");
+            commandSender.sendMessage("§6If using FAWE, -m will move schematic to global directory");
+            commandSender.sendMessage("§6/sb undo - Undoes the last undo session");
+            commandSender.sendMessage("§6/sb reload - Reloads the plugin");
+            commandSender.sendMessage("§5========================================================");
             return true;
         }
         if (strings[0].equalsIgnoreCase("create")){
@@ -111,7 +110,7 @@ public class StructureBoxCommand implements TabExecutor {
             }
             final File globalSchemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
             playerSchematicFile.renameTo(new File(globalSchemDir, playerSchematicFile.getName()));
-        } else {
+        } else if (!schematicFile.exists()){
             schematicName = player.getUniqueId() + "/" + schematicName;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
@@ -148,25 +147,25 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
-        AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> stringStructurePair = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
-        if (stringStructurePair == null){
+        Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
+        if (structure == null){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
-        String schematicName = stringStructurePair.getKey();
-        HashMap<Location, Object> locationMaterialHashMap = stringStructurePair.getValue();
+        String schematicName = structure.getSchematicName();
+        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
         if (locationMaterialHashMap == null) {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
-        final HashSet<Location> structure = new HashSet<>(locationMaterialHashMap.keySet());
+        final HashSet<Location> structureLocs = new HashSet<>(locationMaterialHashMap.keySet());
         final List<Collection<Location>> sections = new ArrayList<>();
-        for (int i = 0 ; i <= structure.size() / 30000; i++){
+        for (int i = 0 ; i <= structureLocs.size() / 30000; i++){
             sections.add(new HashSet<>());
         }
         int index = 0;
         int count = 0;
-        for (Location location : structure){
+        for (Location location : structureLocs){
             sections.get(index).add(location);
             count++;
             if (count >= 30000){
@@ -175,7 +174,6 @@ public class StructureBoxCommand implements TabExecutor {
             }
 
         }
-        StructureManager.getInstance().addStructure(structure);
 
         final Queue<Collection<Location>> locationQueue = new LinkedList<>(sections);
 
