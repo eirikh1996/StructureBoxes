@@ -88,41 +88,27 @@ public class IWorldEditHandler extends WorldEditHandler {
         int minY = clipboard.getMinimumPoint().getBlockY();
         int minZ = clipboard.getMinimumPoint().getBlockZ();
         int xLength = clipboard.getDimensions().getBlockX();
-        int yLength = clipboard.getDimensions().getBlockY();
+        int yLength = clipboard.getDimensions().getBlockY() + 1;
         int zLength = clipboard.getDimensions().getBlockZ();
 
-        Set<Location> invertedStructure = new HashSet<>();
+
         Vector offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
         Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
-        Location min = minPoint.add(0, 0, 0);
-        Location max = minPoint.add(xLength, yLength, zLength);
-        final ArrayList<Collection<Location>> surfaces = new ArrayList<>(5);
-        for (int i = 0 ; i <= 4 ; i++){
-            surfaces.add(i, new HashSet<>());
-        }
+
+        final Collection<Location> solidStructure = new HashSet<>();
+        final Collection<Location> boundingBox = new HashSet<>();
+
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
                     Location loc = minPoint.add(x, y, z).rotate(theta, pasteLoc.toSBloc());
-                    if (x == 0){
-                        surfaces.get(0).add(loc);
-                    }
-                    if (x == xLength){
-                        surfaces.get(1).add(loc);
-                    }
-                    if (y == 0){
-                        surfaces.get(2).add(loc);
-                    }
-                    if (z == 0){
-                        surfaces.get(3).add(loc);
-                    }
-                    if (z == xLength){
-                        surfaces.get(4).add(loc);
+                    solidStructure.add(loc);
+                    if (x == 0 || x == xLength || y == 0 || y == yLength || z == 0 || z == zLength) {
+                        boundingBox.add(loc);
                     }
                     BaseBlock baseBlock = clipboard.getBlock(new Vector(minX + x, minY + y, minZ + z));
                     if (baseBlock.getType() == 0){
-                        invertedStructure.add(loc);
                         continue;
                     }
 
@@ -131,32 +117,22 @@ public class IWorldEditHandler extends WorldEditHandler {
                 }
             }
         }
-        final Collection<Location> exterior = new HashSet<>();
-        for (Collection<Location> surface : surfaces){
-            exterior.addAll(surface);
+        Collection<Location> invertedStructure = CollectionUtils.filter(solidStructure, structureLocs);
+        Collection<Location> exterior = CollectionUtils.filter(boundingBox, structureLocs);
+        Collection<Location> visited = new HashSet<>();
+        Queue<Location> queue = new LinkedList<>(exterior);
+        while (!queue.isEmpty()){
+            Location node = queue.poll();
+            if (visited.contains(node))
+                continue;
+            visited.add(node);
+            queue.addAll(CollectionUtils.neighbors(invertedStructure, node));
         }
-        Collection<Location> confirmed = new HashSet<>();
-        for (Location exteriorLoc : exterior){
-            Collection<Location> visited = new HashSet<>();
-            Queue<Location> queue = new LinkedList<>();
-            queue.add(exteriorLoc);
-            while (!queue.isEmpty()){
-                Location node = queue.poll();
-                for (Location neighbor : CollectionUtils.neighbors(invertedStructure, node)){
-                    if (confirmed.contains(neighbor) || visited.contains(neighbor)){
-                        continue;
-                    }
-                    visited.add(neighbor);
-                    queue.add(neighbor);
-                }
-            }
-            confirmed.addAll(visited);
-        }
+        Collection<Location> confirmed = new HashSet<>(visited);
         final Collection<Location> interior = CollectionUtils.filter(invertedStructure, confirmed);
         structureLocs.addAll(interior);
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
-
             return false;
         }
         if (!sbMain.structureWithinRegion(playerID, schematicName, structureLocs)){

@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,6 +37,8 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
                     sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
                     return;
                 }
+                Bukkit.broadcast(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion), "structureboxes.update");
+                Bukkit.broadcast(COMMAND_PREFIX + "https://dev.bukkit.org/projects/structure-boxes/files", "structureboxes.update");
                 sb.getLogger().warning(String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
                 sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
             }

@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import io.github.eirikh1996.structureboxes.Direction;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
+import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
@@ -25,8 +26,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -117,5 +117,33 @@ public class BlockListener {
         StructureBoxes.getInstance().scheduleSyncTask(() -> {
             placed.setBlockType(BlockTypes.AIR);
         });
+    }
+
+    @Listener
+    public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
+        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> sessions = StructureManager.getInstance().getSessions(player.getUniqueId());
+        if (sessions == null) {
+            return;
+        }
+        BlockSnapshot snapshot = null;
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
+                continue;
+            }
+            snapshot = transaction.getFinal();
+        }
+        if (snapshot == null || !snapshot.getLocation().isPresent()) {
+            return;
+        }
+        Iterator<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> iter = sessions.iterator();
+        while (iter.hasNext()) {
+            AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>> next = iter.next();
+            if (!next.getValue().getValue().containsKey(MathUtils.spongeToSBLoc(snapshot.getLocation().get()))){
+                continue;
+            }
+            iter.remove();
+            player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
+            break;
+        }
     }
 }

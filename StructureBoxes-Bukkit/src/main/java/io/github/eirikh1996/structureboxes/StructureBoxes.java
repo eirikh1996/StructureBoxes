@@ -454,16 +454,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     @Override
     public void clearInterior(Collection<Location> interior) {
-                for (Location location : interior){
-                    org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
-                    //ignore air blocks
-                    if (bukkitLoc.getBlock().getType().name().endsWith("AIR")){
-                        continue;
-                    }
-                    bukkitLoc.getBlock().setType(Material.AIR);
-                }
-
-
+        for (Location location : interior){
+            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
+            //ignore air blocks
+            if (bukkitLoc.getBlock().getType().name().endsWith("AIR")){
+                continue;
+            }
+            bukkitLoc.getBlock().setType(Material.AIR);
+        }
     }
 
 
