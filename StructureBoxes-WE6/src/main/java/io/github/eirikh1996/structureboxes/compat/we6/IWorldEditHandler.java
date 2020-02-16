@@ -12,6 +12,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.world.World;
 import io.github.eirikh1996.structureboxes.*;
+import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
@@ -22,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
+import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static java.lang.Math.PI;
 
 public class IWorldEditHandler extends WorldEditHandler {
@@ -136,6 +138,13 @@ public class IWorldEditHandler extends WorldEditHandler {
             return false;
         }
         final Structure structure = StructureManager.getInstance().getCorrespondingStructure(structureLocs);
+        for (Location loc : structureLocs) {
+            if (loc.getY() <= 255) {
+                continue;
+            }
+            sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - World height exceeded"));
+            return false;
+        }
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
             sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
