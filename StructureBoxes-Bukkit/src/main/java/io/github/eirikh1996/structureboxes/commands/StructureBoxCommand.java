@@ -123,11 +123,6 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
             return true;
         }
-        int emptySlot = player.getInventory().firstEmpty();
-        if (emptySlot < 0){
-            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Insufficient inventory space"));
-            return true;
-        }
         ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
         List<String> lore = new ArrayList<>();
         ItemMeta meta = structureBox.getItemMeta();
@@ -136,7 +131,10 @@ public class StructureBoxCommand implements TabExecutor {
         lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
-        player.getInventory().addItem(structureBox);
+        if (!player.getInventory().addItem(structureBox).isEmpty()) {
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Insufficient inventory space"));
+            return true;
+        }
         player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - New structure box created"));
         return true;
     }
