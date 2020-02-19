@@ -48,12 +48,11 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event){
         new BukkitRunnable() {
-            final Player player = event.getPlayer();
-            final double newVersion = getNewVersion(getCurrentVersion());
-            final double currentVersion = getCurrentVersion();
-
             @Override
             public void run() {
+                final Player player = event.getPlayer();
+                final double newVersion = getNewVersion(getCurrentVersion());
+                final double currentVersion = getCurrentVersion();
                 if (newVersion <= currentVersion){
                     return;
                 }

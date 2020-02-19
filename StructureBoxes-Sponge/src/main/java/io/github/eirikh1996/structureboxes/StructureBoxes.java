@@ -30,6 +30,7 @@ import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import io.github.eirikh1996.structureboxes.utils.UpdateManager;
+import io.github.pulverizer.movecraft.Movecraft;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import me.ryanhamshire.griefprevention.api.claim.Claim;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -85,7 +86,8 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
                 @Dependency(id = "griefprevention", optional = true),
                 @Dependency(id = "plotsquared", optional = true),
                 @Dependency(id = "eaglefactions", optional = true),
-                @Dependency(id = "universeguard", optional = true)})
+                @Dependency(id = "universeguard", optional = true),
+                @Dependency(id = "movecraft", optional = true)})
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
@@ -111,6 +113,7 @@ public class StructureBoxes implements SBMain {
     @NotNull private Optional<EagleFactionsPlugin> eagleFactionsPlugin = Optional.empty();
     @NotNull private Optional<IPlotMain> plotSquaredPlugin = Optional.empty();
     @NotNull private Optional<UniverseGuard> universeGuardPlugin = Optional.empty();
+    @NotNull private Optional<Movecraft> movecraftPlugin = Optional.empty();
 
     private boolean plotSquaredInstalled = false;
     @Inject private Metrics2 metrics;
@@ -204,6 +207,12 @@ public class StructureBoxes implements SBMain {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - UniverseGuard detected")));
             universeGuardPlugin = (Optional<UniverseGuard>) universeGuard.get().getInstance();
             regionProviderFound = true;
+        }
+        //Check for Movecraft
+        Optional<PluginContainer> movecraft = pluginManager.getPlugin("movecraft");
+        if (movecraft.isPresent() && movecraft.get().getInstance().isPresent()) {
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Movecraft detected")));
+            movecraftPlugin = (Optional<Movecraft>) movecraft.get().getInstance();
         }
         if ((Settings.RestrictToRegionsEnabled || Settings.RestrictToRegionsEntireStructure) && !regionProviderFound) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin")));
@@ -490,5 +499,10 @@ public class StructureBoxes implements SBMain {
 
     public ConsoleSource getConsole() {
         return console;
+    }
+
+    @NotNull
+    public Optional<Movecraft> getMovecraftPlugin() {
+        return movecraftPlugin;
     }
 }

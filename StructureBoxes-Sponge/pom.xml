@@ -143,6 +143,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/sponge/UniverseGuard-2.20.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>io.github.pulverizer</groupId>
+            <artifactId>Movecraft-for-sponge</artifactId>
+            <version>0.1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/sponge/Movecraft.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>

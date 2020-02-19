@@ -118,10 +118,6 @@ public class BlockListener {
 
     @Listener
     public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
-        Set<Structure> sessions = StructureManager.getInstance().getSessions(player.getUniqueId());
-        if (sessions == null) {
-            return;
-        }
         BlockSnapshot snapshot = null;
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
@@ -132,15 +128,11 @@ public class BlockListener {
         if (snapshot == null || !snapshot.getLocation().isPresent()) {
             return;
         }
-        Iterator<Structure> iter = sessions.iterator();
-        while (iter.hasNext()) {
-            Structure next = iter.next();
-            if (!next.getStructure().contains(MathUtils.spongeToSBLoc(snapshot.getLocation().get()))){
-                continue;
-            }
-            iter.remove();
-            player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
-            break;
+        final Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(snapshot.getLocation().get()));
+        if (structure == null) {
+            return;
         }
+        StructureManager.getInstance().removeStructure(structure);
+        player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
     }
 }

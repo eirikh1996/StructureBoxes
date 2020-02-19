@@ -11,8 +11,6 @@ import net.countercraft.movecraft.events.CraftTranslateEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Set;
-
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class MovecraftListener implements Listener {
@@ -22,23 +20,14 @@ public class MovecraftListener implements Listener {
         if (event.getCraft().getNotificationPlayer() == null) {
             return;
         }
-        Set<Structure> sessions = StructureManager.getInstance().getSessions(event.getCraft().getNotificationPlayer().getUniqueId());
-
-        for (Structure session : sessions) {
-            boolean terminate = false;
-            for (MovecraftLocation ml : event.getCraft().getHitBox()) {
-                if (!session.getStructure().contains(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml))) {
-                    continue;
-                }
+        Structure structure;
+        for (MovecraftLocation ml : event.getCraft().getHitBox()) {
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            if (structure != null) {
                 event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Session will expire"));
-                terminate = true;
-                break;
-            }
-            if (terminate) {
                 break;
             }
         }
-
     }
 
     @EventHandler
@@ -46,20 +35,12 @@ public class MovecraftListener implements Listener {
         if (event.getCraft().getNotificationPlayer() == null) {
             return;
         }
-        Set<Structure> sessions = StructureManager.getInstance().getSessions(event.getCraft().getNotificationPlayer().getUniqueId());
-
-        for (Structure session : sessions) {
-            boolean terminate = false;
-            for (MovecraftLocation ml : event.getOldHitBox()) {
-                if (!session.getStructure().contains(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml))) {
-                    continue;
-                }
+        Structure structure;
+        for (MovecraftLocation ml : event.getOldHitBox()) {
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            if (structure != null) {
                 event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
-                sessions.remove(session);
-                terminate = true;
-                break;
-            }
-            if (terminate) {
+                StructureManager.getInstance().removeStructure(structure);
                 break;
             }
         }
@@ -70,20 +51,12 @@ public class MovecraftListener implements Listener {
         if (event.getCraft().getNotificationPlayer() == null) {
             return;
         }
-        Set<Structure> sessions = StructureManager.getInstance().getSessions(event.getCraft().getNotificationPlayer().getUniqueId());
-
-        for (Structure session : sessions) {
-            boolean terminate = false;
-            for (MovecraftLocation ml : event.getOldHitBox()) {
-                if (!session.getStructure().contains(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml))) {
-                    continue;
-                }
+        Structure structure;
+        for (MovecraftLocation ml : event.getOldHitBox()) {
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            if (structure != null) {
                 event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
-                sessions.remove(session);
-                terminate = true;
-                break;
-            }
-            if (terminate) {
+                StructureManager.getInstance().removeStructure(structure);
                 break;
             }
         }
