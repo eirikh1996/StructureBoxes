@@ -542,4 +542,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
 
     }
+
+    public Movecraft getMovecraftPlugin() {
+        return movecraftPlugin;
+    }
 }

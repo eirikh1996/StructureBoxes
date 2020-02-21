@@ -13,6 +13,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,9 @@ public class PlotSquared4Utils {
     public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
         final File worldsFile = new File(ps.getDirectory(), "config/worlds.yml");
+        if (!worldsFile.exists()) {
+            return;
+        }
         Yaml yaml = new Yaml();
         final Map data;
         try {
@@ -29,7 +33,7 @@ public class PlotSquared4Utils {
         } catch (FileNotFoundException e) {
             throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
-        worlds = (Map<String, Object>) data.get("worlds");
+        worlds = (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
     }
 
     public static boolean canBuild(Player player, Location location){

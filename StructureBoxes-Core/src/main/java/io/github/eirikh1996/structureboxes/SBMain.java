@@ -4,7 +4,6 @@ import io.github.eirikh1996.structureboxes.utils.Location;
 
 import java.util.Collection;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 public interface SBMain {
     WorldEditHandler getWorldEditHandler();
@@ -12,7 +11,7 @@ public interface SBMain {
     Platform getPlatform();
     boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations);
     void sendMessageToPlayer(UUID recipient, String message);
-    Logger getLogger();
+    <T> T getLogger();
     void clearInterior(Collection<Location> interior);
     void scheduleSyncTask(final Runnable runnable);
     void scheduleAsyncTask(final Runnable runnable);

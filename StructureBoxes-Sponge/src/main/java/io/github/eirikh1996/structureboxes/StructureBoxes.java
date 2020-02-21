@@ -24,12 +24,10 @@ import io.github.eirikh1996.structureboxes.command.StructureBoxReloadCommand;
 import io.github.eirikh1996.structureboxes.command.StructureBoxUndoCommand;
 import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
+import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.Location;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import io.github.eirikh1996.structureboxes.utils.RegionUtils;
-import io.github.eirikh1996.structureboxes.utils.UpdateManager;
+import io.github.eirikh1996.structureboxes.utils.*;
 import io.github.pulverizer.movecraft.Movecraft;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import me.ryanhamshire.griefprevention.api.claim.Claim;
@@ -40,6 +38,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bstats.sponge.Metrics2;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
@@ -70,7 +69,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -199,6 +197,7 @@ public class StructureBoxes implements SBMain {
         if (plotsquared.isPresent() && plotsquared.get().getInstance().isPresent()) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - PlotSquared detected")));
             plotSquaredPlugin = (Optional<IPlotMain>) plotsquared.get().getInstance();
+            PlotSquaredUtils.initialize();
             regionProviderFound = true;
         }
         //Check for UniverseGuard
@@ -212,6 +211,7 @@ public class StructureBoxes implements SBMain {
         Optional<PluginContainer> movecraft = pluginManager.getPlugin("movecraft");
         if (movecraft.isPresent() && movecraft.get().getInstance().isPresent()) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Movecraft detected")));
+            Sponge.getEventManager().registerListeners(this, new MovecraftListener());
             movecraftPlugin = (Optional<Movecraft>) movecraft.get().getInstance();
         }
         if ((Settings.RestrictToRegionsEnabled || Settings.RestrictToRegionsEntireStructure) && !regionProviderFound) {
@@ -229,9 +229,10 @@ public class StructureBoxes implements SBMain {
             final String schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
             worldEditHandler = new IWorldEditHandler(new File(weDir.toFile(), schematicDir), this);
         } catch (IOException e) {
-            logger.severe(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
+            logger.error(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
             e.printStackTrace();
         }
+        final boolean noRegionProvider = !regionProviderFound;
         metrics.addCustomChart(new Metrics2.AdvancedPie("region_providers", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
             if (getEagleFactionsPlugin().isPresent()) {
@@ -246,16 +247,14 @@ public class StructureBoxes implements SBMain {
             if (getGriefPreventionPlugin().isPresent()) {
                 valueMap.put("GriefPrevention", 1);
             }
-            if (!plotSquaredInstalled && !getRedProtectPlugin().isPresent() &&
-                    !getGriefPreventionPlugin().isPresent() &&
-                    !getEagleFactionsPlugin().isPresent()) {
+            if (noRegionProvider) {
                 valueMap.put("None", 1);
             }
             return valueMap;
         }));
         metrics.addCustomChart(new Metrics2.SimplePie("localisation", () -> Settings.locale));
 
-        if (!Settings.Metrics) {
+        if (!Sponge.getMetricsConfigManager().areMetricsEnabled(this) && !Settings.Metrics) {
             metrics.cancel();
         }
         //Register listener
@@ -306,74 +305,54 @@ public class StructureBoxes implements SBMain {
             if (redProtectPlugin.isPresent()) {
                 RedProtectAPI api = redProtectPlugin.get().getAPI();
                 Region region = api.getRegion(spongeLoc);
-                if (region == null) {
-                    continue;
-                } else if (region.canBuild(p)) {
-                    continue;
+                if (region != null && !region.canBuild(p)) {
+                    p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect")));
+                    return false;
                 }
-                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect")));
-                return false;
             }
             if (griefPreventionPlugin.isPresent()) {
                 final Claim claim = GriefPrevention.getApi().getClaimManager(p.getWorld()).getClaimAt(spongeLoc);
-                if (claim == null) {
-                    continue;
-                } else if (claim.isTrusted(p.getUniqueId())) {
-                    continue;
+                if (claim != null && !claim.isTrusted(p.getUniqueId())) {
+                    p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention")));
+                    return false;
                 }
-                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention")));
-                return false;
+
             }
             if (plotSquaredPlugin.isPresent()) {
                 final PS ps = PS.get();
                 final com.intellectualcrafters.plot.object.Location psLoc = new com.intellectualcrafters.plot.object.Location(spongeLoc.getExtent().getName(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
                 final PlotArea pArea = ps.getApplicablePlotArea(psLoc);
-                if (pArea == null) {
-                    continue;
+                if (pArea != null) {
+                    Plot plot = pArea.getPlot(psLoc);
+                    if (plot != null && !plot.isOwner(p.getUniqueId()) && !plot.isAdded(p.getUniqueId())) {
+                        p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared")));
+                        return false;
+                    }
                 }
-                Plot plot = pArea.getPlot(psLoc);
-                if (plot == null) {
-                    continue;
-                }
-                if (plot.isOwner(p.getUniqueId()) || plot.isAdded(p.getUniqueId())) {
-                    continue;
-                }
-                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared")));
-                return false;
             }
             if (eagleFactionsPlugin.isPresent()) {
                 final Optional<Faction> optionalFaction = eagleFactionsPlugin.get().getFactionLogic().getFactionByChunk(spongeLoc.getExtent().getUniqueId(), spongeLoc.getChunkPosition());
-                if (!optionalFaction.isPresent()) {
-                    continue;
+                if (optionalFaction.isPresent() && !optionalFaction.get().containsPlayer(p.getUniqueId())) {
+                    p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "EagleFactions")));
+                    return false;
                 }
-                Faction faction = optionalFaction.get();
-                if (faction.containsPlayer(p.getUniqueId())) {
-                    continue;
-                }
-                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "EagleFactions")));
-                return false;
             }
             if (universeGuardPlugin.isPresent()) {
                 final com.universeguard.region.Region region = com.universeguard.utils.RegionUtils.getRegion(spongeLoc);
-                if (region == null) {
-                    continue;
-                }
                 boolean forbidden = false;
                 if (region instanceof GlobalRegion) {
                     GlobalRegion globalRegion = (GlobalRegion) region;
-                    if (globalRegion.getFlag(EnumRegionFlag.PLACE)) {
-                        continue;
+                    if (!globalRegion.getFlag(EnumRegionFlag.PLACE)) {
+                        forbidden = true;
                     }
-                    forbidden = true;
                 }
                 if (region instanceof LocalRegion) {
                     LocalRegion localRegion = (LocalRegion) region;
                     RegionMember owner = new RegionMember(p, RegionRole.OWNER);
                     RegionMember member = new RegionMember(p, RegionRole.MEMBER);
-                    if (localRegion.getOwner().equals(owner) || localRegion.getMembers().contains(member)) {
-                        continue;
+                    if (!localRegion.getOwner().equals(owner) && !localRegion.getMembers().contains(member)) {
+                        forbidden = true;
                     }
-                    forbidden = true;
                 }
                 if (forbidden) {
                     p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "UniverseGuard")));
@@ -390,6 +369,8 @@ public class StructureBoxes implements SBMain {
         Sponge.getServer().getPlayer(recipient).get().sendMessage(Text.of(message));
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
     public Logger getLogger() {
         return logger;
     }
