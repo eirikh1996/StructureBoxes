@@ -6,6 +6,7 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -152,8 +153,10 @@ public class IWorldEditHandler extends WorldEditHandler {
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
             try {
-                Operations.complete(builder.build());
+                final ForwardExtentCopy copy = (ForwardExtentCopy) builder.build();
+                Operations.completeLegacy(copy);
                 sbMain.clearInterior(interior);
+                sbMain.removeItems(pasteLoc.getWorldID(), structure);
             } catch (WorldEditException e) {
                 e.printStackTrace();
             }

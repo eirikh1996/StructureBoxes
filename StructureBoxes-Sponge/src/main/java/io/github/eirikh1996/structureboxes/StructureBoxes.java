@@ -1,8 +1,26 @@
+/*
+    This file is part of Structure Boxes.
+
+    Structure Boxes is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Structure Boxes is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Structure Boxes.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Sponge.API.RedProtectAPI;
 import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Sponge.Region;
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.intellectualcrafters.plot.IPlotMain;
@@ -18,10 +36,7 @@ import com.universeguard.region.enums.EnumRegionFlag;
 import com.universeguard.region.enums.RegionRole;
 import io.github.aquerr.eaglefactions.api.entities.Faction;
 import io.github.aquerr.eaglefactions.common.EagleFactionsPlugin;
-import io.github.eirikh1996.structureboxes.command.StructureBoxCommand;
-import io.github.eirikh1996.structureboxes.command.StructureBoxCreateCommand;
-import io.github.eirikh1996.structureboxes.command.StructureBoxReloadCommand;
-import io.github.eirikh1996.structureboxes.command.StructureBoxUndoCommand;
+import io.github.eirikh1996.structureboxes.command.*;
 import io.github.eirikh1996.structureboxes.compat.we6.IWorldEditHandler;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
@@ -50,6 +65,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
@@ -62,6 +78,7 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.EntityUniverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +86,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -152,11 +170,20 @@ public class StructureBoxes implements SBMain {
                 .permission("structureboxes.reload")
                 .build();
 
+        //sessions command
+        CommandSpec sessionsCommand = CommandSpec.builder()
+                .executor(new StructureBoxSessionsCommand())
+                .arguments(
+                        GenericArguments.optional(GenericArguments.string(Text.of("player|-a"))),
+                        GenericArguments.optional(GenericArguments.integer(Text.of("page"))))
+                .build();
+
         CommandSpec structureBoxCommand = CommandSpec.builder()
                 .executor(new StructureBoxCommand())
                 .child(createCommand, "create", "cr", "c")
                 .child(undoCommand, "undo", "u" , "ud")
                 .child(reloadCommand, "reload", "r", "rl")
+                .child(sessionsCommand, "sessions", "s")
                 .build();
         Sponge.getCommandManager().register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
         console = Sponge.getServer().getConsole();
@@ -236,7 +263,7 @@ public class StructureBoxes implements SBMain {
         metrics.addCustomChart(new Metrics2.AdvancedPie("region_providers", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
             if (getEagleFactionsPlugin().isPresent()) {
-                valueMap.put("Factions", 1);
+                valueMap.put("EagleFactions", 1);
             }
             if (plotSquaredInstalled) {
                 valueMap.put("PlotSquared", 1);
@@ -369,8 +396,21 @@ public class StructureBoxes implements SBMain {
         Sponge.getServer().getPlayer(recipient).get().sendMessage(Text.of(message));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
+    public void logMessage(Level level, String message) {
+        switch (level.toString()) {
+            case "SEVERE":
+                logger.error(message);
+                break;
+            case "WARNING":
+                logger.warn(message);
+                break;
+            case "INFO":
+                logger.info(message);
+                break;
+        }
+    }
+
     public Logger getLogger() {
         return logger;
     }
@@ -409,6 +449,23 @@ public class StructureBoxes implements SBMain {
         for (Location loc : interior){
             MathUtils.sbToSpongeLoc(loc).setBlockType(BlockTypes.AIR);
         }
+    }
+
+    @Override
+    public void removeItems(UUID world, Structure structure) {
+        final Vector3d min = new Vector3d(structure.getMinX(), structure.getMinY(), structure.getMinZ());
+        final Vector3d max = new Vector3d(structure.getMaxX(), structure.getMaxY(), structure.getMaxZ());
+        final Optional<World> w = Sponge.getServer().getWorld(world);
+        if (!w.isPresent())
+            return;
+        Task.builder().execute(() -> {
+            for (EntityUniverse.EntityHit e : w.get().getIntersectingEntities(min, max)) {
+                if (!structure.contains(MathUtils.spongeToSBLoc(e.getEntity().getLocation())) || !(e.getEntity() instanceof Item)) {
+                    continue;
+                }
+                e.getEntity().remove();
+            }
+        }).submit(this);
     }
 
     @Override

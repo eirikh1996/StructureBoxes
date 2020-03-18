@@ -1,3 +1,20 @@
+/*
+    This file is part of Structure Boxes.
+
+    Structure Boxes is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Structure Boxes is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Structure Boxes.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package io.github.eirikh1996.structureboxes.listener;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -18,12 +35,14 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -111,9 +130,9 @@ public class BlockListener {
             event.setCancelled(true);
             return;
         }
-        StructureBoxes.getInstance().scheduleSyncTask(() -> {
+        Task.builder().execute(() -> {
             placed.setBlockType(BlockTypes.AIR);
-        });
+        }).submit(StructureBoxes.getInstance());
     }
 
     @Listener
@@ -130,6 +149,9 @@ public class BlockListener {
         }
         final Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(snapshot.getLocation().get()));
         if (structure == null) {
+            return;
+        }
+        if (player == null) {
             return;
         }
         StructureManager.getInstance().removeStructure(structure);

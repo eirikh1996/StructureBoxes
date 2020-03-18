@@ -58,7 +58,7 @@ public class UpdateManager implements Runnable {
         final Gson gson = new Gson();
         final JsonArray jsonArray = gson.fromJson(response, JsonArray.class);
         if (jsonArray.size() == 0) {
-            StructureBoxes.getInstance().getLogger().warning("No files found, or Feed URL is bad.");
+            StructureBoxes.getInstance().getLogger().warn("No files found, or Feed URL is bad.");
             return currentVersion;
         }
         JsonObject jsonObj = (JsonObject) jsonArray.get(0);

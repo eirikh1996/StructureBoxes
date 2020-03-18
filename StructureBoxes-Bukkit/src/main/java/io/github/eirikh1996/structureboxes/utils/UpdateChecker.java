@@ -32,14 +32,14 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                final double newVersion = getNewVersion(getCurrentVersion());
-                if (newVersion <= getCurrentVersion()){
+                String newVersion = newVersionAvailable();
+                if (newVersion == null){
                     sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
                     return;
                 }
-                Bukkit.broadcast(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion), "structureboxes.update");
+                Bukkit.broadcast(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%d", newVersion).replace("{NewVersion}", newVersion), "structureboxes.update");
                 Bukkit.broadcast(COMMAND_PREFIX + "https://dev.bukkit.org/projects/structure-boxes/files", "structureboxes.update");
-                sb.getLogger().warning(String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
+                sb.getLogger().warning(I18nSupport.getInternationalisedString("Update - Update available").replace("%d", newVersion).replace("{NewVersion}", newVersion));
                 sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
             }
         }.runTaskLaterAsynchronously(sb, 120);
@@ -51,15 +51,14 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             @Override
             public void run() {
                 final Player player = event.getPlayer();
-                final double newVersion = getNewVersion(getCurrentVersion());
-                final double currentVersion = getCurrentVersion();
-                if (newVersion <= currentVersion){
+                String newVersion = newVersionAvailable();
+                if (newVersion == null){
                     return;
                 }
                 if (!player.hasPermission("structureboxes.update")){
                     return;
                 }
-                player.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
+                player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%d", newVersion).replace("{NewVersion}", newVersion));
                 player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
             }
         }.runTaskLaterAsynchronously(StructureBoxes.getInstance(), 120);
@@ -76,7 +75,7 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
         return Double.parseDouble(StructureBoxes.getInstance().getDescription().getVersion());
     }
 
-    private double getNewVersion(double currentVersion) {
+    private String getNewVersion(String currentVersion) {
         try {
             URL url = new URL("https://servermods.forgesvc.net/servermods/files?projectids=349569");
             URLConnection conn = url.openConnection();
@@ -93,11 +92,22 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             }
             JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
             String versionName = jsonObj.get("name").getAsString();
-            String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
-            return Double.parseDouble(newVersion);
+            return versionName.substring(versionName.lastIndexOf("v") + 1);
         } catch (Exception e) {
             e.printStackTrace();
             return currentVersion;
         }
+    }
+
+    private String newVersionAvailable() {
+        String currentVersion = StructureBoxes.getInstance().getDescription().getVersion();
+        String[] newVersion = getNewVersion(currentVersion).split(".");
+        for (int i = 0 ; i < newVersion.length ; i++) {
+            if (Integer.parseInt(newVersion[i]) <= Integer.parseInt(currentVersion.split(".")[i])) {
+                continue;
+            }
+            return String.join(".", newVersion);
+        }
+        return null;
     }
 }

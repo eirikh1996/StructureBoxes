@@ -91,6 +91,9 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         structureBox.offer(Keys.ITEM_LORE, lore);
         p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo")));
         PlayerInventory pInv = (PlayerInventory) p.getInventory();
+        if (!structure.isProcessing()) {
+            structure.setProcessing(true);
+        }
         Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap, structureLocs)).submit(StructureBoxes.getInstance());
 
 

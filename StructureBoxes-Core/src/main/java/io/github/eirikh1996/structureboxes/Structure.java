@@ -1,14 +1,17 @@
 package io.github.eirikh1996.structureboxes;
 
 import io.github.eirikh1996.structureboxes.utils.Location;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Structure {
+public class Structure implements Iterable<Location> {
     private final UUID id;
+    private int minX, minY, minZ, maxX, maxY, maxZ;
     private final long placementTime;
     private final String schematicName;
     private final Map<Location, Object> originalBlocks;
@@ -21,6 +24,26 @@ public class Structure {
         this.owner = owner;
         placementTime = System.currentTimeMillis();
         id = UUID.randomUUID();
+        for (Location loc : originalBlocks.keySet()) {
+            if (minX > loc.getX()) {
+                minX = loc.getX();
+            }
+            if (minY > loc.getY()) {
+                minY = loc.getY();
+            }
+            if (minZ > loc.getZ()) {
+                minZ = loc.getZ();
+            }
+            if (maxX < loc.getX()) {
+                maxX = loc.getX();
+            }
+            if (maxY < loc.getY()) {
+                maxY = loc.getY();
+            }
+            if (maxZ < loc.getZ()) {
+                maxZ = loc.getZ();
+            }
+        }
         processing = new AtomicBoolean(true);
     }
 
@@ -38,6 +61,10 @@ public class Structure {
 
     public Set<Location> getStructure() {
         return originalBlocks.keySet();
+    }
+
+    public boolean contains(Location location) {
+        return originalBlocks.containsKey(location);
     }
 
     public Map<Location, Object> getOriginalBlocks() {
@@ -67,8 +94,38 @@ public class Structure {
                 getOwner().equals(structure1.getOwner());
     }
 
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
     @Override
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Location> iterator() {
+        return originalBlocks.keySet().iterator();
     }
 }

@@ -157,7 +157,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
             try {
-                Operations.complete(builder.build());
+                Operations.completeLegacy(builder.build());
                 sbMain.clearInterior(interior);
             } catch (WorldEditException e) {
                 e.printStackTrace();

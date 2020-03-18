@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -453,6 +454,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     @Override
+    public void logMessage(Level level, String message) {
+        getLogger().log(level, message);
+    }
+
+    @Override
     public void clearInterior(Collection<Location> interior) {
         for (Location location : interior){
             org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
@@ -463,8 +469,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             bukkitLoc.getBlock().setType(Material.AIR);
         }
     }
-
-
 
     @Override
     public void scheduleSyncTask(final Runnable runnable) {
@@ -542,6 +546,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
 
     }
+
 
     public Movecraft getMovecraftPlugin() {
         return movecraftPlugin;

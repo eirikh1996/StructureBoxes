@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StructureBoxes implements ModInitializer, SBMain {
@@ -29,6 +30,10 @@ public class StructureBoxes implements ModInitializer, SBMain {
     }
 
     public void sendMessageToPlayer(UUID recipient, String message) {
+
+    }
+
+    public void logMessage(Level level, String message) {
 
     }
 
