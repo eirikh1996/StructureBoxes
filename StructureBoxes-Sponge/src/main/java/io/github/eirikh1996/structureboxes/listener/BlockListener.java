@@ -26,6 +26,8 @@ import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
@@ -41,6 +43,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +52,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 public class BlockListener {
 
     @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player){
+    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player) throws IOException {
         if (event.isCancelled()) {
             return;
         }
@@ -156,5 +159,47 @@ public class BlockListener {
         }
         StructureManager.getInstance().removeStructure(structure);
         player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
+    }
+/*
+    @Listener
+    public void onBlockUpdate(NotifyNeighborBlockEvent event) {
+        if (!(event.getSource() instanceof LocatableBlock)) {
+            return;
+        }
+        LocatableBlock lb = (LocatableBlock) event.getSource();
+        Structure structure = null;
+        for (org.spongepowered.api.util.Direction dir : event.getNeighbors().keySet()) {
+            Location<World> relative = lb.getLocation().getBlockRelative(dir);
+            structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(relative));
+            if (structure == null || !structure.isProcessing()) {
+                continue;
+            }
+            break;
+        }
+
+        if (structure == null)
+            structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(lb.getLocation()));
+        if (structure == null || !structure.isProcessing())
+            return;
+        if (lb.getBlockState().getType().equals(BlockTypes.WALL_SIGN)) {
+            StructureBoxes.getInstance().broadcast(event.getNeighbors().toString());
+        }
+        Set<org.spongepowered.api.util.Direction> directions = new HashSet<>(event.getNeighbors().keySet());
+        for (org.spongepowered.api.util.Direction dir : directions) {
+            event.getNeighbors().remove(dir);
+        }
+
+
+
+    }*/
+
+    private boolean isFragile(BlockState state) {
+        final BlockType type = state.getType();
+        return type == BlockTypes.STANDING_SIGN ||
+                type == BlockTypes.WALL_SIGN ||
+                type == BlockTypes.REDSTONE_WIRE ||
+                type == BlockTypes.LADDER ||
+                type == BlockTypes.POWERED_REPEATER ||
+                type == BlockTypes.UNPOWERED_REPEATER;
     }
 }

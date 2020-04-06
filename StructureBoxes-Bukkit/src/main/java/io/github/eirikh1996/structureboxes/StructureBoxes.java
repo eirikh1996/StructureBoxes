@@ -114,9 +114,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
         String weVersion = worldEditPlugin.getDescription().getVersion();
-        int index = weVersion.indexOf(".");
 
-        int versionNumber = Integer.parseInt(weVersion.substring(0, index));
+        int versionNumber = Settings.IsLegacy ? 6 : 7;
         final Map data;
         try {
             File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
@@ -277,7 +276,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
-            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 0, 20000);
+            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
             startup = false;
         }
 
@@ -473,6 +472,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void scheduleSyncTask(final Runnable runnable) {
         getServer().getScheduler().runTask(this, runnable);
+    }
+
+    @Override
+    public void scheduleSyncTaskLater(Runnable runnable, long delay) {
+        long ticks = (delay / 1000) * 20;
+        ticks = Math.max(ticks, 1);
+        getServer().getScheduler().runTaskLater(this, runnable, ticks);
     }
 
     @Override

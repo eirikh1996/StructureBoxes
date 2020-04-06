@@ -3,10 +3,7 @@ package io.github.eirikh1996.structureboxes;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Structure implements Iterable<Location> {
@@ -81,6 +78,16 @@ public class Structure implements Iterable<Location> {
 
     public void setProcessing(boolean processing) {
         this.processing.set(processing);
+    }
+
+    public void setProcessingLater(final boolean processing, long delay) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                setProcessing(processing);
+            }
+        }, delay);
     }
 
     @Override

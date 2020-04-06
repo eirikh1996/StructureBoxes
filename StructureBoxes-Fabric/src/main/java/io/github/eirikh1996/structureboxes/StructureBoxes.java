@@ -49,6 +49,10 @@ public class StructureBoxes implements ModInitializer, SBMain {
 
     }
 
+    public void scheduleSyncTaskLater(Runnable runnable, long delay) {
+
+    }
+
     public void scheduleAsyncTask(Runnable runnable) {
 
     }

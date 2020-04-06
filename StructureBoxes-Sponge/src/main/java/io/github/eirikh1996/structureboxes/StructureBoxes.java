@@ -20,7 +20,6 @@ package io.github.eirikh1996.structureboxes;
 import br.net.fabiozumbi12.RedProtect.Sponge.API.RedProtectAPI;
 import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Sponge.Region;
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.intellectualcrafters.plot.IPlotMain;
@@ -65,7 +64,6 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
@@ -77,8 +75,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.EntityUniverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,7 +92,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "1.1",
+        version = "2.0",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),
@@ -114,6 +112,8 @@ public class StructureBoxes implements SBMain {
     @Inject @ConfigDir(sharedRoot = false) private Path configDir;
 
     private ConfigurationLoader<CommentedConfigurationNode> loader;
+    private String schematicDir;
+    private Path weDir;
 
     public Path getConfigDir() {
         return configDir;
@@ -249,11 +249,11 @@ public class StructureBoxes implements SBMain {
 
         }
         //Now read WorldEdit config
-        final Path weDir = Paths.get(configDir.getParent().toString(), "worldedit");
+        weDir = Paths.get(configDir.getParent().toString(), "worldedit");
         final Path weConfig = Paths.get(weDir.toString(), "worldedit.conf");
         final ConfigurationLoader<CommentedConfigurationNode> weLoader = HoconConfigurationLoader.builder().setPath(weConfig).build();
         try {
-            final String schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
+            schematicDir = weLoader.load().getNode("saving").getNode("dir").getString();
             worldEditHandler = new IWorldEditHandler(new File(weDir.toFile(), schematicDir), this);
         } catch (IOException e) {
             logger.error(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
@@ -447,30 +447,21 @@ public class StructureBoxes implements SBMain {
 
     public void clearInterior(Collection<Location> interior) {
         for (Location loc : interior){
-            MathUtils.sbToSpongeLoc(loc).setBlockType(BlockTypes.AIR);
+            MathUtils.sbToSpongeLoc(loc).setBlockType(BlockTypes.AIR, BlockChangeFlags.NONE);
         }
-    }
-
-    @Override
-    public void removeItems(UUID world, Structure structure) {
-        final Vector3d min = new Vector3d(structure.getMinX(), structure.getMinY(), structure.getMinZ());
-        final Vector3d max = new Vector3d(structure.getMaxX(), structure.getMaxY(), structure.getMaxZ());
-        final Optional<World> w = Sponge.getServer().getWorld(world);
-        if (!w.isPresent())
-            return;
-        Task.builder().execute(() -> {
-            for (EntityUniverse.EntityHit e : w.get().getIntersectingEntities(min, max)) {
-                if (!structure.contains(MathUtils.spongeToSBLoc(e.getEntity().getLocation())) || !(e.getEntity() instanceof Item)) {
-                    continue;
-                }
-                e.getEntity().remove();
-            }
-        }).submit(this);
     }
 
     @Override
     public void scheduleSyncTask(Runnable runnable) {
         Task.builder().execute(runnable).submit(this);
+    }
+
+    @Override
+    public void scheduleSyncTaskLater(Runnable runnable, long delay) {
+        Task.builder()
+                .delay(delay, TimeUnit.MILLISECONDS)
+                .execute(runnable)
+                .submit(this);
     }
 
     @Override
@@ -537,6 +528,14 @@ public class StructureBoxes implements SBMain {
 
     public ConsoleSource getConsole() {
         return console;
+    }
+
+    public String getSchematicDir() {
+        return schematicDir;
+    }
+
+    public Path getWeDir() {
+        return weDir;
     }
 
     @NotNull

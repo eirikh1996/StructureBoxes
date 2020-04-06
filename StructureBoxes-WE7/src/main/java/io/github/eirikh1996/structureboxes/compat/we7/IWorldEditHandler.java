@@ -1,5 +1,7 @@
 package io.github.eirikh1996.structureboxes.compat.we7;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -28,11 +30,9 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 import static java.lang.Math.PI;
 
 public class IWorldEditHandler extends WorldEditHandler {
-    private final File schemDir;
-    private final SBMain sbMain;
+
     public IWorldEditHandler(File schemDir, SBMain sbMain){
-        this.schemDir = schemDir;
-        this.sbMain = sbMain;
+        super(schemDir, sbMain);
     }
     @Override
     public Clipboard loadClipboardFromSchematic(World world, String schematicName) {
@@ -85,10 +85,8 @@ public class IWorldEditHandler extends WorldEditHandler {
         AffineTransform transform = new AffineTransform();
         transform = transform.rotateY(angle);
         holder.setTransform(transform);
-        PasteBuilder builder = holder.createPaste(world);
-        builder.ignoreAirBlocks(true);
         BlockVector3 to = BlockVector3.at(pasteLoc.getX(), pasteLoc.getY(), pasteLoc.getZ());
-        builder.to(to);
+
         final Set<Location> structureLocs = new HashSet<>();
         int minX = clipboard.getMinimumPoint().getBlockX();
         int minY = clipboard.getMinimumPoint().getBlockY();
@@ -156,7 +154,10 @@ public class IWorldEditHandler extends WorldEditHandler {
         }
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
-            try {
+            try (final EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1)){
+                PasteBuilder builder = holder.createPaste(session);
+                builder.ignoreAirBlocks(true);
+                builder.to(to);
                 Operations.completeLegacy(builder.build());
                 sbMain.clearInterior(interior);
             } catch (WorldEditException e) {

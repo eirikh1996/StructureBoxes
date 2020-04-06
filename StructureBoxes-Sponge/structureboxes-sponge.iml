@@ -21,7 +21,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:spongeapi:7.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.errorprone:error_prone_annotations:2.0.15" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
@@ -38,12 +38,19 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-math:1.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flowpowered:flow-noise:1.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.ow2.asm:asm:5.2" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:6.1.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />
+    <orderEntry type="library" name="Maven: rhino:js:1.7R2" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.9" level="project" />
+    <orderEntry type="library" name="Maven: com.thoughtworks.paranamer:paranamer:2.6" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.lib:jlibnoise:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:4.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-yaml:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.spongepowered:configurate-core:3.6" level="project" />
     <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.18" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-sponge:6.1.7-SNAPSHOT" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
         <CLASSES>
@@ -101,10 +108,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />
-    <orderEntry type="library" name="Maven: org.mozilla:rhino:1.7.11" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />

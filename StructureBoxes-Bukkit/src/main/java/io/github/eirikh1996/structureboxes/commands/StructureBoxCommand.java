@@ -7,6 +7,7 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.BlockUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.TopicPaginator;
@@ -164,52 +165,45 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
-        final HashSet<Location> structureLocs = new HashSet<>(locationMaterialHashMap.keySet());
-        final List<Collection<Location>> sections = new ArrayList<>();
-        for (int i = 0 ; i <= structureLocs.size() / 30000; i++){
-            sections.add(new HashSet<>());
+        final Queue<Location> locations = new LinkedList<>();
+        for (Location loc : locationMaterialHashMap.keySet()) {
+            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(loc);
+            if (!BlockUtils.isFragile(bukkitLoc.getBlock()))
+                continue;
+            locations.add(loc);
         }
-        int index = 0;
-        int count = 0;
-        for (Location location : structureLocs){
-            sections.get(index).add(location);
-            count++;
-            if (count >= 30000){
-                index++;
-                count = 0;
+        for (Location loc : locationMaterialHashMap.keySet()) {
+            if (locations.contains(loc))
+                continue;
+            locations.add(loc);
+        }
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+            int queueSize = Math.min(locations.size(), 30000);
+            for (int i = 1 ; i <= queueSize ; i++) {
+                Location poll = locations.poll();
+                if (poll == null)
+                    break;
+                final Material origType = (Material) locationMaterialHashMap.get(poll);
+                Block b = MathUtils.sb2BukkitLoc(poll).getBlock();
+                if (b.getState() instanceof InventoryHolder){
+                    InventoryHolder holder = (InventoryHolder) b.getState();
+                    holder.getInventory().clear();
+                }
+                b.setType(origType);
+            }
+            if (locations.isEmpty()){
+                StructureManager.getInstance().removeStructure(structure);
+                if (structure.isProcessing()) {
+                    structure.setProcessing(false);
+                }
+                cancel();
+            }
             }
 
-        }
-
-        final Queue<Collection<Location>> locationQueue = new LinkedList<>(sections);
-
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Collection<Location> poll = locationQueue.poll();
-                    if (poll == null){
-                        return;
-                    }
-                    for (Location location : poll){
-                        final Material origType = (Material) locationMaterialHashMap.get(location);
-                        Block b = MathUtils.sb2BukkitLoc(location).getBlock();
-                        if (b.getState() instanceof InventoryHolder){
-                            InventoryHolder holder = (InventoryHolder) b.getState();
-                            holder.getInventory().clear();
-                        }
-                        b.setType(origType);
-
-                    }
-                    if (locationQueue.isEmpty()){
-                        StructureManager.getInstance().removeStructure(structure);
-                        if (structure.isProcessing()) {
-                            structure.setProcessing(false);
-                        }
-                        cancel();
-                    }
-                }
-
-            }.runTaskTimer(StructureBoxes.getInstance(), 0, 3);
+        }.runTaskTimer(StructureBoxes.getInstance(), 0, 3);
 
 
 
@@ -223,8 +217,7 @@ public class StructureBoxCommand implements TabExecutor {
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
         p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo"));
-        @NotNull HashMap<Integer, ItemStack> notFitting = p.getInventory().addItem(structureBox);
-        if (!notFitting.isEmpty()){
+        if (!p.getInventory().addItem(structureBox).isEmpty()){
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space"));
             p.getWorld().dropItem(p.getLocation(), structureBox);
         }

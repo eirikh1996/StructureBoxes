@@ -22,6 +22,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class MathUtils {
+
     public static Location<World> sbToSpongeLoc(io.github.eirikh1996.structureboxes.utils.Location sbLoc){
         return new Location<>(Sponge.getServer().getWorld(sbLoc.getWorld()).get(), sbLoc.getX(), sbLoc.getY(), sbLoc.getZ());
     }

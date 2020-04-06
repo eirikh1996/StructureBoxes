@@ -3,6 +3,7 @@ package io.github.eirikh1996.structureboxes;
 import io.github.eirikh1996.structureboxes.utils.Location;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -19,7 +20,12 @@ public interface SBMain {
 
     }
 
+    default void placeSupportBlocks(Map<Location, Object> supportBlocks) {
+
+    }
+
     void scheduleSyncTask(final Runnable runnable);
+    void scheduleSyncTaskLater(final Runnable runnable, long delay);
     void scheduleAsyncTask(final Runnable runnable);
     void broadcast(String s);
 }
