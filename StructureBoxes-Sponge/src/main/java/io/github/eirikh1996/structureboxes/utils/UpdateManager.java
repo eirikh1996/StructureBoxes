@@ -39,10 +39,10 @@ public class UpdateManager implements Runnable {
                 if (!p.hasPermission("structureboxes.update")) {
                     continue;
                 }
-                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("{NewVersion}", newVersion)));
+                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
                 p.sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
             }
-            StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("{NewVersion}", newVersion)));
+            StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
             StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
             this.newVersion = newVersion;
         }).submit(StructureBoxes.getInstance());
@@ -88,7 +88,7 @@ public class UpdateManager implements Runnable {
             if (newVersion == null) {
                 return;
             }
-            p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"))));
+            p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
             p.sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
 
         }).submit(StructureBoxes.getInstance());
