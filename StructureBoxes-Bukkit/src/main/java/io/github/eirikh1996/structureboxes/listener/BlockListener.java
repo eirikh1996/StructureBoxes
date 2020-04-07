@@ -34,10 +34,12 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent event){
-        if (event.isCancelled() && RegionUtils.canPlaceStructure(event.getBlockPlaced().getLocation())){
-            event.setCancelled(false);
-        } else if (event.isCancelled()) {
-            return;
+        if (event.isCancelled()) {
+            if (RegionUtils.canPlaceStructure(event.getBlockPlaced().getLocation())) {
+                event.setCancelled(false);
+            } else {
+                return;
+            }
         }
         final UUID id = event.getPlayer().getUniqueId();
         if (!event.getBlockPlaced().getType().equals(Settings.StructureBoxItem) &&
