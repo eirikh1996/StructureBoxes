@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,43 +25,49 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
     private int secondCooldown = 0;
     private int delayBeforeCheckingUpdate = 0;
 
-    private UpdateChecker(){}
+    private UpdateChecker(){
+    }
 
     @Override
     public void run() {
-        secondCooldown++;
-        if (secondCooldown < 3600) {
-            return;
-        }
         StructureBoxes sb = StructureBoxes.getInstance();
-        if (delayBeforeCheckingUpdate == 0) {
-            sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Checking for updates"));
-        } else if (delayBeforeCheckingUpdate >= 5) {
-            delayBeforeCheckingUpdate = 0;
-            secondCooldown = 0;
-            final double newVersion = getNewVersion(getCurrentVersion());
-            if (newVersion <= getCurrentVersion()){
-                sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
-                return;
+        sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Checking for updates"));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                String newVersion = getNewVersion();
+                if (newVersion == null){
+                    sb.getLogger().info(I18nSupport.getInternationalisedString("Update - Up to date"));
+                    return;
+                }
+                Bukkit.broadcast(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("{NewVersion}", newVersion), "structureboxes.update");
+                Bukkit.broadcast(COMMAND_PREFIX + "https://dev.bukkit.org/projects/structure-boxes/files", "structureboxes.update");
+                sb.getLogger().warning(I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("{NewVersion}", newVersion));
+                sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
+
             }
-            sb.getLogger().warning(String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
-            sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
-        }
+        }.runTaskLaterAsynchronously(sb, 120);
         delayBeforeCheckingUpdate++;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event){
-        final Player player = event.getPlayer();
-        final double newVersion = getNewVersion(getCurrentVersion());
-        if (newVersion <= getCurrentVersion()){
-            return;
-        }
-        if (!player.hasPermission("structureboxes.update")){
-            return;
-        }
-        player.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Update - Update available"), newVersion));
-        player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                final Player player = event.getPlayer();
+                String newVersion = getNewVersion();
+                if (newVersion == null){
+                    return;
+                }
+                if (!player.hasPermission("structureboxes.update")){
+                    return;
+                }
+                player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%d", newVersion).replace("{NewVersion}", newVersion));
+                player.sendMessage("https://dev.bukkit.org/projects/structure-boxes/files");
+            }
+        }.runTaskLaterAsynchronously(StructureBoxes.getInstance(), 120);
+
     }
 
     public static synchronized UpdateChecker getInstance() {
@@ -69,11 +76,9 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
         }
         return instance;
     }
-    private double getCurrentVersion(){
-        return Double.parseDouble(StructureBoxes.getInstance().getDescription().getVersion());
-    }
 
-    private double getNewVersion(double currentVersion) {
+    private String getNewVersion() {
+        String currentVersion = StructureBoxes.getInstance().getDescription().getVersion();
         try {
             URL url = new URL("https://servermods.forgesvc.net/servermods/files?projectids=349569");
             URLConnection conn = url.openConnection();
@@ -91,10 +96,14 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
             String versionName = jsonObj.get("name").getAsString();
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
-            return Double.parseDouble(newVersion);
+            int nv = Integer.parseInt(newVersion.replace(".", ""));
+            int cv = Integer.parseInt(currentVersion.replace("v", "").replace(".", ""));
+            if (nv > cv)
+                return newVersion;
         } catch (Exception e) {
             e.printStackTrace();
-            return currentVersion;
+
         }
+        return null;
     }
 }

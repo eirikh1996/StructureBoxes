@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StructureBoxes implements ModInitializer, SBMain {
@@ -32,6 +33,10 @@ public class StructureBoxes implements ModInitializer, SBMain {
 
     }
 
+    public void logMessage(Level level, String message) {
+
+    }
+
     public Logger getLogger() {
         return null;
     }
@@ -41,6 +46,10 @@ public class StructureBoxes implements ModInitializer, SBMain {
     }
 
     public void scheduleSyncTask(Runnable runnable) {
+
+    }
+
+    public void scheduleSyncTaskLater(Runnable runnable, long delay) {
 
     }
 

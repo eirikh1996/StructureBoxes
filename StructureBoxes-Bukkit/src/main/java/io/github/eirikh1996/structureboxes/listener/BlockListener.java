@@ -3,6 +3,7 @@ package io.github.eirikh1996.structureboxes.listener;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.Direction;
+import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -121,7 +122,6 @@ public class BlockListener implements Listener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        StructureManager.getInstance().removeStructure(StructureManager.getInstance().getStructureByPlayer(id));
                         loc.getBlock().setType(Material.AIR);
                     }
                 }.runTask(StructureBoxes.getInstance());
@@ -136,7 +136,8 @@ public class BlockListener implements Listener {
     public void onBlockPhysics(BlockPhysicsEvent event){
         Block b = event.getBlock();
         io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ());
-        if (!StructureManager.getInstance().isPartOfStructure(structureLoc)){
+        final Structure structure = StructureManager.getInstance().getStructureAt(structureLoc);
+        if (structure == null || !structure.isProcessing()){
             return;
         }
         event.setCancelled(true);
@@ -144,14 +145,14 @@ public class BlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
-        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> sessions = StructureManager.getInstance().getSessions(event.getPlayer().getUniqueId());
-        if (sessions == null) {
+        Set<Structure> sessions = StructureManager.getInstance().getStructures();
+        if (sessions == null || sessions.isEmpty()) {
             return;
         }
-        Iterator<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>>> iter = sessions.iterator();
+        Iterator<Structure> iter = sessions.iterator();
         while (iter.hasNext()) {
-            AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<io.github.eirikh1996.structureboxes.utils.Location, Object>>> next = iter.next();
-            if (!next.getValue().getValue().containsKey(MathUtils.bukkit2SBLoc(event.getBlock().getLocation()))){
+            Structure next = iter.next();
+            if (!next.getStructure().contains(MathUtils.bukkit2SBLoc(event.getBlock().getLocation()))){
                 continue;
             }
             iter.remove();

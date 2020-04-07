@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class CollectionUtils {
-    public static ArrayList<Location> boundingBox(@NotNull final Location min, @NotNull final Location max){
-        ArrayList<Location> box = new ArrayList<>();
+    public static Collection<Location> boundingBox(@NotNull final Location min, @NotNull final Location max){
+        Collection<Location> box = new HashSet<>();
         for (int x = min.getX(); x <= max.getX() ; x++){
             for (int y = min.getY(); y <= max.getY() ; y++){
                 for (int z = min.getZ(); z <= max.getZ() ; z++){
@@ -40,7 +40,7 @@ public class CollectionUtils {
     }
 
     @Contract(pure = true)
-    public static ArrayList<Location> exterior(Location min, Location max, Collection<Location> invertedStructure, Collection<Location> structure){
+    public static Collection<Location> exterior(Location min, Location max, Collection<Location> invertedStructure, Collection<Location> structure){
         final ArrayList<Location> exterior = new ArrayList<>();
 
         /*for (int y = min.getY(); y <= max.getY() ; y++){
@@ -121,7 +121,7 @@ public class CollectionUtils {
 
 
     private static final Vector[] SHIFTS = {
-            new Vector(0, -1, 0),
+            new Vector(0, 1, 0),
             new Vector(1, 0, 0),
             new Vector(-1, 0, 0),
             new Vector(0, 0, 1),

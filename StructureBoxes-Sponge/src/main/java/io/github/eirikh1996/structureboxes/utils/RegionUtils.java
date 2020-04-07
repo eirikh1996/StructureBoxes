@@ -10,6 +10,8 @@ public class RegionUtils {
         boolean redProtect = false;
         boolean griefPrevention = false;
         boolean eagleFactions = false;
+        boolean plotSquared = false;
+        boolean universeGuard = false;
         final StructureBoxes sb = StructureBoxes.getInstance();
         if (sb.getRedProtectPlugin().isPresent()) {
             redProtect = sb.getRedProtectPlugin().get().getAPI().getRegion(loc) != null;
@@ -20,6 +22,12 @@ public class RegionUtils {
         if (sb.getEagleFactionsPlugin().isPresent()) {
             eagleFactions = sb.getEagleFactionsPlugin().get().getFactionLogic().getFactionByChunk(loc.getExtent().getUniqueId(), loc.getChunkPosition()).isPresent();
         }
-        return redProtect || griefPrevention || eagleFactions;
+        if (sb.getPlotSquaredPlugin().isPresent()) {
+            plotSquared = PlotSquaredUtils.withinPlot(loc);
+        }
+        if (sb.getUniverseGuardPlugin().isPresent()) {
+            universeGuard = !com.universeguard.utils.RegionUtils.getAllLocalRegionsAt(loc).isEmpty();
+        }
+        return redProtect || griefPrevention || eagleFactions || plotSquared || universeGuard;
     }
 }

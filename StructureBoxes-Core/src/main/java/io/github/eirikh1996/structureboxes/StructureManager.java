@@ -2,81 +2,106 @@ package io.github.eirikh1996.structureboxes;
 
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.Location;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static java.lang.System.currentTimeMillis;
-
-public class StructureManager implements Iterable<Collection<Location>>, Runnable {
-    private final Set<Collection<Location>> locationSets = new HashSet<>();
+public class StructureManager implements Iterable<Structure>, Runnable {
+    private final Set<Structure> structures = new HashSet<>();
     private Map<UUID, Collection<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
     private StructureManager() {}
 
     public boolean isPartOfStructure(Location location){
-        for (Collection<Location> locationSet : locationSets){
-            if (!locationSet.contains(location)){
+        for (Structure structure : structures) {
+            if (!structure.getStructure().contains(location)) {
                 continue;
             }
             return true;
         }
         return false;
     }
+
+    public Structure getCorrespondingStructure(Collection<Location> locations) {
+        for (Structure structure : structures) {
+            if (!structure.getStructure().containsAll(locations)) {
+                continue;
+            }
+            return structure;
+        }
+        return null;
+    }
     private void processRemovalOfSavedStructures(){
-        if (playerTimeStructureMap.isEmpty()){
+        if (structures.isEmpty()){
             return;
         }
-        for (UUID id : playerTimeStructureMap.keySet()){
-            LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> pairLinkedList = playerTimeStructureMap.get(id);
-            if (pairLinkedList == null || pairLinkedList.isEmpty()){
-                return;
+        final Iterator<Structure> iter = structures.iterator();
+        while (iter.hasNext()) {
+            final Structure structure = iter.next();
+            if ((System.currentTimeMillis() - structure.getPlacementTime()) / 1000 < Settings.MaxSessionTime) {
+                continue;
             }
-            long timeStamp = pairLinkedList.getLast().getKey();
-            if (currentTimeMillis() - timeStamp > Settings.MaxSessionTime * 1000){
-                pairLinkedList.pollLast();
-            }
+            iter.remove();
         }
 
     }
 
-    public AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> getLatestStructure(UUID playerID){
-        LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> pairLinkedList = playerTimeStructureMap.get(playerID);
-        if (pairLinkedList == null || pairLinkedList.isEmpty()){
-            return null;
+    public Structure getLatestStructure(UUID playerID){
+        Structure ret = null;
+        for (Structure structure : structures) {
+            if (!structure.getOwner().equals(playerID)) {
+                continue;
+            }
+            if (ret != null && ret.getPlacementTime() > structure.getPlacementTime()) {
+                continue;
+            }
+            ret = structure;
         }
-        AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>> pair = pairLinkedList.pollFirst();
-        return pair != null ? pair.getValue() : null;
-
+        return ret;
     }
     public void addStructureByPlayer(UUID id, String schematicName, HashMap<Location, Object> structure){
+        structures.add(new Structure(schematicName, structure, id));
 
-        AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>> timePair = new AbstractMap.SimpleImmutableEntry<>(currentTimeMillis(), new AbstractMap.SimpleImmutableEntry<>(schematicName, structure));
-        if (playerTimeStructureMap.containsKey(id)){
-            playerTimeStructureMap.get(id).addFirst(timePair);
-        } else {
-            LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> pairLinkedList = new LinkedList<>();
-            pairLinkedList.addFirst(timePair);
-            playerTimeStructureMap.put(id, pairLinkedList);
+    }
+
+    public Set<Structure> getSessions(UUID playerID) {
+        Set<Structure> playerStructures = new HashSet<>();
+        for (Structure structure : structures) {
+            if (!structure.getOwner().equals(playerID)) {
+                continue;
+            }
+            playerStructures.add(structure);
         }
-
-
+        return playerStructures;
     }
 
-    public LinkedList<AbstractMap.SimpleImmutableEntry<Long, AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>> getSessions(UUID playerID) {
-        return playerTimeStructureMap.getOrDefault(playerID, new LinkedList<>());
+
+    public Set<Structure> getStructures() {
+        return structures;
     }
 
-    public void addStructure(Collection<Location> structure){
-        locationSets.add(structure);
+    public Structure getStructureAt(Location loc) {
+        for (Structure structure : structures) {
+            if (!structure.getStructure().contains(loc)) {
+                continue;
+            }
+            return structure;
+        }
+        return null;
     }
 
-    public void removeStructure(Collection<Location> structure){
-        locationSets.remove(structure);
+    public void addStructure(Structure structure){
+        structures.add(structure);
     }
 
+    public void removeStructure(Structure structure){
+        structures.remove(structure);
+    }
+
+    @NotNull
     @Override
-    public Iterator<Collection<Location>> iterator() {
-        return Collections.unmodifiableCollection(locationSets).iterator();
+    public Iterator<Structure> iterator() {
+        return Collections.unmodifiableCollection(structures).iterator();
     }
 
     public static synchronized StructureManager getInstance(){

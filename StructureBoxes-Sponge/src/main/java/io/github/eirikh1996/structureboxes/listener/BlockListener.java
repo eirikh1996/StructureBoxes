@@ -1,16 +1,33 @@
+/*
+    This file is part of Structure Boxes.
+
+    Structure Boxes is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Structure Boxes is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Structure Boxes.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package io.github.eirikh1996.structureboxes.listener;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.sponge.SpongeWorld;
-import io.github.eirikh1996.structureboxes.Direction;
-import io.github.eirikh1996.structureboxes.StructureBoxes;
-import io.github.eirikh1996.structureboxes.WorldEditHandler;
+import io.github.eirikh1996.structureboxes.*;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
@@ -20,11 +37,13 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +52,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 public class BlockListener {
 
     @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player){
+    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player) throws IOException {
         if (event.isCancelled()) {
             return;
         }
@@ -114,8 +133,73 @@ public class BlockListener {
             event.setCancelled(true);
             return;
         }
-        StructureBoxes.getInstance().scheduleSyncTask(() -> {
+        Task.builder().execute(() -> {
             placed.setBlockType(BlockTypes.AIR);
-        });
+        }).submit(StructureBoxes.getInstance());
+    }
+
+    @Listener
+    public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
+        BlockSnapshot snapshot = null;
+        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
+                continue;
+            }
+            snapshot = transaction.getFinal();
+        }
+        if (snapshot == null || !snapshot.getLocation().isPresent()) {
+            return;
+        }
+        final Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(snapshot.getLocation().get()));
+        if (structure == null) {
+            return;
+        }
+        if (player == null) {
+            return;
+        }
+        StructureManager.getInstance().removeStructure(structure);
+        player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
+    }
+/*
+    @Listener
+    public void onBlockUpdate(NotifyNeighborBlockEvent event) {
+        if (!(event.getSource() instanceof LocatableBlock)) {
+            return;
+        }
+        LocatableBlock lb = (LocatableBlock) event.getSource();
+        Structure structure = null;
+        for (org.spongepowered.api.util.Direction dir : event.getNeighbors().keySet()) {
+            Location<World> relative = lb.getLocation().getBlockRelative(dir);
+            structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(relative));
+            if (structure == null || !structure.isProcessing()) {
+                continue;
+            }
+            break;
+        }
+
+        if (structure == null)
+            structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(lb.getLocation()));
+        if (structure == null || !structure.isProcessing())
+            return;
+        if (lb.getBlockState().getType().equals(BlockTypes.WALL_SIGN)) {
+            StructureBoxes.getInstance().broadcast(event.getNeighbors().toString());
+        }
+        Set<org.spongepowered.api.util.Direction> directions = new HashSet<>(event.getNeighbors().keySet());
+        for (org.spongepowered.api.util.Direction dir : directions) {
+            event.getNeighbors().remove(dir);
+        }
+
+
+
+    }*/
+
+    private boolean isFragile(BlockState state) {
+        final BlockType type = state.getType();
+        return type == BlockTypes.STANDING_SIGN ||
+                type == BlockTypes.WALL_SIGN ||
+                type == BlockTypes.REDSTONE_WIRE ||
+                type == BlockTypes.LADDER ||
+                type == BlockTypes.POWERED_REPEATER ||
+                type == BlockTypes.UNPOWERED_REPEATER;
     }
 }

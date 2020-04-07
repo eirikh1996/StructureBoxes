@@ -1,9 +1,11 @@
 package io.github.eirikh1996.structureboxes.command;
 
+import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.BlockUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.spongepowered.api.Sponge;
@@ -23,6 +25,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.World;
 
 import java.util.*;
@@ -43,36 +46,31 @@ public class StructureBoxUndoCommand implements CommandExecutor {
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission")));
             return CommandResult.success();
         }
-        AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>> stringStructurePair = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
-        if (stringStructurePair == null){
+        Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
+        if (structure == null){
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
-        String schematicName = stringStructurePair.getKey();
-        HashMap<Location, Object> locationMaterialHashMap = stringStructurePair.getValue();
+        String schematicName = structure.getSchematicName();
+        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
+        final Queue<Location> locationQueue = new LinkedList<>();
         if (locationMaterialHashMap == null) {
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
-        final HashSet<Location> structure = new HashSet<>(locationMaterialHashMap.keySet());
-        final List<Collection<Location>> sections = new ArrayList<>();
-        for (int i = 0 ; i <= structure.size() / 30000; i++){
-            sections.add(new HashSet<>());
+        for (Location loc : locationMaterialHashMap.keySet()) {
+            org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
+            if (!BlockUtils.isFragile(spongeLoc.getBlock()))
+                continue;
+            locationQueue.add(loc);
         }
-        int index = 0;
-        int count = 0;
-        for (Location location : structure){
-            sections.get(index).add(location);
-            count++;
-            if (count >= 30000){
-                index++;
-                count = 0;
-            }
-
+        for (Location loc : locationMaterialHashMap.keySet()) {
+            if (locationQueue.contains(loc))
+                continue;
+            locationQueue.add(loc);
         }
-        StructureManager.getInstance().addStructure(structure);
 
-        final Queue<Collection<Location>> locationQueue = new LinkedList<>(sections);
+
 
 
 
@@ -91,7 +89,10 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         structureBox.offer(Keys.ITEM_LORE, lore);
         p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo")));
         PlayerInventory pInv = (PlayerInventory) p.getInventory();
-        Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap, structure)).submit(StructureBoxes.getInstance());
+        if (!structure.isProcessing()) {
+            structure.setProcessing(true);
+        }
+        Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap)).submit(StructureBoxes.getInstance());
 
 
         if (!pInv.getMain().canFit(structureBox)){
@@ -111,23 +112,23 @@ public class StructureBoxUndoCommand implements CommandExecutor {
     }
 
     private static class StructureUndoTask implements Consumer<Task> {
-        private final Queue<Collection<Location>> locationQueue;
-        private final HashMap<Location, Object> locationMaterialHashMap;
+        private final Queue<Location> locationQueue;
+        private final Map<Location, Object> locationMaterialHashMap;
         private final HashSet<Location> structure;
 
-        private StructureUndoTask(Queue<Collection<Location>> locationQueue, HashMap<Location, Object> locationMaterialHashMap, HashSet<Location> structure) {
+        private StructureUndoTask(Queue<Location> locationQueue, Map<Location, Object> locationMaterialHashMap) {
             this.locationQueue = locationQueue;
             this.locationMaterialHashMap = locationMaterialHashMap;
-            this.structure = structure;
+            this.structure = new HashSet<>(locationQueue);
         }
 
         @Override
         public void accept(Task task) {
-            Collection<Location> poll = locationQueue.poll();
-            if (poll == null){
-                return;
-            }
-            for (Location location : poll){
+            int queueSize = Math.min(locationQueue.size(), 30000);
+            for (int i = 1 ; i <= queueSize ; i++){
+                final Location location = locationQueue.poll();
+                if (location == null)
+                    break;
                 final BlockType origType = (BlockType) locationMaterialHashMap.get(location);
                 org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(location);
                 Optional<TileEntity> tileHolder = spongeLoc.getTileEntity();
@@ -135,11 +136,12 @@ public class StructureBoxUndoCommand implements CommandExecutor {
                     TileEntityCarrier carrier = (TileEntityCarrier) tileHolder.get();
                     carrier.getInventory().clear();
                 }
-                spongeLoc.setBlockType(origType);
+                spongeLoc.setBlockType(origType, BlockChangeFlags.NONE);
 
             }
             if (locationQueue.isEmpty()){
-                StructureManager.getInstance().removeStructure(structure);
+
+                StructureManager.getInstance().removeStructure(StructureManager.getInstance().getCorrespondingStructure(structure));
                 task.cancel();
             }
         }

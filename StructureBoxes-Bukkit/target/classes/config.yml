@@ -1,0 +1,59 @@
+Debug: false #Debug mode
+Metrics: true
+Structure Box Item: chest #The item the structure box is. Must be a placable block
+Structure Box Display Name: '§6Structure Box' #Display names for structure boxes
+Max Structure Size: 10000 #Maximum allowed size of structures
+Max Session Time: 300 #Time in seconds
+Place cooldown time: 10 #Time before players can place another structure box
+Alternative Display Names: #Other accepted display names. Useful if converting from similar plugins
+  - SiB
+Structure Box Prefix: '§6Structure Box: ' #Prefix for schematic ID
+Alternative Prefixes: #Other accepted prefixes. Useful if converting from similar plugins
+  - 'SiB: '
+Structure Box Instruction Message:
+  - '§bPlace in a free space'
+  - '§bto spawn a structure'
+Require permission per structure box: false #If enabled, players must have structureboxes.place.<schematic-ID> permission to place the structure
+#Determines if the structure box must be placed inside of a region of supported anti-griefing plugins
+Restrict to regions:
+  Enabled: false
+  #Determines if the entire structure or just the placement loc should be within a region
+  Entire structure: false
+  #If the schematic ID linked to a structure box contains any of the strings listed here,
+  #it can be placed outside regions if region restriction is enabled
+  Exceptions:
+    - Merchantman
+    - MM
+Free space: #Settings for free space check
+  Require free space: true
+  Blocks to ignore:
+    - grass
+    - tall_grass
+    - fern
+    - large_fern
+    - double_plant
+    - water
+    - lava
+    - kelp
+    - kelp_plant
+    - seagrass
+    - tall_seagrass
+    - dandelion
+    - poppy
+    - blue_orchid
+    - allium
+    - azure_bluet
+    - red_tulip
+    - orange_tulip
+    - white_tulip
+    - pink_tulip
+    - oxeye_daisy
+    - cornflower
+    - lily_of_the_valley
+    - wither_rose
+    - sunflower
+    - lilac
+    - rose_bush
+    - peony
+    - sea_pickle
+    - bubble_column

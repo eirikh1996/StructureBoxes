@@ -20,10 +20,8 @@
       <module name="structureboxes-bukkit" target="1.8" />
       <module name="StructureBoxes-Core" target="1.8" />
       <module name="StructureBoxes-Fabric" target="1.5" />
-      <module name="structureboxes-main" target="1.8" />
       <module name="StructureBoxes-NonLegacy" target="8" />
       <module name="structureboxes-sponge" target="8" />
-      <module name="StructureBoxes-Sponge" target="1.5" />
       <module name="StructureBoxes-WE6" target="1.8" />
       <module name="StructureBoxes-WE7" target="1.8" />
     </bytecodeTargetLevel>

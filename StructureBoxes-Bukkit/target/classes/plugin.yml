@@ -1,0 +1,26 @@
+name: StructureBoxes
+main: io.github.eirikh1996.structureboxes.StructureBoxes
+version: 3.0
+api-version: 1.13
+depend:
+  - WorldEdit
+softdepend:
+  - WorldGuard
+  - RedProtect
+  - Factions
+  - Civs
+  - Lands
+  - LandClaiming
+  - GriefPrevention
+  - Kingdoms
+  - Towny
+  - Movecraft
+commands:
+  structurebox:
+    aliases:
+      - sb
+      - sbox
+    usage: /structurebox <create|reload|undo>
+permissions:
+  structureboxes.undo:
+    default: true

@@ -39,7 +39,7 @@ public final class Location {
         return subtract(loc.getX(), loc.getY(), loc.getZ());
     }
 
-    private Location subtract(int x, int y, int z) {
+    public Location subtract(int x, int y, int z) {
         return new Location(getWorld(), getX() - x, getY() - y, getZ() - z);
     }
 

@@ -12,6 +12,9 @@
     <artifactId>structureboxes-core</artifactId>
     <name>StructureBoxes-Core</name>
     <version>Core</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <build>
         <plugins>
             <plugin>
