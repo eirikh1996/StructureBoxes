@@ -33,10 +33,14 @@ import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegi
 public class BlockListener implements Listener {
     private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(
+            priority = EventPriority.HIGHEST
+    )
     public void onBlockPlace(final BlockPlaceEvent event){
+        Bukkit.broadcastMessage("Test");
         if (event.isCancelled()) {
             if (RegionUtils.canPlaceStructure(event.getBlockPlaced().getLocation())) {
+
                 event.setCancelled(false);
             } else {
                 return;

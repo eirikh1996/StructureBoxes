@@ -166,7 +166,16 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         if (f instanceof Factions){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             factionsPlugin = (Factions) f;
-            MFlag.getCreative(16000, "structurebox", "structurebox", "Can players place structure boxes in this faction's territory?", "Players can place structure boxes", "Players cannot place structure boxes", false, false, true);
+            MFlag.getCreative(
+                    16000,
+                    "structurebox",
+                    "structurebox",
+                    "Can players place structure boxes in this faction's territory?",
+                    "Players can place structure boxes",
+                    "Players cannot place structure boxes",
+                    false,
+                    false,
+                    true);
             foundRegionProvider = true;
         }
         //Check for RedProtect
