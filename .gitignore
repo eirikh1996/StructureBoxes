@@ -2,5 +2,9 @@
 /.idea/
 /API/target/
 /StructureBoxes-Sponge/target/
+/StructureBoxes-Bukkit/target/
+/StructureBoxes-Core/target/
+/StructureBoxes-NonLegacy/target/
 /StructureBoxes-WE6/target/
+/StructureBoxes-WE7/target/
 /target/
