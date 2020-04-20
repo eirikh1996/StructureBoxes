@@ -15,6 +15,7 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/StructureBoxes-Fabric/pom.xml" />
         <option value="$PROJECT_DIR$/StructureBoxes-Nukkit/pom.xml" />
       </set>
     </option>
