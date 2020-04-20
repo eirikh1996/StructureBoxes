@@ -50,7 +50,7 @@ public class RegionUtils {
             griefprevention = GriefPreventionUtils.withinClaim(location);
         }
         if (structureBoxes.isPlotSquaredInstalled()){
-            plotSquared = Settings.IsLegacy ? PlotSquaredUtils.withinPlot(location) : PlotSquared4Utils.withinPlot(location);
+            plotSquared = Settings.IsLegacy ? PlotSquaredUtils.withinPlot(location) : (Settings.UsePS5 ? PlotSquared5Utils.withinPlot(location) : PlotSquared4Utils.withinPlot(location)) ;
         }
         if (structureBoxes.getLandClaimingPlugin() != null){
             landClaiming = LandClaimingUtils.insideClaimedLand(location);

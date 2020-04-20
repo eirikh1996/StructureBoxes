@@ -180,7 +180,15 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             if (Settings.IsLegacy) {
                 PlotSquaredUtils.initialize();
             } else {
-                PlotSquared4Utils.initialize();
+                try { //Check if PlotSquared 5 is installed
+                    Class.forName("com.plotsquared.bukkit.BukkitMain");
+                    Settings.UsePS5 = true;
+                    PlotSquared5Utils.initialize();
+                } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
+                    Settings.UsePS5 = false;
+                    PlotSquared4Utils.initialize();
+                }
+
             }
             plotSquaredInstalled = true;
             foundRegionProvider = true;
@@ -404,7 +412,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                 return false;
             }
-            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc))){
+            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
                 return false;
             }

@@ -92,8 +92,10 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
             String versionName = jsonObj.get("name").getAsString();
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
-            int nv = Integer.parseInt(newVersion.replace(".", ""));
-            int cv = Integer.parseInt(currentVersion.replace("v", "").replace(".", ""));
+            int nv = Integer.parseInt(newVersion.split(".")[0]) * 1000;
+            nv += Integer.parseInt(newVersion.split(".")[1]);
+            int cv = Integer.parseInt(currentVersion.replace("v", "").split(".")[0]) * 1000;
+            cv += Integer.parseInt(currentVersion.replace("v", "").split(".")[0]);
             if (nv > cv)
                 return newVersion;
         } catch (Exception e) {
