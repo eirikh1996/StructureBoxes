@@ -11,7 +11,6 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,14 +36,8 @@ public class BlockListener implements Listener {
             priority = EventPriority.HIGHEST
     )
     public void onBlockPlace(final BlockPlaceEvent event){
-        Bukkit.broadcastMessage("Test");
         if (event.isCancelled()) {
-            if (RegionUtils.canPlaceStructure(event.getBlockPlaced().getLocation())) {
-
-                event.setCancelled(false);
-            } else {
-                return;
-            }
+            return;
         }
         final UUID id = event.getPlayer().getUniqueId();
         if (!event.getBlockPlaced().getType().equals(Settings.StructureBoxItem) &&

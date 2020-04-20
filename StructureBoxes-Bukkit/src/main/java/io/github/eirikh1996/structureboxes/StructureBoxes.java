@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.engine.EnginePermBuild;
 import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -11,6 +12,7 @@ import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import io.github.eirikh1996.structureboxes.region.RegionFlagManager;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -23,6 +25,8 @@ import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -302,6 +306,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
+        getServer().getPluginManager().registerEvent(
+                BlockPlaceEvent.class,
+                EnginePermBuild.get(),
+                EventPriority.NORMAL,
+                new RegionFlagManager(),
+                this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
             UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
