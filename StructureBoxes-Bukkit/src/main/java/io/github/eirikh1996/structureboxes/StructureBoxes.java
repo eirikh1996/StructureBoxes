@@ -175,20 +175,22 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
-        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)){
+        if (!Settings.IsLegacy) {
+            try { //Check if PlotSquared 5 is installed
+                Class.forName("com.plotsquared.bukkit.BukkitMain");
+                Settings.UsePS5 = true;
+            } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
+                Settings.UsePS5 = false;
+            }
+        }
+        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
             if (Settings.IsLegacy) {
                 PlotSquaredUtils.initialize();
+            } else if (Settings.UsePS5){
+                PlotSquared5Utils.initialize();
             } else {
-                try { //Check if PlotSquared 5 is installed
-                    Class.forName("com.plotsquared.bukkit.BukkitMain");
-                    Settings.UsePS5 = true;
-                    PlotSquared5Utils.initialize();
-                } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
-                    Settings.UsePS5 = false;
-                    PlotSquared4Utils.initialize();
-                }
-
+                PlotSquared4Utils.initialize();
             }
             plotSquaredInstalled = true;
             foundRegionProvider = true;
