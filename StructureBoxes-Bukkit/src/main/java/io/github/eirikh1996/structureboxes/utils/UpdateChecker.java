@@ -92,10 +92,12 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             JsonObject jsonObj = (JsonObject) jsonArray.get(jsonArray.size() - 1);
             String versionName = jsonObj.get("name").getAsString();
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
-            int nv = Integer.parseInt(newVersion.split(".")[0]) * 1000;
-            nv += Integer.parseInt(newVersion.split(".")[1]);
-            int cv = Integer.parseInt(currentVersion.replace("v", "").split(".")[0]) * 1000;
-            cv += Integer.parseInt(currentVersion.replace("v", "").split(".")[0]);
+            int nv = Integer.parseInt(newVersion.replace(".", ""));
+            int cv = Integer.parseInt(currentVersion.replace("v", "").replace(".", ""));
+            //If a new major update, multiply nv by 1k
+            if (Integer.parseInt(newVersion.substring(0, 1)) > Integer.parseInt(currentVersion.substring(0, 1))) {
+                nv *= 1000;
+            }
             if (nv > cv)
                 return newVersion;
         } catch (Exception e) {

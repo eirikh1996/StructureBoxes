@@ -1,4 +1,6 @@
 Debug: false #Debug mode
+Metrics: true
+Plugin prefix: '§5[§6StructureBoxes§5]§r'
 Structure Box Item: chest #The item the structure box is. Must be a placable block
 Structure Box Display Name: '§6Structure Box' #Display names for structure boxes
 Max Structure Size: 10000 #Maximum allowed size of structures

@@ -505,6 +505,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.Metrics = getConfig().getBoolean("Metrics", true);
         Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
+        Settings.PluginPrefix = getConfig().getString("Plugin prefix", "§5[§6StructureBoxes§5]§r");
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
         Object object = getConfig().get("Structure Box Instruction Message");
