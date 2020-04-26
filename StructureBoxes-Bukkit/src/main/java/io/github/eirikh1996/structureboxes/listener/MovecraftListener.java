@@ -72,12 +72,12 @@ public class MovecraftListener implements Listener {
         Structure structure;
         HitBox oldHitbox;
         try {
-            Method getNewHitBox = CraftTranslateEvent.class.getDeclaredMethod("getOldHitBox");
+            Method getNewHitBox = CraftRotateEvent.class.getDeclaredMethod("getOldHitBox");
             oldHitbox = (HitBox) getNewHitBox.invoke(event);
         } catch (Exception e) {
             return;
         }
-        for (MovecraftLocation ml : event.getOldHitBox()) {
+        for (MovecraftLocation ml : oldHitbox) {
             structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
             if (structure != null) {
                 event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
