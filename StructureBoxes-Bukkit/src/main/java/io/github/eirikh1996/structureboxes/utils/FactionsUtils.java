@@ -13,7 +13,7 @@ public class FactionsUtils {
         if (mp.isOverriding()){
             return true;
         }
-        return f.isPermitted(MPerm.getPermBuild(), f.getRelationTo(mp));
+        return f.isPermitted(MPerm.getPermBuild(), f.getRelationTo(mp)) || BoardColl.get().getTerritoryAccessAt(ps).isMPlayerGranted(mp);
     }
 
     public static boolean withinRegion(Location location){
