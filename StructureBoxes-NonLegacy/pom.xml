@@ -35,6 +35,10 @@
             <id>p2-repo</id>
             <url>http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/</url>
         </repository>
+        <repository>
+            <id>plotsquared</id>
+            <url>https://plotsquared.com/mvn/</url>
+        </repository>
         <!-- Jenkins4J -->
         <repository>
             <id>jitpack.io</id>
@@ -72,6 +76,11 @@
             <groupId>com.github.intellectualsites.plotsquared</groupId>
             <artifactId>PlotSquared-API</artifactId>
             <version>latest</version>
+        </dependency>
+        <dependency>
+            <groupId>com.plotsquared</groupId>
+            <artifactId>PlotSquared</artifactId>
+            <version>5.1</version> <!-- Or 'latest' -->
         </dependency>
     </dependencies>
 

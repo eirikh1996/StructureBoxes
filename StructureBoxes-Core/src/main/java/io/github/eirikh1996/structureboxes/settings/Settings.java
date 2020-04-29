@@ -10,10 +10,11 @@ public class Settings {
     public static String locale;
     public static boolean FAWE;
     public static boolean IsLegacy;
+    public static boolean UsePS5;
     public static boolean Debug;
     public static Object StructureBoxItem;
     public static String StructureBoxLore;
-    public static String StructureBoxPrefix;
+    public static String StructureBoxPrefix, PluginPrefix;
     public static List<String> StructureBoxInstruction = new ArrayList<>();
     public static List<String> AlternativePrefixes = new ArrayList<>();
     public static boolean RestrictToRegionsEnabled;

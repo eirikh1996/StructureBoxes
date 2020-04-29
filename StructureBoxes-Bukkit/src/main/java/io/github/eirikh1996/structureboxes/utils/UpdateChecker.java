@@ -98,6 +98,10 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
             int nv = Integer.parseInt(newVersion.replace(".", ""));
             int cv = Integer.parseInt(currentVersion.replace("v", "").replace(".", ""));
+            //If a new major update, multiply nv by 1k
+            if (Integer.parseInt(newVersion.substring(0, 1)) > Integer.parseInt(currentVersion.substring(0, 1))) {
+                nv *= 1000;
+            }
             if (nv > cv)
                 return newVersion;
         } catch (Exception e) {

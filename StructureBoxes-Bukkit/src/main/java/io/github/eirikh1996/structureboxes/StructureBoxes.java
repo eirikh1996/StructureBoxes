@@ -199,11 +199,21 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
-        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)){
+        if (!Settings.IsLegacy) {
+            try { //Check if PlotSquared 5 is installed
+                Class.forName("com.plotsquared.bukkit.BukkitMain");
+                Settings.UsePS5 = true;
+            } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
+                Settings.UsePS5 = false;
+            }
+        }
+        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
             if (Settings.IsLegacy) {
                 PlotSquaredUtils.initialize();
                 PlotSquaredUtils.registerFlag();
+            } else if (Settings.UsePS5){
+                PlotSquared5Utils.initialize();
             } else {
                 PlotSquared4Utils.initialize();
                 PlotSquared4Utils.registerFlag();
@@ -450,7 +460,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                 return false;
             }
-            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc))){
+            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
                 return false;
             }
@@ -541,6 +551,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.Metrics = getConfig().getBoolean("Metrics", true);
         Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
+        Settings.PluginPrefix = getConfig().getString("Plugin prefix", "§5[§6StructureBoxes§5]§r");
         Settings.StructureBoxItem = Material.getMaterial(getConfig().getString("Structure Box Item").toUpperCase());
         Settings.StructureBoxLore = getConfig().getString("Structure Box Display Name");
         Object object = getConfig().get("Structure Box Instruction Message");

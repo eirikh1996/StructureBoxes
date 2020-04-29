@@ -2,6 +2,7 @@
 /.idea/
 /API/target/
 /StructureBoxes-Sponge/target/
+/StructureBoxes-Sponge/dependency-reduced-pom.xml
 /StructureBoxes-Bukkit/target/
 /StructureBoxes-Core/target/
 /StructureBoxes-NonLegacy/target/

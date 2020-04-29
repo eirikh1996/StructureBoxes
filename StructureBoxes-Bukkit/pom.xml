@@ -191,6 +191,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>src/main/resources/localisation</exclude>
+                </excludes>
             </resource>
         </resources>
         <finalName>StructureBoxes-Bukkit</finalName>

@@ -13,6 +13,6 @@ public class Factions3Utils {
         MPlayer mp = MPlayer.get(player);
         PS ps = PS.valueOf(location);
         Faction faction = BoardColl.get().getFactionAt(ps);
-        return faction.isPlayerPermitted(mp, MPerm.getPermBuild());
+        return faction.isPlayerPermitted(mp, MPerm.getPermBuild()) || BoardColl.get().getTerritoryAccessAt(ps).isGranted(mp);
     }
 }
