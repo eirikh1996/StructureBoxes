@@ -5,37 +5,60 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.FactionsUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
 
 public class RegionFlagManager implements EventExecutor {
+    private static RegionFlagManager instance;
+
+    private RegionFlagManager() {}
+
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) {
-        if (!(listener instanceof EnginePermBuild) || !(event instanceof BlockPlaceEvent)) {
-            return;
-        }
         Bukkit.broadcastMessage(String.valueOf(listener));
-        BlockPlaceEvent placeEvent = (BlockPlaceEvent) event;
-        if (!placeEvent.isCancelled()) {
+        Bukkit.broadcastMessage(String.valueOf(event));
+        if (!(listener instanceof EnginePermBuild)) {
             return;
         }
-        Bukkit.broadcastMessage("Test");
-        if (!FactionsUtils.canPlaceStructureBox(placeEvent.getBlockPlaced().getLocation())) {
+        if (!(event instanceof Cancellable) || !((Cancellable) event).isCancelled()) {
+            return;
+        }
+        Cancellable can = (Cancellable) event;
+        Block b;
+        ItemStack handItem;
+        boolean place = false;
+        if (event instanceof BlockPlaceEvent) {
+            BlockPlaceEvent placeEvent = (BlockPlaceEvent) event;
+            b = placeEvent.getBlockPlaced();
+            handItem = placeEvent.getItemInHand();
+            place = true;
+        } else if (event instanceof PlayerInteractEvent) {
+            PlayerInteractEvent interactEvent = (PlayerInteractEvent) event;
+            b = interactEvent.getClickedBlock();
+            handItem = interactEvent.getItem();
+        } else {
             return;
         }
 
-        if (!placeEvent.getBlockPlaced().getType().equals(Settings.StructureBoxItem)) {
+
+        if (!FactionsUtils.canPlaceStructureBox(b.getLocation())) {
             return;
         }
-        final ItemStack placedItem = placeEvent.getItemInHand();
-        if (!placedItem.hasItemMeta())
+        if (place ? !b.getType().equals(Settings.StructureBoxItem) : !handItem.getType().equals(Settings.StructureBoxItem)) {
             return;
-        final ItemMeta meta = placedItem.getItemMeta();
+        }
+        if (!handItem.hasItemMeta())
+            return;
+        Bukkit.broadcastMessage(b.getType().name());
+        final ItemMeta meta = handItem.getItemMeta();
         assert meta != null;
         if (!meta.hasLore()) {
             return;
@@ -55,6 +78,12 @@ public class RegionFlagManager implements EventExecutor {
                 return;
             }
         }
-        placeEvent.setCancelled(false);
+        can.setCancelled(false);
+    }
+
+    public static RegionFlagManager getInstance() {
+        if (instance == null)
+            instance = new RegionFlagManager();
+        return instance;
     }
 }

@@ -14,6 +14,7 @@ io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils.class
 io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils$PlotSquaredWorldsConfigException.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker$2.class
 io\github\eirikh1996\structureboxes\utils\LandsUtils.class
+io\github\eirikh1996\structureboxes\region\RegionFlagManager.class
 io\github\eirikh1996\structureboxes\StructureBoxes.class
 io\github\eirikh1996\structureboxes\utils\LandClaimingUtils.class
 io\github\eirikh1996\structureboxes\utils\ReflectionUtils.class

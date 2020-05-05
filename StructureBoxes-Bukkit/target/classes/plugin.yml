@@ -1,7 +1,8 @@
 name: StructureBoxes
 main: io.github.eirikh1996.structureboxes.StructureBoxes
-version: 3.0
+version: '3.0'
 api-version: 1.13
+author: eirikh1996
 depend:
   - WorldEdit
 softdepend:

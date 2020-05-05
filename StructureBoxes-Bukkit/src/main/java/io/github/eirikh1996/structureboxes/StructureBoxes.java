@@ -27,6 +27,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -320,7 +321,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 BlockPlaceEvent.class,
                 EnginePermBuild.get(),
                 EventPriority.NORMAL,
-                new RegionFlagManager(),
+                RegionFlagManager.getInstance(),
+                this);
+        getServer().getPluginManager().registerEvent(
+                PlayerInteractEvent.class,
+                EnginePermBuild.get(),
+                EventPriority.NORMAL,
+                RegionFlagManager.getInstance(),
                 this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
