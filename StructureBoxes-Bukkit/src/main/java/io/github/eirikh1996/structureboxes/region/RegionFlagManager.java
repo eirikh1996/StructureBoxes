@@ -23,8 +23,6 @@ public class RegionFlagManager implements EventExecutor {
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) {
-        Bukkit.broadcastMessage(String.valueOf(listener));
-        Bukkit.broadcastMessage(String.valueOf(event));
         if (!(listener instanceof EnginePermBuild)) {
             return;
         }
@@ -55,6 +53,7 @@ public class RegionFlagManager implements EventExecutor {
         if (place ? !b.getType().equals(Settings.StructureBoxItem) : !handItem.getType().equals(Settings.StructureBoxItem)) {
             return;
         }
+        Bukkit.broadcastMessage(String.valueOf(handItem.hasItemMeta()));
         if (!handItem.hasItemMeta())
             return;
         Bukkit.broadcastMessage(b.getType().name());
