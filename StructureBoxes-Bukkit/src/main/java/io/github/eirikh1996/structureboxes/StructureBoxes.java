@@ -415,7 +415,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }
-            if (isFactionsUUIDInstalled() && FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
+            if (isFactionsUUIDInstalled() && !FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }
