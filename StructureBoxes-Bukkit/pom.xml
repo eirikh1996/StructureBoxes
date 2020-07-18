@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
     <name>StructureBoxes-Bukkit</name>
-    <version>2.11</version>
+    <version>2.12</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -76,6 +76,12 @@
             <groupId>io.github.eirikh1996</groupId>
             <artifactId>structureboxes-nonlegacy</artifactId>
             <version>NonLegacy</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-factionsuuid</artifactId>
+            <version>FactionsUUID</version>
             <type>jar</type>
         </dependency>
         <!--MassiveCore-->
@@ -151,7 +157,7 @@
         <dependency>
             <groupId>com.github.Angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
-            <version>4.3.3.0</version>
+            <version>4.7.3</version>
             <scope>provided</scope>
         </dependency>
         <!--Movecraft-->

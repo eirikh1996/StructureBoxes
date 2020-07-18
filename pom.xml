@@ -15,6 +15,7 @@
         <module>StructureBoxes-WE7</module>
         <module>StructureBoxes-Bukkit</module>
         <module>StructureBoxes-Sponge</module>
+        <module>StructureBoxes-FactionsUUID</module>
     </modules>
     <repositories>
         <repository>

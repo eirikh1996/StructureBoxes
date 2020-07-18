@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="StructureBoxes-FactionsUUID" />
         <module name="StructureBoxes-NonLegacy" />
         <module name="StructureBoxes-Core" />
         <module name="structureboxes-bukkit" />
@@ -19,6 +20,7 @@
       <module name="structureboxes-bukkit" target="1.8" />
       <module name="StructureBoxes-Core" target="1.8" />
       <module name="StructureBoxes-Fabric" target="1.5" />
+      <module name="StructureBoxes-FactionsUUID" target="1.5" />
       <module name="structureboxes-main" target="1.8" />
       <module name="StructureBoxes-NonLegacy" target="8" />
       <module name="StructureBoxes-Nukkit" target="1.5" />

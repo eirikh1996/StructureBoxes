@@ -49,6 +49,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
+    private boolean factionsUUIDInstalled = false;
     private Civs civsPlugin;
     private Plugin landsPlugin;
     private Movecraft movecraftPlugin;
@@ -158,6 +159,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             factionsPlugin = (Factions) f;
             foundRegionProvider = true;
+        } else if (FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
+            foundRegionProvider = true;
+            factionsUUIDInstalled = true;
         }
         //Check for RedProtect
         Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
@@ -410,6 +415,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }
+            if (isFactionsUUIDInstalled() && FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
+                return false;
+            }
             if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                 return false;
@@ -567,5 +576,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public Movecraft getMovecraftPlugin() {
         return movecraftPlugin;
+    }
+
+    public boolean isFactionsUUIDInstalled() {
+        return factionsUUIDInstalled;
     }
 }
