@@ -100,6 +100,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
+      <library name="Maven: com.arckenver:Nations:LATEST">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/sponge/NationsUpdated-2.10.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
       <library name="Maven: io.github.pulverizer:Movecraft-for-sponge:0.1.0">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/sponge/Movecraft.jar!/" />
