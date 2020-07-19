@@ -12,6 +12,7 @@ public class RegionUtils {
         boolean eagleFactions = false;
         boolean plotSquared = false;
         boolean universeGuard = false;
+        boolean nations = false;
         final StructureBoxes sb = StructureBoxes.getInstance();
         if (sb.getRedProtectPlugin().isPresent()) {
             redProtect = sb.getRedProtectPlugin().get().getAPI().getRegion(loc) != null;
@@ -28,6 +29,9 @@ public class RegionUtils {
         if (sb.getUniverseGuardPlugin().isPresent()) {
             universeGuard = !com.universeguard.utils.RegionUtils.getAllLocalRegionsAt(loc).isEmpty();
         }
-        return redProtect || griefPrevention || eagleFactions || plotSquared || universeGuard;
+        if (sb.getNationsPlugin().isPresent()) {
+            nations = NationsUtils.withinRegion(loc);
+        }
+        return redProtect || griefPrevention || eagleFactions || plotSquared || universeGuard || nations;
     }
 }

@@ -56,6 +56,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
     private boolean plotSquaredInstalled = false;
+    private boolean factionsUUIDInstalled = false;
     private Civs civsPlugin;
     private Plugin landsPlugin;
     private Movecraft movecraftPlugin;
@@ -182,6 +183,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     false,
                     true);
             foundRegionProvider = true;
+        } else if (FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
+            foundRegionProvider = true;
+            factionsUUIDInstalled = true;
         }
         //Check for RedProtect
         Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
@@ -385,10 +390,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return landsPlugin;
     }
 
-    public Movecraft getMovecraftPlugin() {
-        return movecraftPlugin;
-    }
-
     public Kingdoms getKingdomsPlugin() {
         return kingdomsPlugin;
     }
@@ -460,6 +461,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 return false;
             }
             if (getFactionsPlugin() != null && (Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))){
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
+                return false;
+            }
+            if (isFactionsUUIDInstalled() && !FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }
@@ -615,5 +620,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
 
+    }
+
+    public Movecraft getMovecraftPlugin() {
+        return movecraftPlugin;
+    }
+
+    public boolean isFactionsUUIDInstalled() {
+        return factionsUUIDInstalled;
     }
 }

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>structureboxes-sponge</artifactId>
   <name>StructureBoxes-Sponge</name>
-  <version>2.0</version>
+  <version>2.3</version>
   <build>
     <finalName>StructureBoxes-Sponge</finalName>
     <plugins>
@@ -202,6 +202,13 @@
       <version>LATEST</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/../libs/sponge/UniverseGuard-2.20.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.arckenver</groupId>
+      <artifactId>Nations</artifactId>
+      <version>LATEST</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../libs/sponge/NationsUpdated-2.10.1.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>io.github.pulverizer</groupId>

@@ -50,6 +50,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-gson:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-legacy:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-plain:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: io.github.eirikh1996:structureboxes-factionsuuid:FactionsUUID" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:LATEST">
         <CLASSES>
@@ -120,7 +121,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.3.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.7.3" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.songoda:Kingdoms:LATEST">
         <CLASSES>

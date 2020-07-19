@@ -20,6 +20,7 @@ package io.github.eirikh1996.structureboxes;
 import br.net.fabiozumbi12.RedProtect.Sponge.API.RedProtectAPI;
 import br.net.fabiozumbi12.RedProtect.Sponge.RedProtect;
 import br.net.fabiozumbi12.RedProtect.Sponge.Region;
+import com.arckenver.nations.NationsPlugin;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.intellectualcrafters.plot.IPlotMain;
@@ -92,7 +93,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "2.0",
+        version = "2.3",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),
@@ -101,6 +102,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
                 @Dependency(id = "plotsquared", optional = true),
                 @Dependency(id = "eaglefactions", optional = true),
                 @Dependency(id = "universeguard", optional = true),
+                @Dependency(id = "nations-updated", optional = true),
                 @Dependency(id = "movecraft", optional = true)})
 public class StructureBoxes implements SBMain {
 
@@ -129,6 +131,7 @@ public class StructureBoxes implements SBMain {
     @NotNull private Optional<EagleFactionsPlugin> eagleFactionsPlugin = Optional.empty();
     @NotNull private Optional<IPlotMain> plotSquaredPlugin = Optional.empty();
     @NotNull private Optional<UniverseGuard> universeGuardPlugin = Optional.empty();
+    @NotNull private Optional<NationsPlugin> nationsPlugin = Optional.empty();
     @NotNull private Optional<Movecraft> movecraftPlugin = Optional.empty();
 
     private boolean plotSquaredInstalled = false;
@@ -241,6 +244,12 @@ public class StructureBoxes implements SBMain {
             Sponge.getEventManager().registerListeners(this, new MovecraftListener());
             movecraftPlugin = (Optional<Movecraft>) movecraft.get().getInstance();
         }
+        Optional<PluginContainer> nations = pluginManager.getPlugin("nations-updated");
+        if (nations.isPresent() && nations.get().getInstance().isPresent()) {
+            console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Nations Updated detected")));
+            nationsPlugin = (Optional<NationsPlugin>) nations.get().getInstance();
+            regionProviderFound = true;
+        }
         if ((Settings.RestrictToRegionsEnabled || Settings.RestrictToRegionsEntireStructure) && !regionProviderFound) {
             console.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin")));
             Settings.RestrictToRegionsEnabled = false;
@@ -274,6 +283,9 @@ public class StructureBoxes implements SBMain {
             if (getGriefPreventionPlugin().isPresent()) {
                 valueMap.put("GriefPrevention", 1);
             }
+            if (getNationsPlugin().isPresent()) {
+                valueMap.put("Nations Updated", 1);
+            }
             if (noRegionProvider) {
                 valueMap.put("None", 1);
             }
@@ -302,7 +314,7 @@ public class StructureBoxes implements SBMain {
     @Override
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
         final Player p = Sponge.getServer().getPlayer(playerID).get();
-        if (!Settings.RestrictToRegionsEntireStructure && p.hasPermission("structureboxes.bypassregionrestriction")) {
+        if (!Settings.RestrictToRegionsEntireStructure || p.hasPermission("structureboxes.bypassregionrestriction")) {
             return true;
         }
         for (Location location : locations) {
@@ -325,10 +337,7 @@ public class StructureBoxes implements SBMain {
         for (Location loc : locations){
             org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
             originalBlocks.put(loc, spongeLoc.getBlockType());
-            if (!spongeLoc.getBlockType().equals(BlockTypes.AIR) && !Settings.blocksToIgnore.contains(spongeLoc.getBlockType())){
-                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No free space")));
-                return false;
-            }
+
             if (redProtectPlugin.isPresent()) {
                 RedProtectAPI api = redProtectPlugin.get().getAPI();
                 Region region = api.getRegion(spongeLoc);
@@ -385,6 +394,17 @@ public class StructureBoxes implements SBMain {
                     p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "UniverseGuard")));
                     return false;
                 }
+            }
+            if (nationsPlugin.isPresent() && NationsUtils.allowedToBuild(p, spongeLoc)) {
+                p.sendMessage(Text.of(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Nations")));
+                return false;
+            }
+            if (!Settings.CheckFreeSpace){
+                continue;
+            }
+            if (!spongeLoc.getBlockType().equals(BlockTypes.AIR) && !Settings.blocksToIgnore.contains(spongeLoc.getBlockType())){
+                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No free space")));
+                return false;
             }
 
         }
@@ -541,5 +561,9 @@ public class StructureBoxes implements SBMain {
     @NotNull
     public Optional<Movecraft> getMovecraftPlugin() {
         return movecraftPlugin;
+    }
+
+    public Optional<NationsPlugin> getNationsPlugin() {
+        return nationsPlugin;
     }
 }

@@ -78,6 +78,12 @@
             <version>NonLegacy</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-factionsuuid</artifactId>
+            <version>FactionsUUID</version>
+            <type>jar</type>
+        </dependency>
         <!--MassiveCore-->
         <dependency>
             <groupId>com.massivecraft</groupId>
@@ -151,7 +157,7 @@
         <dependency>
             <groupId>com.github.Angeschossen</groupId>
             <artifactId>LandsAPI</artifactId>
-            <version>4.3.3.0</version>
+            <version>4.7.3</version>
             <scope>provided</scope>
         </dependency>
         <!--FabledKingdoms-->

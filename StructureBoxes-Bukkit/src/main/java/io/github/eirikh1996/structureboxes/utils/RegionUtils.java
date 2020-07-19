@@ -24,6 +24,9 @@ public class RegionUtils {
         if (structureBoxes.getFactionsPlugin() != null){
             factions = FactionsUtils.withinRegion(location);
         }
+        if (structureBoxes.isFactionsUUIDInstalled()) {
+            factions = FactionsUUIDUtils.isWithinRegion(location);
+        }
         if (structureBoxes.getRedProtectPlugin() != null){
             redprotect = RedProtectUtils.withinRegion(location);
         }
