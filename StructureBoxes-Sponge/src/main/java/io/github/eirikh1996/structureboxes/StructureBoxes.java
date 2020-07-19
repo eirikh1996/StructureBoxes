@@ -93,7 +93,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "2.2",
+        version = "2.3",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),
@@ -314,7 +314,7 @@ public class StructureBoxes implements SBMain {
     @Override
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
         final Player p = Sponge.getServer().getPlayer(playerID).get();
-        if (!Settings.RestrictToRegionsEntireStructure && p.hasPermission("structureboxes.bypassregionrestriction")) {
+        if (!Settings.RestrictToRegionsEntireStructure || p.hasPermission("structureboxes.bypassregionrestriction")) {
             return true;
         }
         for (Location location : locations) {
