@@ -61,7 +61,7 @@ public class WorldGuardUtils {
 
     public static boolean canPlaceStructureBox(Player player, Location loc) {
         LocalPlayer lp = StructureBoxes.getInstance().getWorldGuardPlugin().wrapPlayer(player);
-        return getRegions(loc).queryState(lp) == StateFlag.State.ALLOW;
+        return getRegions(loc).queryValue(lp, STRUCTUREBOX_FLAG) == StateFlag.State.ALLOW;
     }
 
     public static void registerFlag() {
