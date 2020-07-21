@@ -16,13 +16,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.EventExecutor;
 import org.jetbrains.annotations.NotNull;
 
-public class RegionFlagManager implements EventExecutor {
-    private static RegionFlagManager instance;
+public class FactionsFlagManager implements EventExecutor {
+    private static FactionsFlagManager instance;
 
-    private RegionFlagManager() {}
+    private FactionsFlagManager() {}
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) {
+        if (Settings.Debug) {
+            Bukkit.broadcastMessage(listener.toString());
+            Bukkit.broadcastMessage(event.toString());
+        }
         if (!(listener instanceof EnginePermBuild)) {
             return;
         }
@@ -47,16 +51,14 @@ public class RegionFlagManager implements EventExecutor {
         }
 
 
-        if (!FactionsUtils.canPlaceStructureBox(b.getLocation())) {
+        if (b == null || !FactionsUtils.canPlaceStructureBox(b.getLocation())) {
             return;
         }
         if (place ? !b.getType().equals(Settings.StructureBoxItem) : !handItem.getType().equals(Settings.StructureBoxItem)) {
             return;
         }
-        Bukkit.broadcastMessage(String.valueOf(handItem.hasItemMeta()));
         if (!handItem.hasItemMeta())
             return;
-        Bukkit.broadcastMessage(b.getType().name());
         final ItemMeta meta = handItem.getItemMeta();
         assert meta != null;
         if (!meta.hasLore()) {
@@ -80,9 +82,9 @@ public class RegionFlagManager implements EventExecutor {
         can.setCancelled(false);
     }
 
-    public static RegionFlagManager getInstance() {
+    public static FactionsFlagManager getInstance() {
         if (instance == null)
-            instance = new RegionFlagManager();
+            instance = new FactionsFlagManager();
         return instance;
     }
 }

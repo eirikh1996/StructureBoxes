@@ -3,6 +3,7 @@ package io.github.eirikh1996.structureboxes.utils;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public class RegionUtils {
 
@@ -63,7 +64,7 @@ public class RegionUtils {
                 kingdoms;
     }
 
-    public static boolean canPlaceStructure(Location loc) {
+    public static boolean canPlaceStructure(Player player, Location loc) {
         boolean worldguard = false;
         boolean factions = false;
         boolean redprotect = false;
@@ -76,7 +77,7 @@ public class RegionUtils {
             redprotect = RedProtectUtils.canPlaceStructureBox(loc);
         }
         if (sb.getWorldGuardPlugin() != null) {
-            worldguard = WorldGuardUtils.canPlaceStructureBox(loc);
+            worldguard = WorldGuardUtils.canPlaceStructureBox(player, loc);
         }
         if (sb.isPlotSquaredInstalled()) {
             plotSquared = PlotSquaredUtils.canPlaceStructureBox(loc);

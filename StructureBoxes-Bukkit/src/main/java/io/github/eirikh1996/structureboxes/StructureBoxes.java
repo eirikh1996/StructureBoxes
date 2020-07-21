@@ -7,12 +7,14 @@ import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.songoda.kingdoms.main.Kingdoms;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
-import io.github.eirikh1996.structureboxes.region.RegionFlagManager;
+import io.github.eirikh1996.structureboxes.region.FactionsFlagManager;
+import io.github.eirikh1996.structureboxes.region.WorldGuardFlagManager;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -26,6 +28,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
@@ -164,8 +167,15 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         //Check for WorldGuard
         if (worldGuardPlugin != null){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - WorldGuard detected"));
-            worldGuardPlugin = (WorldGuardPlugin) wg;
             foundRegionProvider = true;
+            EventAbstractionListener listener = new EventAbstractionListener(worldGuardPlugin);
+            HandlerList.unregisterAll(listener);
+            listener.registerEvents();
+            getServer().getPluginManager().registerEvent(
+                    BlockPlaceEvent.class,
+                    listener,
+                    EventPriority.NORMAL,
+                    new WorldGuardFlagManager(), this);
         }
         Plugin f = getServer().getPluginManager().getPlugin("Factions");
         //Check for Factions
@@ -183,6 +193,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     false,
                     true);
             foundRegionProvider = true;
+            getServer().getPluginManager().registerEvent(
+                    BlockPlaceEvent.class,
+                    EnginePermBuild.get(),
+                    EventPriority.NORMAL,
+                    FactionsFlagManager.getInstance(),
+                    this);
+            getServer().getPluginManager().registerEvent(
+                    PlayerInteractEvent.class,
+                    EnginePermBuild.get(),
+                    EventPriority.NORMAL,
+                    FactionsFlagManager.getInstance(),
+                    this);
         } else if (FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             foundRegionProvider = true;
@@ -322,18 +344,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
-        getServer().getPluginManager().registerEvent(
-                BlockPlaceEvent.class,
-                EnginePermBuild.get(),
-                EventPriority.NORMAL,
-                RegionFlagManager.getInstance(),
-                this);
-        getServer().getPluginManager().registerEvent(
-                PlayerInteractEvent.class,
-                EnginePermBuild.get(),
-                EventPriority.NORMAL,
-                RegionFlagManager.getInstance(),
-                this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
             UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
@@ -460,7 +470,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
                 return false;
             }
-            if (getFactionsPlugin() != null && (Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))){
+            if (getFactionsPlugin() != null && ((Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                 return false;
             }

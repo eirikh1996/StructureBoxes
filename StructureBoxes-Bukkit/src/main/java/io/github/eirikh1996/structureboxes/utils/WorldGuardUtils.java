@@ -9,7 +9,6 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
@@ -27,6 +26,9 @@ public class WorldGuardUtils {
     public static StateFlag STRUCTUREBOX_FLAG = new StateFlag("structurebox", false);
 
     public static boolean allowBuild(Player player, Location location){
+        if (canPlaceStructureBox(player, location)) {
+            return true;
+        }
         if (CAN_BUILD != null){
             try {
                 return (boolean) CAN_BUILD.invoke(StructureBoxes.getInstance().getWorldGuardPlugin(), player, location);
@@ -57,27 +59,9 @@ public class WorldGuardUtils {
         }
     }
 
-    public static boolean canPlaceStructureBox(Location loc) {
-        final ApplicableRegionSet regions;
-        if (GET_REGION_MANAGER != null && GET_APPLICABLE_REGIONS != null){
-            try {
-                RegionManager manager = (RegionManager) GET_REGION_MANAGER.invoke(StructureBoxes.getInstance().getWorldGuardPlugin(), loc.getWorld());
-                regions = (ApplicableRegionSet) GET_APPLICABLE_REGIONS.invoke(manager, loc);
-
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                return false;
-            }
-        } else {
-            regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(loc.getWorld())).getApplicableRegions(BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-        }
-        for (ProtectedRegion region : regions) {
-            if (region.getFlag(STRUCTUREBOX_FLAG) != StateFlag.State.ALLOW) {
-                continue;
-            }
-            return true;
-        }
-        return false;
+    public static boolean canPlaceStructureBox(Player player, Location loc) {
+        LocalPlayer lp = StructureBoxes.getInstance().getWorldGuardPlugin().wrapPlayer(player);
+        return getRegions(loc).queryState(lp) == StateFlag.State.ALLOW;
     }
 
     public static void registerFlag() {
@@ -94,5 +78,22 @@ public class WorldGuardUtils {
             flags = WorldGuard.getInstance().getFlagRegistry();
         }
         flags.register(STRUCTUREBOX_FLAG);
+    }
+
+    public static ApplicableRegionSet getRegions(Location location) {
+        final ApplicableRegionSet regions;
+        if (GET_REGION_MANAGER != null && GET_APPLICABLE_REGIONS != null){
+            try {
+                RegionManager manager = (RegionManager) GET_REGION_MANAGER.invoke(StructureBoxes.getInstance().getWorldGuardPlugin(), location.getWorld());
+                regions = (ApplicableRegionSet) GET_APPLICABLE_REGIONS.invoke(manager, location);
+
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            regions = WorldGuard.getInstance().getPlatform().getRegionContainer().get(new BukkitWorld(location.getWorld())).getApplicableRegions(BlockVector3.at(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        }
+        return regions;
     }
 }

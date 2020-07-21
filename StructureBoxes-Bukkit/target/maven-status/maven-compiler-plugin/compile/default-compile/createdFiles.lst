@@ -14,14 +14,15 @@ io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils.class
 io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils$PlotSquaredWorldsConfigException.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker$2.class
 io\github\eirikh1996\structureboxes\utils\LandsUtils.class
-io\github\eirikh1996\structureboxes\region\RegionFlagManager.class
 io\github\eirikh1996\structureboxes\StructureBoxes.class
 io\github\eirikh1996\structureboxes\utils\LandClaimingUtils.class
 io\github\eirikh1996\structureboxes\utils\ReflectionUtils.class
 io\github\eirikh1996\structureboxes\utils\MathUtils$1.class
+io\github\eirikh1996\structureboxes\region\WorldGuardFlagManager.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker.class
 io\github\eirikh1996\structureboxes\utils\FactionsUtils.class
 io\github\eirikh1996\structureboxes\listener\BlockListener.class
+io\github\eirikh1996\structureboxes\region\FactionsFlagManager.class
 io\github\eirikh1996\structureboxes\commands\StructureBoxCommand$1.class
 io\github\eirikh1996\structureboxes\utils\GriefPreventionUtils.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker$1.class
