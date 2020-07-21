@@ -5,6 +5,7 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.engine.EnginePermBuild;
 import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
+import com.plotsquared.bukkit.listeners.PlayerEvents;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
@@ -14,6 +15,8 @@ import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.region.FactionsFlagManager;
+import io.github.eirikh1996.structureboxes.region.PlotSquaredFlagManager;
+import io.github.eirikh1996.structureboxes.region.RedProtectFlagManager;
 import io.github.eirikh1996.structureboxes.region.WorldGuardFlagManager;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
@@ -217,6 +220,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             redProtectPlugin = (RedProtect) rp;
             foundRegionProvider = true;
             redProtectPlugin.getAPI().addFlag("structurebox", false, true);
+            getServer().getPluginManager().registerEvent(
+                    BlockPlaceEvent.class,
+                    new br.net.fabiozumbi12.RedProtect.Bukkit.listeners.BlockListener(),
+                    EventPriority.NORMAL,
+                    new RedProtectFlagManager(),
+                    this
+            );
         }
         //Check for GriefPrevention
         Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
@@ -240,6 +250,13 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             if (Settings.IsLegacy) {
                 PlotSquaredUtils.initialize();
                 PlotSquaredUtils.registerFlag();
+                getServer().getPluginManager().registerEvent(
+                        BlockPlaceEvent.class,
+                        new PlayerEvents(),
+                        EventPriority.NORMAL,
+                        new PlotSquaredFlagManager(),
+                        this
+                );
             } else if (Settings.UsePS5){
                 PlotSquared5Utils.initialize();
             } else {

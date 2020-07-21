@@ -21,7 +21,7 @@ import java.util.Map;
 public class PlotSquaredUtils {
     private static Map<String, Object> worlds;
     private static IPlotMain ps;
-    private static Flag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
+    public static final Flag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
     private PlotSquaredUtils() {
 
     }
