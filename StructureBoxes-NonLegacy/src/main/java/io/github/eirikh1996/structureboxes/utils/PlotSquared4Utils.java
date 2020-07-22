@@ -3,7 +3,6 @@ package io.github.eirikh1996.structureboxes.utils;
 import com.github.intellectualsites.plotsquared.api.PlotAPI;
 import com.github.intellectualsites.plotsquared.plot.IPlotMain;
 import com.github.intellectualsites.plotsquared.plot.flag.BooleanFlag;
-import com.github.intellectualsites.plotsquared.plot.flag.Flag;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import org.bukkit.Bukkit;
@@ -21,7 +20,7 @@ import java.util.Set;
 
 public class PlotSquared4Utils {
     private static Map<String, Object> worlds;
-    private static FlagHolder flagHolder;
+    public static BooleanFlag StructureBoxFlag = new BooleanFlag("structurebox");
 
     public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
@@ -80,8 +79,7 @@ public class PlotSquared4Utils {
     }
 
     public static void registerFlag() {
-        flagHolder = new FlagHolder();
-        new PlotAPI().addFlag(flagHolder.getStructureBoxFlag());
+        new PlotAPI().addFlag(StructureBoxFlag);
     }
 
     public static boolean canPlaceStructureBox(Location loc) {
@@ -97,7 +95,7 @@ public class PlotSquared4Utils {
         if (plot == null) {
             return true;
         }
-        return (boolean) plot.getFlag(flagHolder.getStructureBoxFlag()).get();
+        return plot.getFlag(StructureBoxFlag).get();
     }
 
     private static com.github.intellectualsites.plotsquared.plot.object.Location bukkitToPSLoc(Location location){
@@ -107,14 +105,6 @@ public class PlotSquared4Utils {
     private static class PlotSquaredWorldsConfigException extends RuntimeException {
         public PlotSquaredWorldsConfigException(String message, Throwable cause){
             super(message, cause);
-        }
-    }
-
-    private static class FlagHolder {
-        private  Flag StructureBoxFlag = new BooleanFlag("structurebox");
-
-        public Flag getStructureBoxFlag() {
-            return StructureBoxFlag;
         }
     }
 }

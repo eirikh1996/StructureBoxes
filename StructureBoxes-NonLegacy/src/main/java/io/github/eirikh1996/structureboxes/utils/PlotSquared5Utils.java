@@ -4,6 +4,7 @@ import com.plotsquared.core.IPlotMain;
 import com.plotsquared.core.api.PlotAPI;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
+import com.plotsquared.core.plot.flag.GlobalFlagContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -34,6 +35,10 @@ public class PlotSquared5Utils {
             throw new PlotSquared5Utils.PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
         worlds = (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
+    }
+
+    public static void registerFlag() {
+        GlobalFlagContainer.getInstance().addFlag(StructureBoxFlag.STRUCTUREBOX_FLAG_FALSE);
     }
 
     public static boolean canBuild(Player player, Location location){
