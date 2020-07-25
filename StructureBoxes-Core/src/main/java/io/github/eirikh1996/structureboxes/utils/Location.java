@@ -1,19 +1,20 @@
 package io.github.eirikh1996.structureboxes.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.UUID;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-public final class Location {
-    private final UUID world;
+public final class Location implements Comparable<Location> {
+    private final String world;
     private final int x;
     private final int y;
     private final int z;
 
-    public Location(UUID world, int x, int y, int z) {
+    public Location(String world, int x, int y, int z) {
         this.world = world;
         this.x = x;
         this.y = y;
@@ -43,7 +44,7 @@ public final class Location {
         return new Location(getWorld(), getX() - x, getY() - y, getZ() - z);
     }
 
-    public UUID getWorld() {
+    public String getWorld() {
         return world;
     }
 
@@ -69,9 +70,9 @@ public final class Location {
         int x = Integer.MAX_VALUE;
         int y = Integer.MAX_VALUE;
         int z = Integer.MAX_VALUE;
-        UUID wID = null;
+        String world = null;
         for (Location loc : structure){
-            wID = loc.getWorld();
+            world = loc.getWorld();
             if (loc.getX() < x){
                 x = loc.getX();
             }
@@ -82,28 +83,9 @@ public final class Location {
                 z = loc.getZ();
             }
         }
-        return new Location(wID, x, y, z);
+        return new Location(world, x, y, z);
     }
 
-    public static Location max(ArrayList<Location> structure) {
-        int x = Integer.MIN_VALUE;
-        int y = Integer.MIN_VALUE;
-        int z = Integer.MIN_VALUE;
-        UUID wID = null;
-        for (Location loc : structure) {
-            wID = loc.getWorld();
-            if (loc.getX() > x) {
-                x = loc.getX();
-            }
-            if (loc.getY() > y) {
-                y = loc.getY();
-            }
-            if (loc.getZ() > z) {
-                z = loc.getZ();
-            }
-        }
-        return new Location(wID, x, y, z);
-    }
     @Override
     public int hashCode() {
         return Objects.hash(world, x, y, z);
@@ -115,7 +97,7 @@ public final class Location {
             return false;
         }
         Location other = (Location) obj;
-        return getWorld() == other.getWorld() &&
+        return getWorld().equals(other.getWorld()) &&
                 getX() == other.getX() &&
                 getY() == other.getY() &&
                 getZ() == other.getZ();
@@ -124,6 +106,11 @@ public final class Location {
 
     @Override
     public String toString() {
-        return String.format("{world ID: %s, x: %d, y: %d, z: %d}", getWorld().toString(), getX(), getY(), getZ());
+        return String.format("{world: %s, x: %d, y: %d, z: %d}", getWorld(), getX(), getY(), getZ());
+    }
+
+    @Override
+    public int compareTo(@NotNull Location o) {
+        return world.compareTo(o.world) + x - o.x + y - o.y + z - o.z;
     }
 }

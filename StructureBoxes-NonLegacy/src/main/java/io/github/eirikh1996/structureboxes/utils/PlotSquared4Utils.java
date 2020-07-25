@@ -20,7 +20,7 @@ import java.util.Set;
 
 public class PlotSquared4Utils {
     private static Map<String, Object> worlds;
-    public static BooleanFlag StructureBoxFlag = new BooleanFlag("structurebox");
+    public static BooleanFlag StructureBoxFlag;
 
     public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
@@ -36,6 +36,7 @@ public class PlotSquared4Utils {
             throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
         worlds = (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
+        StructureBoxFlag = new BooleanFlag("structurebox");
     }
 
     public static boolean canBuild(Player player, Location location){

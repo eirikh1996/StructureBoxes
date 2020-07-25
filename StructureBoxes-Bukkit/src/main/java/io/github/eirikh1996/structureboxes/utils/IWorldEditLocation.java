@@ -31,7 +31,7 @@ public class IWorldEditLocation implements WorldEditLocation {
 
     @Override
     public io.github.eirikh1996.structureboxes.utils.Location toSBloc() {
-        return new io.github.eirikh1996.structureboxes.utils.Location(getWorldID(), getX(), getY(), getZ());
+        return new io.github.eirikh1996.structureboxes.utils.Location(getWorld().getName(), getX(), getY(), getZ());
     }
 
     @Override

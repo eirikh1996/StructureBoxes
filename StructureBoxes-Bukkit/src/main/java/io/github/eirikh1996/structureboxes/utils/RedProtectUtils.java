@@ -11,7 +11,7 @@ public class RedProtectUtils {
         if (region == null) {
             return true;
         }
-        return region.canBuild(player);
+        return region.canBuild(player) || canPlaceStructureBox(location);
     }
 
     public static boolean withinRegion(Location location) {

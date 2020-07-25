@@ -219,11 +219,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
             redProtectPlugin = (RedProtect) rp;
             foundRegionProvider = true;
-            redProtectPlugin.getAPI().addFlag("structurebox", false, true);
+            redProtectPlugin.getAPI().addFlag("structurebox", false, false);
             getServer().getPluginManager().registerEvent(
                     BlockPlaceEvent.class,
                     new br.net.fabiozumbi12.RedProtect.Bukkit.listeners.BlockListener(),
-                    EventPriority.NORMAL,
+                    EventPriority.HIGH,
                     new RedProtectFlagManager(),
                     this
             );
@@ -237,35 +237,38 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
-        if (!Settings.IsLegacy) {
-            try { //Check if PlotSquared 5 is installed
-                Class.forName("com.plotsquared.bukkit.BukkitMain");
-                Settings.UsePS5 = true;
-            } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
-                Settings.UsePS5 = false;
+        if (ps != null) {
+            if (!Settings.IsLegacy) {
+                try { //Check if PlotSquared 5 is installed
+                    Class.forName("com.plotsquared.bukkit.BukkitMain");
+                    Settings.UsePS5 = true;
+                } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
+                    Settings.UsePS5 = false;
+                }
+            }
+            if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
+                getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
+                if (Settings.IsLegacy) {
+                    PlotSquaredUtils.initialize();
+                    PlotSquaredUtils.registerFlag();
+                    getServer().getPluginManager().registerEvent(
+                            BlockPlaceEvent.class,
+                            new PlayerEvents(),
+                            EventPriority.NORMAL,
+                            new PlotSquaredFlagManager(),
+                            this
+                    );
+                } else if (Settings.UsePS5){
+                    PlotSquared5Utils.initialize();
+                } else {
+                    PlotSquared4Utils.initialize();
+                    PlotSquared4Utils.registerFlag();
+                }
+                plotSquaredInstalled = true;
+                foundRegionProvider = true;
             }
         }
-        if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
-            if (Settings.IsLegacy) {
-                PlotSquaredUtils.initialize();
-                PlotSquaredUtils.registerFlag();
-                getServer().getPluginManager().registerEvent(
-                        BlockPlaceEvent.class,
-                        new PlayerEvents(),
-                        EventPriority.NORMAL,
-                        new PlotSquaredFlagManager(),
-                        this
-                );
-            } else if (Settings.UsePS5){
-                PlotSquared5Utils.initialize();
-            } else {
-                PlotSquared4Utils.initialize();
-                PlotSquared4Utils.registerFlag();
-            }
-            plotSquaredInstalled = true;
-            foundRegionProvider = true;
-        }
+
         //Check for landClaiming
         Plugin lp = getServer().getPluginManager().getPlugin("LandClaiming");
         if (lp instanceof LandClaiming){

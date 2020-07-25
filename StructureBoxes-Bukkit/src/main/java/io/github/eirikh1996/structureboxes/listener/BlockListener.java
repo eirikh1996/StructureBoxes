@@ -132,7 +132,7 @@ public class BlockListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event){
         Block b = event.getBlock();
-        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ());
+        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
         final Structure structure = StructureManager.getInstance().getStructureAt(structureLoc);
         if (structure == null || !structure.isProcessing()){
             return;

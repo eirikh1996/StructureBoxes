@@ -93,7 +93,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         int zLength = clipboard.getDimensions().getBlockZ();
 
         Vector offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
-        Location minPoint = new Location(pasteLoc.getWorldID(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
+        Location minPoint = new Location(pasteLoc.getWorld().getName(), to.add(offset).getBlockX(), to.add(offset).getBlockY(), to.add(offset).getBlockZ());
         final double theta = -(angle * (PI / 180.0));
 
         final Collection<Location> solidStructure = new HashSet<>();
@@ -102,7 +102,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         final Clipboard fClipboard = new BlockArrayClipboard(clipboard.getRegion());
         fClipboard.setOrigin(clipboard.getOrigin());
 
-        Map<Location, Object> supportBlocks = new HashMap<>();
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
