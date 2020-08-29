@@ -3,7 +3,6 @@ package io.github.eirikh1996.structureboxes.region;
 import com.massivecraft.factions.engine.EnginePermBuild;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.FactionsUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
@@ -23,10 +22,6 @@ public class FactionsFlagManager implements EventExecutor {
 
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) {
-        if (Settings.Debug) {
-            Bukkit.broadcastMessage(listener.toString());
-            Bukkit.broadcastMessage(event.toString());
-        }
         if (!(listener instanceof EnginePermBuild)) {
             return;
         }

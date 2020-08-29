@@ -15,6 +15,7 @@ io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils$PlotSquaredWorldsConf
 io\github\eirikh1996\structureboxes\utils\UpdateChecker$2.class
 io\github\eirikh1996\structureboxes\utils\LandsUtils.class
 io\github\eirikh1996\structureboxes\StructureBoxes.class
+io\github\eirikh1996\structureboxes\listener\WorldListener.class
 io\github\eirikh1996\structureboxes\utils\LandClaimingUtils.class
 io\github\eirikh1996\structureboxes\utils\ReflectionUtils.class
 io\github\eirikh1996\structureboxes\utils\MathUtils$1.class

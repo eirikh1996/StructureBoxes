@@ -16,6 +16,7 @@ softdepend:
   - Kingdoms
   - Towny
   - Movecraft
+  - PlotSquared
 commands:
   structurebox:
     aliases:

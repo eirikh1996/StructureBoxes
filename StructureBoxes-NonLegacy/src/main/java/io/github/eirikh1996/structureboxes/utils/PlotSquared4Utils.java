@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ public class PlotSquared4Utils {
         } catch (FileNotFoundException e) {
             throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
-        worlds = (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
+        worlds = data == null ? new HashMap<>() : (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
         StructureBoxFlag = new BooleanFlag("structurebox");
     }
 

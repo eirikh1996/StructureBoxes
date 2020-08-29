@@ -2,13 +2,14 @@ package io.github.eirikh1996.structureboxes.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-public final class Location implements Comparable<Location> {
+public final class Location implements Comparable<Location>, Serializable {
     private final String world;
     private final int x;
     private final int y;

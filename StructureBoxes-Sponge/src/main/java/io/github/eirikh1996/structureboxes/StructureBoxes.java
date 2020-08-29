@@ -566,4 +566,6 @@ public class StructureBoxes implements SBMain {
     public Optional<NationsPlugin> getNationsPlugin() {
         return nationsPlugin;
     }
+
+
 }

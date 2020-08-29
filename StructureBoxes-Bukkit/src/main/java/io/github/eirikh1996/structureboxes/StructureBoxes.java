@@ -13,11 +13,9 @@ import com.songoda.kingdoms.main.Kingdoms;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
+import io.github.eirikh1996.structureboxes.listener.WorldListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
-import io.github.eirikh1996.structureboxes.region.FactionsFlagManager;
-import io.github.eirikh1996.structureboxes.region.PlotSquaredFlagManager;
-import io.github.eirikh1996.structureboxes.region.RedProtectFlagManager;
-import io.github.eirikh1996.structureboxes.region.WorldGuardFlagManager;
+import io.github.eirikh1996.structureboxes.region.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -32,6 +30,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.Plugin;
@@ -254,19 +253,45 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     getServer().getPluginManager().registerEvent(
                             BlockPlaceEvent.class,
                             new PlayerEvents(),
-                            EventPriority.NORMAL,
+                            EventPriority.HIGHEST,
                             new PlotSquaredFlagManager(),
                             this
                     );
                 } else if (Settings.UsePS5){
                     PlotSquared5Utils.initialize();
+                    try {
+                        Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listeners.BlockEventListener");
+                        getServer().getPluginManager().registerEvent(
+                            BlockPlaceEvent.class,
+                            blockEventListener.getConstructor().newInstance(),
+                            EventPriority.HIGHEST,
+                            new PlotSquared5FlagManager(),
+                            this
+                        );
+                    } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
                     PlotSquared4Utils.initialize();
                     PlotSquared4Utils.registerFlag();
+                    try {
+                        Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listeners.PlayerEvents");
+                        getServer().getPluginManager().registerEvent(
+                                BlockPlaceEvent.class,
+                                playerEvents.getConstructor().newInstance(),
+                                EventPriority.HIGHEST,
+                                new PlotSquared4FlagManager(),
+                                this
+                        );
+                    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
                 plotSquaredInstalled = true;
                 foundRegionProvider = true;
             }
+            getServer().getPluginManager().registerEvents(new WorldListener(), this);
         }
 
         //Check for landClaiming
