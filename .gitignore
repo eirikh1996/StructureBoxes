@@ -1,11 +1,4 @@
 # Project exclude paths
 /.idea/
-/API/target/
-/StructureBoxes-Sponge/target/
-/StructureBoxes-Sponge/dependency-reduced-pom.xml
-/StructureBoxes-Bukkit/target/
-/StructureBoxes-Core/target/
-/StructureBoxes-NonLegacy/target/
-/StructureBoxes-WE6/target/
-/StructureBoxes-WE7/target/
-/target/
+target/
+*dependency-reduced-pom.xml

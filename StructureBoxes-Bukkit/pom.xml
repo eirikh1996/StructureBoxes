@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
     <name>StructureBoxes-Bukkit</name>
-    <version>3.0</version>
+    <version>2.12</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -159,14 +159,6 @@
             <artifactId>LandsAPI</artifactId>
             <version>4.7.3</version>
             <scope>provided</scope>
-        </dependency>
-        <!--FabledKingdoms-->
-        <dependency>
-            <groupId>com.songoda</groupId>
-            <artifactId>Kingdoms</artifactId>
-            <version>LATEST</version>
-            <scope>system</scope>
-            <systemPath>C:/Users/eirik/libs/FabledKingdoms.jar</systemPath>
         </dependency>
         <!--Movecraft-->
         <dependency>

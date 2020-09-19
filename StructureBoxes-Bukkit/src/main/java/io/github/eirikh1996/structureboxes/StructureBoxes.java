@@ -12,6 +12,7 @@ import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.songoda.kingdoms.main.Kingdoms;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
+import io.github.eirikh1996.structureboxes.listener.InventoryListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.listener.WorldListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -389,6 +390,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
             UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
