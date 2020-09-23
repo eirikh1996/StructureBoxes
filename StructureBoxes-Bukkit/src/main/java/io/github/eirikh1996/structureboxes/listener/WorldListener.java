@@ -16,14 +16,17 @@ public class WorldListener implements Listener {
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
         final ChunkGenerator generator = event.getWorld().getGenerator();
-        if (!(generator instanceof GeneratorWrapper || generator instanceof com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper || generator instanceof com.plotsquared.core.generator.GeneratorWrapper)) {
-            return;
-        }
         if (Settings.IsLegacy) {
+            if (!(generator instanceof GeneratorWrapper))
+                return;
             PlotSquaredUtils.initialize();
         } else if (Settings.UsePS5) {
+            if (!(generator instanceof com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper))
+                return;
             PlotSquared5Utils.initialize();
         } else {
+            if (!(generator instanceof com.plotsquared.core.generator.GeneratorWrapper))
+                return;
             PlotSquared4Utils.initialize();
         }
     }

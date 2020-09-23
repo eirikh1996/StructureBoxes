@@ -86,7 +86,6 @@ public class IWorldEditHandler extends WorldEditHandler {
         transform = transform.rotateY(angle);
         holder.setTransform(transform);
         BlockVector3 to = BlockVector3.at(pasteLoc.getX(), pasteLoc.getY(), pasteLoc.getZ());
-
         final Set<Location> structureLocs = new HashSet<>();
         int minX = clipboard.getMinimumPoint().getBlockX();
         int minY = clipboard.getMinimumPoint().getBlockY();
@@ -100,7 +99,8 @@ public class IWorldEditHandler extends WorldEditHandler {
 
         final Collection<Location> solidStructure = new HashSet<>();
         final Collection<Location> boundingBox = new HashSet<>();
-
+        final HashMap<Location, BaseBlock> blockHashMap = new HashMap<>();
+        final Queue<Location> locationQueue = new LinkedList<>();
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
@@ -112,6 +112,11 @@ public class IWorldEditHandler extends WorldEditHandler {
                     BaseBlock baseBlock = clipboard.getFullBlock(BlockVector3.at(minX + x, minY + y, minZ + z));
                     if (baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:cave_air") || baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:void_air")){
                         continue;
+                    }
+
+                    if (Settings.IncrementalBlockPlacement) {
+                        blockHashMap.put(loc, baseBlock);
+                        locationQueue.add(loc);
                     }
 
 
@@ -152,6 +157,43 @@ public class IWorldEditHandler extends WorldEditHandler {
             final long end = System.currentTimeMillis();
             sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
         }
+        if (Settings.IncrementalBlockPlacement) {
+            final int queueSize = locationQueue.size();
+            TimerTask task = new TimerTask(){
+                int placedBlocks = 0;
+                /**
+                 * The action to be performed by this timer task.
+                 */
+                @Override
+                public void run() {
+                    if (locationQueue.isEmpty()) {
+                        sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Complete"));
+                        cancel();
+                        playerIncrementPlacementMap.remove(playerID);
+                        return;
+                    }
+                    final Location poll = locationQueue.poll();
+                    final BaseBlock block = blockHashMap.remove(poll);
+                    placedBlocks++;
+                    final float percent = (placedBlocks / queueSize) * 100f;
+                    if ((int) percent % 5 == 0) {
+                        sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress").replace("{PERCENTAGE}", String.valueOf(percent)));
+                    }
+                    sbMain.scheduleSyncTask(() -> {
+                        try {
+                            world.setBlock(blockVectorFromLocation(poll), block, true);
+                        } catch (WorldEditException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            };
+            new Timer().schedule(task, 0, Settings.IncrementalPlacementDelay);
+            playerIncrementPlacementMap.put(playerID, task);
+            return true;
+        }
+
+
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
             try (final EditSession session = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1)){
@@ -195,6 +237,10 @@ public class IWorldEditHandler extends WorldEditHandler {
             }
         }
         return count;
+    }
+
+    private BlockVector3 blockVectorFromLocation(Location loc) {
+        return BlockVector3.at(loc.getX(), loc.getY(), loc.getZ());
     }
 
 

@@ -123,15 +123,6 @@
     </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.7.3" level="project" />
     <orderEntry type="module-library">
-      <library name="Maven: com.songoda:Kingdoms:LATEST">
-        <CLASSES>
-          <root url="jar://$USER_HOME$/libs/FabledKingdoms.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="Maven: net.countercraft:Movecraft:LATEST">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/bukkit/Movecraft.jar!/" />
@@ -142,6 +133,15 @@
     </orderEntry>
     <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: com.songoda:Kingdoms:LATEST">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Desktop/FabledKingdoms.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />

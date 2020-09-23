@@ -98,6 +98,8 @@ public class IWorldEditHandler extends WorldEditHandler {
 
         final Collection<Location> solidStructure = new HashSet<>();
         final Collection<Location> boundingBox = new HashSet<>();
+        final HashMap<Location, BaseBlock> blockHashMap = new HashMap<>();
+        final Queue<Location> locationQueue = new LinkedList<>();
 
         final Clipboard fClipboard = new BlockArrayClipboard(clipboard.getRegion());
         fClipboard.setOrigin(clipboard.getOrigin());
@@ -187,6 +189,42 @@ public class IWorldEditHandler extends WorldEditHandler {
             sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
         }
 
+        if (Settings.IncrementalBlockPlacement) {
+            final int queueSize = locationQueue.size();
+            TimerTask task = new TimerTask(){
+                int placedBlocks = 0;
+                /**
+                 * The action to be performed by this timer task.
+                 */
+                @Override
+                public void run() {
+                    if (locationQueue.isEmpty()) {
+                        sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Complete"));
+                        cancel();
+                        playerIncrementPlacementMap.remove(playerID);
+                        return;
+                    }
+                    final Location poll = locationQueue.poll();
+                    final BaseBlock block = blockHashMap.remove(poll);
+                    placedBlocks++;
+                    final float percent = (placedBlocks / queueSize) * 100f;
+                    if ((int) percent % 5 == 0) {
+                        sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress").replace("{PERCENTAGE}", String.valueOf(percent)));
+                    }
+                    sbMain.scheduleSyncTask(() -> {
+                        try {
+                            world.setBlock(vectorFromLocation(poll), block, true);
+                        } catch (WorldEditException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }
+            };
+            new Timer().schedule(task, 0, Settings.IncrementalPlacementDelay);
+            playerIncrementPlacementMap.put(playerID, task);
+            return true;
+        }
+
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
             try {
@@ -212,6 +250,10 @@ public class IWorldEditHandler extends WorldEditHandler {
             }
         });
         return true;
+    }
+
+    private Vector vectorFromLocation(Location poll) {
+        return new Vector(poll.getX(), poll.getY(), poll.getZ());
     }
 
     @Override

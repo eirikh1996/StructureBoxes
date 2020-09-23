@@ -5,6 +5,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
+import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.BlockUtils;
@@ -150,6 +151,10 @@ public class StructureBoxCommand implements TabExecutor {
         if (!p.hasPermission("structureboxes.undo")){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
+        }
+        final WorldEditHandler weHandler =  StructureBoxes.getInstance().getWorldEditHandler();
+        if (Settings.IncrementalBlockPlacement && weHandler.getPlayerIncrementPlacementMap().containsKey(p.getUniqueId())) {
+            weHandler.getPlayerIncrementPlacementMap().remove(p.getUniqueId()).cancel();
         }
         Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
         if (structure == null){
