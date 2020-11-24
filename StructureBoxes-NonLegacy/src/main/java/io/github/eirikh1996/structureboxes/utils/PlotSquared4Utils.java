@@ -57,7 +57,7 @@ public class PlotSquared4Utils {
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId());
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(StructureBoxFlag, false);
     }
 
     public static boolean withinPlot(Location location){

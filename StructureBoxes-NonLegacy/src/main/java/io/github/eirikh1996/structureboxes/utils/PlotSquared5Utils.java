@@ -59,7 +59,7 @@ public class PlotSquared5Utils {
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId());
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(StructureBoxFlag.class);
     }
 
     public static boolean withinPlot(Location location){

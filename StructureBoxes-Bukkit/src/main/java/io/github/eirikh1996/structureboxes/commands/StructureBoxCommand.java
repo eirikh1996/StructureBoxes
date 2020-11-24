@@ -82,7 +82,7 @@ public class StructureBoxCommand implements TabExecutor {
 
 
 
-    private boolean createStructureBox(CommandSender sender, String schematicName, boolean moveSchem){
+    private boolean createStructureBox(CommandSender sender, @NotNull String schematicName, boolean moveSchem){
         if (!(sender instanceof Player)){
 
             return true;
@@ -90,11 +90,11 @@ public class StructureBoxCommand implements TabExecutor {
 
         Player player = (Player) sender;
         if (!player.hasPermission("structureboxes.create")){
-            return true;
-        }
-        if (schematicName == null){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
+        }
+        if (schematicName.endsWith("_#")) {
+
         }
         File schematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + schematicName + ".schematic");
 

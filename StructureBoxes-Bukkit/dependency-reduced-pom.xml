@@ -207,18 +207,18 @@
       <systemPath>${project.basedir}/../libs/bukkit/civs-1.5.8.jar</systemPath>
     </dependency>
     <dependency>
-      <groupId>com.songoda</groupId>
-      <artifactId>Kingdoms</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>C:/Users/eirik/libs/FabledKingdoms.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>net.countercraft</groupId>
       <artifactId>Movecraft</artifactId>
       <version>LATEST</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/../libs/bukkit/Movecraft.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.songoda</groupId>
+      <artifactId>Kingdoms</artifactId>
+      <version>LATEST</version>
+      <scope>system</scope>
+      <systemPath>C:/Users/eirik/Desktop/FabledKingdoms.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>

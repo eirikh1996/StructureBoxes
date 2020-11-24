@@ -259,9 +259,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 if (Settings.IsLegacy) {
                     PlotSquaredUtils.initialize();
                     PlotSquaredUtils.registerFlag();
+                    PlayerEvents events = new PlayerEvents();
+                    HandlerList.unregisterAll(events);
+                    getServer().getPluginManager().registerEvents(events, ps);
                     getServer().getPluginManager().registerEvent(
                             BlockPlaceEvent.class,
-                            new PlayerEvents(),
+                            events,
                             EventPriority.HIGHEST,
                             new PlotSquaredFlagManager(),
                             this
@@ -270,9 +273,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     PlotSquared5Utils.initialize();
                     try {
                         Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listeners.BlockEventListener");
+                        final Listener listener = blockEventListener.getConstructor().newInstance();
+                        HandlerList.unregisterAll(listener);
+                        getServer().getPluginManager().registerEvents(listener, ps);
                         getServer().getPluginManager().registerEvent(
                             BlockPlaceEvent.class,
-                            blockEventListener.getConstructor().newInstance(),
+                            listener,
                             EventPriority.HIGHEST,
                             new PlotSquared5FlagManager(),
                             this
@@ -286,9 +292,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     PlotSquared4Utils.registerFlag();
                     try {
                         Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listeners.PlayerEvents");
+                        final Listener listener = playerEvents.getConstructor().newInstance();
+                        HandlerList.unregisterAll(listener);
+                        getServer().getPluginManager().registerEvents(listener, ps);
                         getServer().getPluginManager().registerEvent(
                                 BlockPlaceEvent.class,
-                                playerEvents.getConstructor().newInstance(),
+                                listener,
                                 EventPriority.HIGHEST,
                                 new PlotSquared4FlagManager(),
                                 this

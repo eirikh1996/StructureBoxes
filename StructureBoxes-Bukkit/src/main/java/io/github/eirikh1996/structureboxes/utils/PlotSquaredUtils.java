@@ -4,7 +4,6 @@ package io.github.eirikh1996.structureboxes.utils;
 import com.intellectualcrafters.plot.IPlotMain;
 import com.intellectualcrafters.plot.api.PlotAPI;
 import com.intellectualcrafters.plot.flag.BooleanFlag;
-import com.intellectualcrafters.plot.flag.Flag;
 import com.intellectualcrafters.plot.object.Plot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,7 +21,7 @@ import java.util.Map;
 public class PlotSquaredUtils {
     private static Map<String, Object> worlds;
     private static IPlotMain ps;
-    public static final Flag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
+    public static final BooleanFlag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
     private PlotSquaredUtils() {
 
     }
@@ -54,7 +53,7 @@ public class PlotSquaredUtils {
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId());
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(STRUCTUREBOX_FLAG, false);
     }
 
     public static boolean withinPlot(org.bukkit.Location location){
