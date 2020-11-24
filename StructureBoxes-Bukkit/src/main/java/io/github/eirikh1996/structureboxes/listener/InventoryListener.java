@@ -5,6 +5,7 @@ import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,7 +56,13 @@ public class InventoryListener implements Listener {
     public void onClick(InventoryClickEvent event) {
         if (event.getAction() == InventoryAction.NOTHING)
             return;
-        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(event.getClickedInventory().getLocation()));
+        final Inventory inv = event.getClickedInventory();
+        if (inv == null)
+            return;
+        final Location loc = inv.getLocation();
+        if (loc == null)
+            return;
+        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(loc));
         if (structure == null)
             return;
         event.getWhoClicked().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - Expired due to editing inventory"));

@@ -93,7 +93,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "2.3",
+        version = "2.4",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),

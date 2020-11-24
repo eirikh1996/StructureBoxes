@@ -181,8 +181,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     new WorldGuardFlagManager(), this);
         }
         Plugin f = getServer().getPluginManager().getPlugin("Factions");
+        try {
+            Class.forName("com.massivecraft.factions.FactionsPlugin");
+            factionsUUIDInstalled = true;
+        } catch (ClassNotFoundException e) {
+            factionsUUIDInstalled = false;
+        }
         //Check for Factions
-        if (f instanceof Factions){
+        if (!factionsUUIDInstalled && f instanceof Factions){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             factionsPlugin = (Factions) f;
             MFlag.getCreative(
@@ -212,6 +218,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             foundRegionProvider = true;
             factionsUUIDInstalled = true;
+        } else {
+            factionsUUIDInstalled = false;
         }
         //Check for RedProtect
         Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
