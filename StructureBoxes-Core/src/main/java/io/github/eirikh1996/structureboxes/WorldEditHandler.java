@@ -29,4 +29,8 @@ public abstract class WorldEditHandler {
     public Map<UUID, TimerTask> getPlayerIncrementPlacementMap() {
         return playerIncrementPlacementMap;
     }
+
+    public File getSchemDir() {
+        return schemDir;
+    }
 }

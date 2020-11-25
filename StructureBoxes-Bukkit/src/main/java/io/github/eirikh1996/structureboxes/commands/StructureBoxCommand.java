@@ -93,9 +93,6 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
-        if (schematicName.endsWith("_#")) {
-
-        }
         File schematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + schematicName + ".schematic");
 
         if (!schematicFile.exists()){
@@ -106,7 +103,18 @@ public class StructureBoxCommand implements TabExecutor {
         if (!playerSchematicFile.exists()) {
             playerSchematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + player.getUniqueId() + "/" + schematicName + ".schem");
         }
-        if (!schematicFile.exists() && !playerSchematicFile.exists()){
+        boolean noSchematic = !schematicFile.exists() && !playerSchematicFile.exists();
+        String[] foundRandomSchematics = null;
+        if (schematicName.endsWith("_#"))  {
+            final String start = schematicName.replace("_#", "");
+            final File schemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
+            final String[] foundFiles = schemDir.list(
+                    (file, name) -> (name.endsWith(".schematic") || name.endsWith(".schem")) &&
+                            name.startsWith(start) && isInteger(name.replace(start + "_", "").replace(".schematic", "").replace(".schem", "")));
+            noSchematic = foundFiles == null || foundFiles.length == 0;
+            foundRandomSchematics = foundFiles;
+        }
+        if (noSchematic){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No schematic"));
             return true;
         }
@@ -117,13 +125,25 @@ public class StructureBoxCommand implements TabExecutor {
             }
             final File globalSchemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
             playerSchematicFile.renameTo(new File(globalSchemDir, playerSchematicFile.getName()));
-        } else if (!schematicFile.exists()){
+        } else if (!schematicFile.exists() && (foundRandomSchematics == null || foundRandomSchematics.length == 0)){
             schematicName = player.getUniqueId() + "/" + schematicName;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
-        if (Settings.MaxStructureSize > -1 && StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
-            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
-            return true;
+        if (Settings.MaxStructureSize > -1) {
+            if (foundRandomSchematics != null) {
+                for (String name : foundRandomSchematics) {
+                    clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), name.replace(".schematic", "").replace(".schem", ""));
+                    if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
+                        sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
+                        return true;
+                    }
+                }
+            }
+            else if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
+                sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
+                return true;
+            }
+
         }
         ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
         List<String> lore = new ArrayList<>();
@@ -332,7 +352,17 @@ public class StructureBoxCommand implements TabExecutor {
                 if (!schem.endsWith(".schematic") && !schem.endsWith(".schem")){
                     continue;
                 }
-                subCmds.add(schem.replace(".schematic", "").replace(".schem", ""));
+                final String schemName = schem.replace(".schematic", "").replace(".schem", "");
+                final String end = schemName.substring(schemName.lastIndexOf("_") + 1);
+                if (isInteger(end)) {
+                    final String start = schemName.replace(end, "");
+                    final String[] foundFiles = schemFolder.list( (dir, name) -> (name.endsWith(".schematic") || name.endsWith(".schem")) && name.startsWith(start) && isInteger(name.replace(start, "").replace(".schematic", "").replace(".schem", "")));
+                    final String entry = start + "#";
+                    if (foundFiles.length > 1 && !subCmds.contains(entry))
+                        subCmds.add(entry);
+                }
+
+                subCmds.add(schemName);
             }
             if (playerFolder.exists()) {
                 for (String schem : playerFolder.list()) {
@@ -351,5 +381,14 @@ public class StructureBoxCommand implements TabExecutor {
             completions.add(arg);
         }
         return completions;
+    }
+
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

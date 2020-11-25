@@ -11,7 +11,6 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,10 +23,12 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
 import java.util.*;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
+import static org.bukkit.Bukkit.broadcastMessage;
 
 public class BlockListener implements Listener {
     private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
@@ -73,6 +74,20 @@ public class BlockListener implements Listener {
             return;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schematicID);
+        if (clipboard == null && schematicID.endsWith("_#")){
+            final String start = schematicID.replace("#", "");
+            File schemDir = StructureBoxes.getInstance().getWorldEditHandler().getSchemDir();
+            final String[] foundFiles = schemDir.list( (file, name) ->
+                    (name.endsWith(".schematic") || name.endsWith(".schem")) &&
+                    name.startsWith(start) &&
+                            isInteger(name.replace(start, "").replace(".schematic", "").replace(".schem", ""))
+            );
+            if (foundFiles.length == 0)
+                return;
+            final Random random = new Random();
+            String schemID = foundFiles[random.nextInt(foundFiles.length - 1)].replace(".schematic", "").replace(".schem", "");
+            clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schemID);
+        }
         if (clipboard == null){
             return;
         }
@@ -95,7 +110,7 @@ public class BlockListener implements Listener {
             }
         }
         if (Settings.Debug){
-            Bukkit.broadcastMessage("Restrict to regions: " + Settings.RestrictToRegionsEnabled + " Outside region: " + !isWithinRegion(placed) + " Not Exempt: " + !exemptFromRegionRestriction + " unable to bypass : " + !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction"));
+            broadcastMessage("Restrict to regions: " + Settings.RestrictToRegionsEnabled + " Outside region: " + !isWithinRegion(placed) + " Not Exempt: " + !exemptFromRegionRestriction + " unable to bypass : " + !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction"));
         }
 
         if (Settings.RestrictToRegionsEnabled && !isWithinRegion(placed) && !exemptFromRegionRestriction && !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction")){
@@ -105,11 +120,10 @@ public class BlockListener implements Listener {
         }
         ItemManager.getInstance().addItem(event.getPlayer().getUniqueId(), event.getItemInHand());
         if (Settings.Debug){
-            Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
+            broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
-        final String schemID = schematicID;
 
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed))) {
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
             event.setCancelled(true);
             return;
         }
@@ -158,4 +172,12 @@ public class BlockListener implements Listener {
         }
     }
 
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
