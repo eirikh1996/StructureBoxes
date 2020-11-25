@@ -85,7 +85,7 @@ public class BlockListener implements Listener {
             if (foundFiles.length == 0)
                 return;
             final Random random = new Random();
-            String schemID = foundFiles[random.nextInt(foundFiles.length - 1)].replace(".schematic", "").replace(".schem", "");
+            String schemID = foundFiles[random.nextInt(foundFiles.length)].replace(".schematic", "").replace(".schem", "");
             clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schemID);
         }
         if (clipboard == null){
