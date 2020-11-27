@@ -14,12 +14,13 @@ public class Settings {
     public static String StructureBoxPrefix, PluginPrefix;
     public static List<String> StructureBoxInstruction = new ArrayList<>();
     public static List<String> AlternativePrefixes = new ArrayList<>();
-    public static boolean RestrictToRegionsEnabled, RequirePermissionPerStructureBox, IncrementalBlockPlacement;
+    public static boolean RestrictToRegionsEnabled, RequirePermissionPerStructureBox, IncrementalPlacement = false;
     public static List<String> RestrictToRegionsExceptions = new ArrayList<>();
     public static Set blocksToIgnore = new HashSet<>();
     public static int MaxStructureSize;
     public static long MaxSessionTime;
-    public static int IncrementalPlacementDelay;
+    public static int IncrementalPlacementDelay = 1;
+    public static int IncrementalPlacementBlocksPerTick = 1;
 
     public static boolean Metrics;
     public static long PlaceCooldownTime;

@@ -58,3 +58,7 @@ Free space: #Settings for free space check
     - peony
     - sea_pickle
     - bubble_column
+Incremental placement:
+  Enabled: false
+  Delay: 1
+  Blocks per tick: 1

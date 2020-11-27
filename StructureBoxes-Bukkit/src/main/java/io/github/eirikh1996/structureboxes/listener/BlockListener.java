@@ -14,12 +14,10 @@ import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -141,17 +139,6 @@ public class BlockListener implements Listener {
 
 
 
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockPhysics(BlockPhysicsEvent event){
-        Block b = event.getBlock();
-        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getName(), b.getX(), b.getY(), b.getZ());
-        final Structure structure = StructureManager.getInstance().getStructureAt(structureLoc);
-        if (structure == null || !structure.isProcessing()){
-            return;
-        }
-        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

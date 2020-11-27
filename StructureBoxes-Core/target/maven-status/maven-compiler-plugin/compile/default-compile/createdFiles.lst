@@ -4,6 +4,7 @@ io\github\eirikh1996\structureboxes\utils\ItemManager.class
 io\github\eirikh1996\structureboxes\utils\Vector.class
 io\github\eirikh1996\structureboxes\StructureManager.class
 io\github\eirikh1996\structureboxes\Direction.class
+io\github\eirikh1996\structureboxes\utils\IncrementalPlacementTask.class
 io\github\eirikh1996\structureboxes\utils\TopicPaginator.class
 io\github\eirikh1996\structureboxes\SBMain.class
 io\github\eirikh1996\structureboxes\Direction$1.class

@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes;
 
+import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,8 @@ public class Structure implements Iterable<Location> {
     private final Map<Location, Object> originalBlocks;
     private final UUID owner;
     private final AtomicBoolean processing;
+    private LinkedList<Location> locationsToRemove = new LinkedList<>();
+    private IncrementalPlacementTask incrementalPlacementTask;
 
     public Structure(String schematicName, Map<Location, Object> originalBlocks, UUID owner) {
         this.schematicName = schematicName;
@@ -134,5 +137,21 @@ public class Structure implements Iterable<Location> {
     @Override
     public Iterator<Location> iterator() {
         return originalBlocks.keySet().iterator();
+    }
+
+    public LinkedList<Location> getLocationsToRemove() {
+        return locationsToRemove;
+    }
+
+    public void setLocationsToRemove(LinkedList<Location> locationsToRemove) {
+        this.locationsToRemove = locationsToRemove;
+    }
+
+    public IncrementalPlacementTask getIncrementalPlacementTask() {
+        return incrementalPlacementTask;
+    }
+
+    public void setIncrementalPlacementTask(IncrementalPlacementTask incrementalPlacementTask) {
+        this.incrementalPlacementTask = incrementalPlacementTask;
     }
 }

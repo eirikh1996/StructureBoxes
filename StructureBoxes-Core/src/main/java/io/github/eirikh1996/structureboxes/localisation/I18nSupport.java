@@ -2,9 +2,7 @@ package io.github.eirikh1996.structureboxes.localisation;
 
 import io.github.eirikh1996.structureboxes.settings.Settings;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Properties;
 
 public class I18nSupport {

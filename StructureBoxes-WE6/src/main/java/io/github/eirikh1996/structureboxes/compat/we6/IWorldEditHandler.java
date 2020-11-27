@@ -4,6 +4,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -17,8 +18,10 @@ import io.github.eirikh1996.structureboxes.*;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
+import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +33,6 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 import static java.lang.Math.PI;
 
 public class IWorldEditHandler extends WorldEditHandler {
-
-    private final int[] fragileBlocks = {26, 34, 50, 55, 63, 64, 65, 68, 69, 70, 71, 72, 75, 76, 77, 93, 94, 96, 131, 132, 143, 147, 148, 149, 150, 151, 171, 323, 324, 330, 331, 356, 404};
-    private final int[] attachedBlocks = {50, 68 };
 
     public IWorldEditHandler(File schemDir, SBMain sbMain){
         super(schemDir, sbMain);
@@ -55,7 +55,7 @@ public class IWorldEditHandler extends WorldEditHandler {
     }
 
     @Override
-    public Direction getClipboardFacingFromOrigin(Clipboard clipboard, Location location) {
+    public @NotNull Direction getClipboardFacingFromOrigin(Clipboard clipboard, Location location) {
         Vector centerpoint = clipboard.getMinimumPoint().add(clipboard.getDimensions().divide(2));
         Vector distance = centerpoint.subtract(clipboard.getOrigin());
         if (Math.abs(distance.getBlockX()) > Math.abs(distance.getBlockZ())){
@@ -99,11 +99,12 @@ public class IWorldEditHandler extends WorldEditHandler {
         final Collection<Location> solidStructure = new HashSet<>();
         final Collection<Location> boundingBox = new HashSet<>();
         final HashMap<Location, BaseBlock> blockHashMap = new HashMap<>();
-        final Queue<Location> locationQueue = new LinkedList<>();
+        final LinkedList<Location> locationQueue = new LinkedList<>();
 
         final Clipboard fClipboard = new BlockArrayClipboard(clipboard.getRegion());
         fClipboard.setOrigin(clipboard.getOrigin());
-
+        LinkedList<Location> placeLater = new LinkedList<>();
+        LinkedList<Location> placeLast = new LinkedList<>();
         for (int x = 0 ; x <= xLength ; x++){
             for (int y = 0 ; y <= yLength ; y++){
                 for (int z = 0 ; z <= zLength ; z++){
@@ -115,43 +116,24 @@ public class IWorldEditHandler extends WorldEditHandler {
                     Vector pos = new Vector(minX + x, minY + y, minZ + z);
                     BaseBlock baseBlock = clipboard.getBlock(pos);
                     int type = baseBlock.getType();
-                    int data = baseBlock.getData();
                     if (type == 0){
                         continue;
                     }
-/*
-                    if (Arrays.binarySearch(fragileBlocks, type) >= 0) {
-                        Location support = loc.subtract(0, 1, 0);
-                        BaseBlock block = clipboard.getBlock(pos.subtract(0, 1, 0));
-                        if (type == 65 || type == 68 || type == 177) {
-                            sbMain.broadcast(String.valueOf(data));
-                            Location add = new Location(pasteLoc.getWorldID(), 0, 1, 0);
-                            switch (data) {
-                                case 0x2: //north
-                                    add = new Location(pasteLoc.getWorldID(), 0, 0, 1);
-                                    block = clipboard.getBlock(pos.add(0, 0, 1));
-                                    break;
-                                case 0x3: //south
-                                    add = new Location(pasteLoc.getWorldID(), 0, 0, -1);
-                                    block = clipboard.getBlock(pos.subtract(0, 0, 1));
-                                    break;
-                                case 0x4: //east
-                                    add = new Location(pasteLoc.getWorldID(), 1, 0, 0);
-                                    block = clipboard.getBlock(pos.add(1, 0, 0));
-                                    break;
-                                case 0x5: //west
-                                    add = new Location(pasteLoc.getWorldID(), -1, 0, 0);
-                                    block = clipboard.getBlock(pos.subtract(1, 0, 0));
-                                    break;
-                            }
-                            support = support.add(add.rotate(theta, pasteLoc.toSBloc()));
-                        }
-                        supportBlocks.put(support, block.getType());
-                    }*/
+                    if (BlockType.shouldPlaceLast(baseBlock.getId()))
+                        placeLater.add(loc);
+                    else if (BlockType.shouldPlaceFinal(baseBlock.getId()))
+                        placeLast.add(loc);
+                    else
+                        locationQueue.add(loc);
+                    if (Settings.IncrementalPlacement) {
+                        blockHashMap.put(loc, baseBlock);
+                    }
                     structureLocs.add(loc);
                 }
             }
         }
+        locationQueue.addAll(placeLater);
+        locationQueue.addAll(placeLast);
 
         Collection<Location> invertedStructure = CollectionUtils.filter(solidStructure, structureLocs);
         Collection<Location> exterior = CollectionUtils.filter(boundingBox, structureLocs);
@@ -189,9 +171,9 @@ public class IWorldEditHandler extends WorldEditHandler {
             sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
         }
 
-        if (Settings.IncrementalBlockPlacement) {
+        if (Settings.IncrementalPlacement) {
             final int queueSize = locationQueue.size();
-            TimerTask task = new TimerTask(){
+            IncrementalPlacementTask task = new IncrementalPlacementTask(){
                 int placedBlocks = 0;
                 /**
                  * The action to be performed by this timer task.
@@ -204,27 +186,34 @@ public class IWorldEditHandler extends WorldEditHandler {
                         playerIncrementPlacementMap.remove(playerID);
                         return;
                     }
-                    final Location poll = locationQueue.poll();
-                    final BaseBlock block = blockHashMap.remove(poll);
-                    placedBlocks++;
-                    final float percent = (placedBlocks / queueSize) * 100f;
-                    if ((int) percent % 5 == 0) {
-                        sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress").replace("{PERCENTAGE}", String.valueOf(percent)));
-                    }
-                    sbMain.scheduleSyncTask(() -> {
-                        try {
-                            world.setBlock(vectorFromLocation(poll), block, true);
-                        } catch (WorldEditException e) {
-                            e.printStackTrace();
+                    for (int i = 1 ; i <= Settings.IncrementalPlacementBlocksPerTick; i++) {
+                        final Location poll = locationQueue.poll();
+                        if (poll == null)
+                            break;
+                        final BaseBlock block = blockHashMap.remove(poll);
+                        placedBlocks++;
+                        final float percent = ((float) placedBlocks / (float) queueSize) * 100f;
+                        if ((int) percent % 5 == 0) {
+                            sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress").replace("{PERCENTAGE}", String.valueOf(percent)));
                         }
-                    });
+                        placedLocations.add(poll);
+                        sbMain.scheduleSyncTask(() -> {
+                            try {
+                                structure.getLocationsToRemove().add(poll);
+                                world.setBlock(vectorFromLocation(poll), block, true);
+                            } catch (WorldEditException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+
                 }
             };
             new Timer().schedule(task, 0, Settings.IncrementalPlacementDelay);
             playerIncrementPlacementMap.put(playerID, task);
             return true;
         }
-
+        structure.setLocationsToRemove(locationQueue);
         sbMain.scheduleSyncTask(() -> {
             final long startTime = System.currentTimeMillis();
             try {
@@ -236,7 +225,7 @@ public class IWorldEditHandler extends WorldEditHandler {
                         .build();
                 Operations.completeLegacy(op);
                 session.flushQueue();
-                //sbMain.clearInterior(interior);
+                sbMain.clearInterior(interior);
             } catch (WorldEditException e) {
                 e.printStackTrace();
             }

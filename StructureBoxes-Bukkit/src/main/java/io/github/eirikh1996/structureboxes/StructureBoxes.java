@@ -103,6 +103,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 continue;
             }
             saveResource("localisation/lang_" + locale + ".properties", false);
+
         }
 
 
@@ -634,6 +635,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     }
 
     public void readConfig() {
+        reloadConfig();
         Settings.locale = getConfig().getString("Locale", "en");
         Settings.Metrics = getConfig().getBoolean("Metrics", true);
         Settings.PlaceCooldownTime = getConfig().getLong("Place Cooldown Time", 10);
@@ -693,6 +695,12 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.blocksToIgnore.add(type);
         }
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
+        final ConfigurationSection incrementalPlacement = getConfig().getConfigurationSection("Incremental placement");
+        if (incrementalPlacement != null) {
+            Settings.IncrementalPlacement = incrementalPlacement.getBoolean("Enabled", false);
+            Settings.IncrementalPlacementBlocksPerTick = incrementalPlacement.getInt("Blocks per tick", 1);
+            Settings.IncrementalPlacementDelay = incrementalPlacement.getInt("Delay", 1);
+        }
 
     }
 
