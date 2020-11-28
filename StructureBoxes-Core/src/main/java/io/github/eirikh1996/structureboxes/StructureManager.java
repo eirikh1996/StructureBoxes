@@ -10,6 +10,7 @@ public class StructureManager implements Iterable<Structure>, Runnable {
     private final Set<Structure> structures = new HashSet<>();
     private Map<UUID, Collection<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
+    private SBMain sbMain;
     private StructureManager() {}
 
     public boolean isPartOfStructure(Location location){
@@ -38,8 +39,12 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         final Iterator<Structure> iter = structures.iterator();
         while (iter.hasNext()) {
             final Structure structure = iter.next();
-            if ((System.currentTimeMillis() - structure.getPlacementTime()) / 1000 < Settings.MaxSessionTime) {
+            long expiry = structure.getExpiry() > -1 ? structure.getExpiry() : Settings.MaxSessionTime;
+            if ((System.currentTimeMillis() - structure.getPlacementTime()) / 1000 < expiry) {
                 continue;
+            }
+            if (structure.getExpiry() > -1) {
+                sbMain.clearStructure(structure);
             }
             iter.remove();
         }
@@ -119,6 +124,14 @@ public class StructureManager implements Iterable<Structure>, Runnable {
     @Override
     public void run() {
         processRemovalOfSavedStructures();
+    }
+
+    public SBMain getSbMain() {
+        return sbMain;
+    }
+
+    public void setSbMain(SBMain sbMain) {
+        this.sbMain = sbMain;
     }
 
     private static class StructureManagerHolder{

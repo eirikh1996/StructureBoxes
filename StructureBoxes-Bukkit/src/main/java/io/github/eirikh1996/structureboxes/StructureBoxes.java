@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -37,8 +38,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.redcastlemedia.multitallented.civs.Civs;
 import org.yaml.snakeyaml.Yaml;
@@ -463,6 +466,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+        StructureManager.getInstance().setSbMain(this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
             UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
@@ -561,6 +565,57 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public Platform getPlatform() {
         return Platform.BUKKIT;
+    }
+
+    @Override
+    public void clearStructure(Structure structure) {
+        final Player sender = Bukkit.getPlayer(structure.getOwner());
+        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
+        if (locationMaterialHashMap == null) {
+            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
+            return;
+        }
+        final Deque<Location> locations = structure.getLocationsToRemove();
+        for (Location loc : locations) {
+            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(loc);
+            if (!bukkitLoc.getBlock().getType().name().endsWith("_DOOR"))
+                continue;
+        }
+        new BukkitRunnable() {
+            final int queueSize = locations.size();
+            final int blocksToProcess = Math.min(queueSize, Settings.IncrementalPlacement ? Settings.IncrementalPlacementBlocksPerTick : 30000);
+            int blocksProcessed = 0;
+            @Override
+            public void run() {
+
+                for (int i = 1 ; i <= blocksToProcess ; i++) {
+                    Location poll = locations.pollLast();
+                    if (poll == null)
+                        break;
+                    final Material origType = (Material) locationMaterialHashMap.get(poll);
+                    org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(poll);
+                    Block b = bukkitLoc.getBlock();
+                    if (b.getState() instanceof InventoryHolder){
+                        InventoryHolder holder = (InventoryHolder) b.getState();
+                        holder.getInventory().clear();
+                    }
+                    b.setType(origType, false);
+                    blocksProcessed++;
+                }
+                if (Settings.IncrementalPlacement && blocksToProcess % blocksProcessed == 10) {
+                    float percent = (((float) blocksProcessed / (float) blocksToProcess) * 100f);
+                    sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Removal - Progress") + ": " + percent );
+                }
+                if (locations.isEmpty()){
+                    StructureManager.getInstance().removeStructure(structure);
+                    if (structure.isProcessing()) {
+                        structure.setProcessing(false);
+                    }
+                    cancel();
+                }
+            }
+
+        }.runTaskTimer(StructureBoxes.getInstance(), 0, Settings.IncrementalPlacement ? Settings.IncrementalPlacementDelay : 3);
     }
 
     @Override

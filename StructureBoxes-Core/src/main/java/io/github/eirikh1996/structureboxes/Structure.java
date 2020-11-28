@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Structure implements Iterable<Location> {
     private final UUID id;
-    private int minX, minY, minZ, maxX, maxY, maxZ;
+    private int minX, minY, minZ, maxX, maxY, maxZ, expiry = -1;
     private final long placementTime;
     private final String schematicName;
     private final Map<Location, Object> originalBlocks;
@@ -153,5 +153,13 @@ public class Structure implements Iterable<Location> {
 
     public void setIncrementalPlacementTask(IncrementalPlacementTask incrementalPlacementTask) {
         this.incrementalPlacementTask = incrementalPlacementTask;
+    }
+
+    public int getExpiry() {
+        return expiry;
+    }
+
+    public void setExpiry(int expiry) {
+        this.expiry = expiry;
     }
 }

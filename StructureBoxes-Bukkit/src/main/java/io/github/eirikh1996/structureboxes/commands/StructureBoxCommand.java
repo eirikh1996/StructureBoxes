@@ -8,27 +8,25 @@ import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.Location;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.TopicPaginator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -62,13 +60,28 @@ public class StructureBoxCommand implements TabExecutor {
             } catch (ArrayIndexOutOfBoundsException e){
                 schematicName = "";
             }
-            boolean moveSchem;
-            try {
-                moveSchem = strings[2].equalsIgnoreCase("-m");
-            } catch (ArrayIndexOutOfBoundsException e) {
-                moveSchem = false;
+            boolean moveSchem = false;
+            int expiry = -1;
+            if (strings.length > 2) {
+                for (int i = 2 ; i < strings.length ; i++) {
+                    String arg = strings[i];
+                    if (arg.equalsIgnoreCase("-m"))
+                        moveSchem = true;
+                    if (arg.equalsIgnoreCase("-e")) {
+                        try {
+                            expiry = Integer.parseInt(strings[i + 1]);
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            commandSender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Invalid argument"));
+                            return true;
+                        } catch (NumberFormatException e) {
+                            commandSender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Not a number"));
+                            return true;
+                        }
+                    }
+                }
             }
-            return createStructureBox(commandSender, schematicName, moveSchem);
+
+            return createStructureBox(commandSender, schematicName, moveSchem, expiry);
         } else if (strings[0].equalsIgnoreCase("undo")){
             return undoCommand(commandSender);
         } else if (strings[0].equalsIgnoreCase("reload")){
@@ -81,7 +94,7 @@ public class StructureBoxCommand implements TabExecutor {
 
 
 
-    private boolean createStructureBox(CommandSender sender, @NotNull String schematicName, boolean moveSchem){
+    private boolean createStructureBox(CommandSender sender, @NotNull String schematicName, boolean moveSchem, int expiry){
         if (!(sender instanceof Player)){
 
             return true;
@@ -149,6 +162,9 @@ public class StructureBoxCommand implements TabExecutor {
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
+        if (expiry > -1) {
+            lore.add("Expires after: " + expiry);
+        }
         lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
@@ -184,52 +200,7 @@ public class StructureBoxCommand implements TabExecutor {
             structure.setProcessing(true);
         }
         String schematicName = structure.getSchematicName();
-        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
-        if (locationMaterialHashMap == null) {
-            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
-            return true;
-        }
-        final Deque<Location> locations = structure.getLocationsToRemove();
-        for (Location loc : locations) {
-            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(loc);
-            if (!bukkitLoc.getBlock().getType().name().endsWith("_DOOR"))
-                continue;
-        }
-        new BukkitRunnable() {
-            final int queueSize = locations.size();
-            final int blocksToProcess = Math.min(queueSize, Settings.IncrementalPlacement ? Settings.IncrementalPlacementBlocksPerTick : 30000);
-            int blocksProcessed = 0;
-            @Override
-            public void run() {
 
-            for (int i = 1 ; i <= blocksToProcess ; i++) {
-                Location poll = locations.pollLast();
-                if (poll == null)
-                    break;
-                final Material origType = (Material) locationMaterialHashMap.get(poll);
-                org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(poll);
-                Block b = bukkitLoc.getBlock();
-                if (b.getState() instanceof InventoryHolder){
-                    InventoryHolder holder = (InventoryHolder) b.getState();
-                    holder.getInventory().clear();
-                }
-                b.setType(origType, false);
-                blocksProcessed++;
-            }
-            if (Settings.IncrementalPlacement && blocksToProcess % blocksProcessed == 10) {
-                float percent = (((float) blocksProcessed / (float) blocksToProcess) * 100f);
-                sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Removal - Progress") + ": " + percent );
-            }
-            if (locations.isEmpty()){
-                StructureManager.getInstance().removeStructure(structure);
-                if (structure.isProcessing()) {
-                    structure.setProcessing(false);
-                }
-                cancel();
-            }
-            }
-
-        }.runTaskTimer(StructureBoxes.getInstance(), 0, Settings.IncrementalPlacement ? Settings.IncrementalPlacementDelay : 3);
 
 
 

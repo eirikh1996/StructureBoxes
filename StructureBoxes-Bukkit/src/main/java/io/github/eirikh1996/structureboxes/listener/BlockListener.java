@@ -63,6 +63,10 @@ public class BlockListener implements Listener {
         } else {
             schematicID = schematicID.replace(ChatColor.stripColor(Settings.StructureBoxPrefix), "");
         }
+        int expiry = -1;
+        if (lore.size() > 2) {
+            expiry = Integer.parseInt(lore.get(1).replace("Expires after:", "" ));
+        }
         if (Settings.RequirePermissionPerStructureBox && !event.getPlayer().hasPermission("structureboxes.place." + schematicID)){
             event.getPlayer().sendMessage(String.format(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
             return;
@@ -125,6 +129,7 @@ public class BlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        StructureManager.getInstance().getLatestStructure(event.getPlayer().getUniqueId()).setExpiry(expiry);
 
 
 

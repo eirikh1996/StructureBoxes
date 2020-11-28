@@ -11,6 +11,7 @@ public interface SBMain {
     WorldEditHandler getWorldEditHandler();
     boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations);
     Platform getPlatform();
+    void clearStructure(Structure structure);
     boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations);
     void sendMessageToPlayer(UUID recipient, String message);
     void logMessage(Level level, String message);
