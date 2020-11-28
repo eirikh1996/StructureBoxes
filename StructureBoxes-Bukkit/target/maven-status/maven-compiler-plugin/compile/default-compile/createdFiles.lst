@@ -3,7 +3,6 @@ io\github\eirikh1996\structureboxes\commands\StructureBoxCommand.class
 io\github\eirikh1996\structureboxes\utils\RegionUtils.class
 io\github\eirikh1996\structureboxes\utils\BlockUtils.class
 io\github\eirikh1996\structureboxes\utils\WorldGuardUtils.class
-io\github\eirikh1996\structureboxes\utils\FabledKingdomsUtils.class
 io\github\eirikh1996\structureboxes\StructureBoxes$1.class
 io\github\eirikh1996\structureboxes\utils\CivsUtils.class
 io\github\eirikh1996\structureboxes\utils\RedProtectUtils.class

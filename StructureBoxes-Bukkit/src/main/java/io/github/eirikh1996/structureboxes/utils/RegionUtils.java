@@ -17,7 +17,12 @@ public class RegionUtils {
         boolean towny = false;
         boolean civs = false;
         boolean lands = false;
-        boolean kingdoms = false;
+        boolean superiorSkyblock = false;
+        boolean skyblock = false;
+        boolean islandWorld = false;
+        boolean bentoBox = false;
+        boolean acidIsland = false;
+        boolean askyblock = false;
         StructureBoxes structureBoxes = StructureBoxes.getInstance();
         if (structureBoxes.getWorldGuardPlugin() != null){
             worldguard = WorldGuardUtils.insideRegion(location);
@@ -49,9 +54,25 @@ public class RegionUtils {
         if (structureBoxes.getLandsPlugin() != null) {
             lands = LandsUtils.isWithinRegion(location);
         }
-        if (structureBoxes.getKingdomsPlugin() != null) {
-            kingdoms = FabledKingdomsUtils.isWithinRegion(location);
+        if (structureBoxes.getSuperiorSkyblockPlugin() != null) {
+            superiorSkyblock = SuperiorSkyblockUtils.isWithinRegion(location);
         }
+        if (structureBoxes.getSkyBlockPlugin() != null) {
+            skyblock = SkyBlockUtils.withinRegion(location);
+        }
+        if (structureBoxes.getIslandWorldPlugin() != null) {
+            islandWorld = IslandWorldUtils.withinRegion(location);
+        }
+        if (structureBoxes.getBentoBoxPlugin() != null) {
+            bentoBox = BentoBoxUtils.withinRegion(location);
+        }
+        if (structureBoxes.getAcidIslandPlugin() != null) {
+            acidIsland = AcidIslandUtils.isWithinRegion(location);
+        }
+        if (structureBoxes.getaSkyBlockPlugin() != null) {
+            askyblock = ASkyBlockUtils.isWithinRegion(location);
+        }
+
         return worldguard ||
                 factions ||
                 redprotect ||
@@ -61,7 +82,12 @@ public class RegionUtils {
                 towny ||
                 civs ||
                 lands ||
-                kingdoms;
+                superiorSkyblock ||
+                skyblock ||
+                islandWorld ||
+                bentoBox ||
+                acidIsland ||
+                askyblock;
     }
 
     public static boolean canPlaceStructure(Player player, Location loc) {

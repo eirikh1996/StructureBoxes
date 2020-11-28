@@ -1,6 +1,8 @@
 package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.engine.EnginePermBuild;
 import com.massivecraft.factions.entity.MFlag;
@@ -9,7 +11,7 @@ import com.plotsquared.bukkit.listeners.PlayerEvents;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
-import com.songoda.kingdoms.main.Kingdoms;
+import com.wasteofplastic.askyblock.ASkyBlock;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.InventoryListener;
@@ -22,6 +24,7 @@ import io.github.eirikh1996.structureboxes.utils.*;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
+import org.Bukkitters.SkyBlock.Main;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -39,6 +42,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.redcastlemedia.multitallented.civs.Civs;
 import org.yaml.snakeyaml.Yaml;
+import pl.islandworld.IslandWorld;
+import world.bentobox.bentobox.BentoBox;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,12 +66,21 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private GriefPrevention griefPreventionPlugin;
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
+
+    //Skyblock plugins
+    private IridiumSkyblock iridiumSkyblockPlugin;
+    private IslandWorld islandWorldPlugin;
+    private Main skyBlockPlugin;
+    private BentoBox bentoBoxPlugin;
+    private SuperiorSkyblock superiorSkyblockPlugin;
+    private ASkyBlock aSkyBlockPlugin;
+    private com.wasteofplastic.acidisland.ASkyBlock acidIslandPlugin;
+
     private boolean plotSquaredInstalled = false;
     private boolean factionsUUIDInstalled = false;
     private Civs civsPlugin;
     private Plugin landsPlugin;
     private Movecraft movecraftPlugin;
-    private Kingdoms kingdomsPlugin;
     private Metrics metrics;
     private boolean startup = true;
 
@@ -341,18 +355,58 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             landsPlugin = lands;
             foundRegionProvider = true;
         }
-        //Check for FabledKingdoms
-        Plugin fk = getServer().getPluginManager().getPlugin("FabledKingdoms");
-        if (fk instanceof Kingdoms) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - FabledKingdoms detected"));
-            kingdomsPlugin = (Kingdoms) fk;
-        }
         //Check for Movecraft
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
         if (movecraft instanceof Movecraft) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
             getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
             movecraftPlugin = (Movecraft) movecraft;
+            foundRegionProvider = true;
+        }
+        //Check for Iridium Skyblock
+        Plugin iSkyBlock = getServer().getPluginManager().getPlugin("IridiumSkyblock");
+        if (iSkyBlock instanceof IridiumSkyblock) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - IridiumSkyblock detected"));
+            iridiumSkyblockPlugin = (IridiumSkyblock) iSkyBlock;
+            foundRegionProvider = true;
+        }
+        //Check for Island World
+        Plugin iw = getServer().getPluginManager().getPlugin("IslandWorld");
+        if (iw instanceof IslandWorld) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - IslandWorld detected"));
+            islandWorldPlugin = (IslandWorld) iw;
+            foundRegionProvider = true;
+        }
+        //Check for SkyBlock
+        Plugin skyblock= getServer().getPluginManager().getPlugin("SkyBlock");
+        if (skyblock instanceof Main) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - SkyBlock detected"));
+            skyBlockPlugin = (Main) skyblock;
+            foundRegionProvider = true;
+        }
+        //Check for BentoBox
+        Plugin bb= getServer().getPluginManager().getPlugin("BentoBox");
+        if (bb instanceof BentoBox) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - BentoBox detected"));
+            bentoBoxPlugin = (BentoBox) bb;
+            foundRegionProvider = true;
+        }
+        Plugin ssb = getServer().getPluginManager().getPlugin("SuperiorSkyblock");
+        if (ssb instanceof SuperiorSkyblock) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - SuperiorSkyblock detected"));
+            superiorSkyblockPlugin = (SuperiorSkyblock) ssb;
+            foundRegionProvider = true;
+        }
+        Plugin ai = getServer().getPluginManager().getPlugin("AcidIsland");
+        if (ai instanceof com.wasteofplastic.acidisland.ASkyBlock) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - AcidIsland detected"));
+            acidIslandPlugin = (com.wasteofplastic.acidisland.ASkyBlock) ai;
+            foundRegionProvider = true;
+        }
+        Plugin asb = getServer().getPluginManager().getPlugin("ASkyBlock");
+        if (asb instanceof ASkyBlock) {
+            getLogger().info(I18nSupport.getInternationalisedString("Startup - ASkyBlock detected"));
+            aSkyBlockPlugin = (ASkyBlock) asb;
             foundRegionProvider = true;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
@@ -465,10 +519,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return landsPlugin;
     }
 
-    public Kingdoms getKingdomsPlugin() {
-        return kingdomsPlugin;
-    }
-
     public Metrics getMetrics() {
         return metrics;
     }
@@ -565,6 +615,30 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             }
             if (getLandsPlugin() != null && !LandsUtils.canBuild(p, bukkitLoc)) {
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Lands"));
+                return false;
+            }
+            if (getSuperiorSkyblockPlugin() != null && !SuperiorSkyblockUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SuperiorSkyblock"));
+                return false;
+            }
+            if (getSkyBlockPlugin() != null && !SkyBlockUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SkyBlock"));
+                return false;
+            }
+            if (getIslandWorldPlugin() != null && !IslandWorldUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "IslandWorld"));
+                return false;
+            }
+            if (getBentoBoxPlugin() != null && !BentoBoxUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "BentoBox"));
+                return false;
+            }
+            if (getAcidIslandPlugin() != null && !AcidIslandUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "AcidIsland"));
+                return false;
+            }
+            if (getaSkyBlockPlugin() != null && !ASkyBlockUtils.canBuild(p, bukkitLoc)) {
+                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "ASkyBlock"));
                 return false;
             }
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
@@ -710,5 +784,33 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public boolean isFactionsUUIDInstalled() {
         return factionsUUIDInstalled;
+    }
+
+    public IridiumSkyblock getIridiumSkyblockPlugin() {
+        return iridiumSkyblockPlugin;
+    }
+
+    public IslandWorld getIslandWorldPlugin() {
+        return islandWorldPlugin;
+    }
+
+    public Main getSkyBlockPlugin() {
+        return skyBlockPlugin;
+    }
+
+    public BentoBox getBentoBoxPlugin() {
+        return bentoBoxPlugin;
+    }
+
+    public SuperiorSkyblock getSuperiorSkyblockPlugin() {
+        return superiorSkyblockPlugin;
+    }
+
+    public com.wasteofplastic.acidisland.ASkyBlock getAcidIslandPlugin() {
+        return acidIslandPlugin;
+    }
+
+    public ASkyBlock getaSkyBlockPlugin() {
+        return aSkyBlockPlugin;
     }
 }

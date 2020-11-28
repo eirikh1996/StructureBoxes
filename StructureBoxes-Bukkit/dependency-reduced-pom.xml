@@ -77,6 +77,10 @@
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
+    <repository>
+      <id>savagelabs</id>
+      <url>https://nexus.savagelabs.net</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -212,13 +216,6 @@
       <version>LATEST</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/../libs/bukkit/Movecraft.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.songoda</groupId>
-      <artifactId>Kingdoms</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>C:/Users/eirik/Desktop/FabledKingdoms.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>
