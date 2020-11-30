@@ -11,10 +11,18 @@ public class RedProtectUtils {
         if (region == null) {
             return true;
         }
-        return region.canBuild(player);
+        return region.canBuild(player) || canPlaceStructureBox(location);
     }
 
     public static boolean withinRegion(Location location) {
         return StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location) != null;
+    }
+
+    public static boolean canPlaceStructureBox(Location location) {
+        final Region region = StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location);
+        if (region == null) {
+            return true;
+        }
+        return region.getFlagBool("structurebox");
     }
 }

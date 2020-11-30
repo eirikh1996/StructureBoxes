@@ -17,6 +17,6 @@ public class MovecraftUtils {
     }
 
     public static Location movecraftToSBloc(World w, MovecraftLocation ml) {
-        return new Location(w.getUID(), ml.getX(), ml.getY(), ml.getZ());
+        return new Location(w.getName(), ml.getX(), ml.getY(), ml.getZ());
     }
 }

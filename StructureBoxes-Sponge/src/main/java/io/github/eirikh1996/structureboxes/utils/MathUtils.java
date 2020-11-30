@@ -28,6 +28,6 @@ public class MathUtils {
     }
 
     public static io.github.eirikh1996.structureboxes.utils.Location spongeToSBLoc(Location<World> spongeLoc){
-        return new io.github.eirikh1996.structureboxes.utils.Location(spongeLoc.getExtent().getUniqueId(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
+        return new io.github.eirikh1996.structureboxes.utils.Location(spongeLoc.getExtent().getName(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
     }
 }

@@ -1,30 +1,11 @@
 package io.github.eirikh1996.structureboxes.utils;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.managers.RegionManager;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
-import org.bukkit.World;
-
-import java.lang.reflect.Method;
+import org.bukkit.entity.Player;
 
 public class RegionUtils {
-    private static Method GET_REGION_MANAGER;
-    private static Method GET_APPLICABLE_REGIONS;
-
-    static {
-        try {
-            GET_REGION_MANAGER = (StructureBoxes.getInstance().getWorldGuardPlugin() != null) ? WorldGuardPlugin.class.getDeclaredMethod("getRegionManager", World.class) : null ;
-        } catch (NoSuchMethodException e) {
-            GET_REGION_MANAGER = null;
-        }
-        try {
-            GET_APPLICABLE_REGIONS = (StructureBoxes.getInstance().getWorldGuardPlugin() != null) ? RegionManager.class.getDeclaredMethod("getApplicableRegions", Location.class) : null;
-        } catch (NoSuchMethodException e) {
-            GET_APPLICABLE_REGIONS = null;
-        }
-    }
 
     public static boolean isWithinRegion(Location location){
         boolean worldguard = false;
@@ -36,6 +17,12 @@ public class RegionUtils {
         boolean towny = false;
         boolean civs = false;
         boolean lands = false;
+        boolean superiorSkyblock = false;
+        boolean skyblock = false;
+        boolean islandWorld = false;
+        boolean bentoBox = false;
+        boolean acidIsland = false;
+        boolean askyblock = false;
         StructureBoxes structureBoxes = StructureBoxes.getInstance();
         if (structureBoxes.getWorldGuardPlugin() != null){
             worldguard = WorldGuardUtils.insideRegion(location);
@@ -67,6 +54,62 @@ public class RegionUtils {
         if (structureBoxes.getLandsPlugin() != null) {
             lands = LandsUtils.isWithinRegion(location);
         }
-        return worldguard || factions || redprotect || griefprevention || plotSquared || landClaiming || towny || civs || lands;
+        if (structureBoxes.getSuperiorSkyblockPlugin() != null) {
+            superiorSkyblock = SuperiorSkyblockUtils.isWithinRegion(location);
+        }
+        if (structureBoxes.getSkyBlockPlugin() != null) {
+            skyblock = SkyBlockUtils.withinRegion(location);
+        }
+        if (structureBoxes.getIslandWorldPlugin() != null) {
+            islandWorld = IslandWorldUtils.withinRegion(location);
+        }
+        if (structureBoxes.getBentoBoxPlugin() != null) {
+            bentoBox = BentoBoxUtils.withinRegion(location);
+        }
+        if (structureBoxes.getAcidIslandPlugin() != null) {
+            acidIsland = AcidIslandUtils.isWithinRegion(location);
+        }
+        if (structureBoxes.getaSkyBlockPlugin() != null) {
+            askyblock = ASkyBlockUtils.isWithinRegion(location);
+        }
+
+        return worldguard ||
+                factions ||
+                redprotect ||
+                griefprevention ||
+                plotSquared ||
+                landClaiming ||
+                towny ||
+                civs ||
+                lands ||
+                superiorSkyblock ||
+                skyblock ||
+                islandWorld ||
+                bentoBox ||
+                acidIsland ||
+                askyblock;
     }
+
+    public static boolean canPlaceStructure(Player player, Location loc) {
+        boolean worldguard = false;
+        boolean factions = false;
+        boolean redprotect = false;
+        boolean plotSquared = false;
+        final StructureBoxes sb = StructureBoxes.getInstance();
+        if (sb.getFactionsPlugin() != null) {
+            factions = FactionsUtils.canPlaceStructureBox(loc);
+        }
+        if (sb.getRedProtectPlugin() != null) {
+            redprotect = RedProtectUtils.canPlaceStructureBox(loc);
+        }
+        if (sb.getWorldGuardPlugin() != null) {
+            worldguard = WorldGuardUtils.canPlaceStructureBox(player, loc);
+        }
+        if (sb.isPlotSquaredInstalled()) {
+            plotSquared = PlotSquaredUtils.canPlaceStructureBox(loc);
+        }
+        return worldguard || factions || redprotect || plotSquared;
+
+    }
+
 }

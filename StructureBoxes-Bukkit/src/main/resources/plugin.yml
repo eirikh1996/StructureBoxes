@@ -16,6 +16,14 @@ softdepend:
   - Kingdoms
   - Towny
   - Movecraft
+  - PlotSquared
+  - IridiumSkyblock
+  - SkyBlock
+  - BentoBox
+  - SuperiorSkyblock
+  - IslandWorld
+  - AcidIsland
+  - ASkyBlock
 commands:
   structurebox:
     aliases:

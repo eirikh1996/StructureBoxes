@@ -21,7 +21,9 @@ import java.net.URLConnection;
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class UpdateChecker extends BukkitRunnable implements Listener {
-    public static UpdateChecker instance;
+    private static UpdateChecker instance;
+    private int secondCooldown = 0;
+    private int delayBeforeCheckingUpdate = 0;
 
     private UpdateChecker(){
     }
@@ -42,8 +44,10 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
                 Bukkit.broadcast(COMMAND_PREFIX + "https://dev.bukkit.org/projects/structure-boxes/files", "structureboxes.update");
                 sb.getLogger().warning(I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("{NewVersion}", newVersion));
                 sb.getLogger().warning("https://dev.bukkit.org/projects/structure-boxes/files");
+
             }
         }.runTaskLaterAsynchronously(sb, 120);
+        delayBeforeCheckingUpdate++;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -94,9 +98,12 @@ public class UpdateChecker extends BukkitRunnable implements Listener {
             String newVersion = versionName.substring(versionName.lastIndexOf("v") + 1);
             int nv = Integer.parseInt(newVersion.replace(".", ""));
             int cv = Integer.parseInt(currentVersion.replace("v", "").replace(".", ""));
+            final String[] cvparts = currentVersion.split("\\.");
+            final String[] nvparts = newVersion.split("\\.");
             //If a new major update, multiply nv by 1k
-            if (Integer.parseInt(newVersion.substring(0, 1)) > Integer.parseInt(currentVersion.substring(0, 1))) {
-                nv *= 1000;
+            if (Integer.parseInt(nvparts[0]) > Integer.parseInt(cvparts[0])) {
+                final String[] parts = newVersion.split("\\.");
+                nv = (Integer.parseInt(parts[0]) * 10000) + Integer.parseInt(parts[1]) ;
             }
             if (nv > cv)
                 return newVersion;

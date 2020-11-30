@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes;
 
+import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,18 +9,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Structure implements Iterable<Location> {
     private final UUID id;
-    private int minX, minY, minZ, maxX, maxY, maxZ;
-    private final long placementTime;
+    private int minX, minY, minZ, maxX, maxY, maxZ, expiry = -1;
+    private long placementTime;
     private final String schematicName;
     private final Map<Location, Object> originalBlocks;
     private final UUID owner;
     private final AtomicBoolean processing;
+    private LinkedList<Location> locationsToRemove = new LinkedList<>();
+    private IncrementalPlacementTask incrementalPlacementTask;
 
     public Structure(String schematicName, Map<Location, Object> originalBlocks, UUID owner) {
         this.schematicName = schematicName;
         this.originalBlocks = originalBlocks;
         this.owner = owner;
-        placementTime = System.currentTimeMillis();
+        placementTime = -1;
         id = UUID.randomUUID();
         for (Location loc : originalBlocks.keySet()) {
             if (minX > loc.getX()) {
@@ -54,6 +57,10 @@ public class Structure implements Iterable<Location> {
 
     public long getPlacementTime() {
         return placementTime;
+    }
+
+    public void setPlacementTime(long placementTime) {
+        this.placementTime = placementTime;
     }
 
     public Set<Location> getStructure() {
@@ -134,5 +141,29 @@ public class Structure implements Iterable<Location> {
     @Override
     public Iterator<Location> iterator() {
         return originalBlocks.keySet().iterator();
+    }
+
+    public LinkedList<Location> getLocationsToRemove() {
+        return locationsToRemove;
+    }
+
+    public void setLocationsToRemove(LinkedList<Location> locationsToRemove) {
+        this.locationsToRemove = locationsToRemove;
+    }
+
+    public IncrementalPlacementTask getIncrementalPlacementTask() {
+        return incrementalPlacementTask;
+    }
+
+    public void setIncrementalPlacementTask(IncrementalPlacementTask incrementalPlacementTask) {
+        this.incrementalPlacementTask = incrementalPlacementTask;
+    }
+
+    public int getExpiry() {
+        return expiry;
+    }
+
+    public void setExpiry(int expiry) {
+        this.expiry = expiry;
     }
 }

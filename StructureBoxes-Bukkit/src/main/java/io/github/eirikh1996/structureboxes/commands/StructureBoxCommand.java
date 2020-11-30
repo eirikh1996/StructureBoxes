@@ -5,30 +5,28 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
+import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.BlockUtils;
-import io.github.eirikh1996.structureboxes.utils.Location;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.TopicPaginator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -62,13 +60,28 @@ public class StructureBoxCommand implements TabExecutor {
             } catch (ArrayIndexOutOfBoundsException e){
                 schematicName = "";
             }
-            boolean moveSchem;
-            try {
-                moveSchem = strings[2].equalsIgnoreCase("-m");
-            } catch (ArrayIndexOutOfBoundsException e) {
-                moveSchem = false;
+            boolean moveSchem = false;
+            int expiry = -1;
+            if (strings.length > 2) {
+                for (int i = 2 ; i < strings.length ; i++) {
+                    String arg = strings[i];
+                    if (arg.equalsIgnoreCase("-m"))
+                        moveSchem = true;
+                    if (arg.equalsIgnoreCase("-e")) {
+                        try {
+                            expiry = Integer.parseInt(strings[i + 1]);
+                        } catch (ArrayIndexOutOfBoundsException e) {
+                            commandSender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Invalid argument"));
+                            return true;
+                        } catch (NumberFormatException e) {
+                            commandSender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Not a number"));
+                            return true;
+                        }
+                    }
+                }
             }
-            return createStructureBox(commandSender, schematicName, moveSchem);
+
+            return createStructureBox(commandSender, schematicName, moveSchem, expiry);
         } else if (strings[0].equalsIgnoreCase("undo")){
             return undoCommand(commandSender);
         } else if (strings[0].equalsIgnoreCase("reload")){
@@ -81,7 +94,7 @@ public class StructureBoxCommand implements TabExecutor {
 
 
 
-    private boolean createStructureBox(CommandSender sender, String schematicName, boolean moveSchem){
+    private boolean createStructureBox(CommandSender sender, @NotNull String schematicName, boolean moveSchem, int expiry){
         if (!(sender instanceof Player)){
 
             return true;
@@ -89,9 +102,6 @@ public class StructureBoxCommand implements TabExecutor {
 
         Player player = (Player) sender;
         if (!player.hasPermission("structureboxes.create")){
-            return true;
-        }
-        if (schematicName == null){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
@@ -105,7 +115,18 @@ public class StructureBoxCommand implements TabExecutor {
         if (!playerSchematicFile.exists()) {
             playerSchematicFile = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir + "/" + player.getUniqueId() + "/" + schematicName + ".schem");
         }
-        if (!schematicFile.exists() && !playerSchematicFile.exists()){
+        boolean noSchematic = !schematicFile.exists() && !playerSchematicFile.exists();
+        String[] foundRandomSchematics = null;
+        if (schematicName.endsWith("_#"))  {
+            final String start = schematicName.replace("_#", "");
+            final File schemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
+            final String[] foundFiles = schemDir.list(
+                    (file, name) -> (name.endsWith(".schematic") || name.endsWith(".schem")) &&
+                            name.startsWith(start) && isInteger(name.replace(start + "_", "").replace(".schematic", "").replace(".schem", "")));
+            noSchematic = foundFiles == null || foundFiles.length == 0;
+            foundRandomSchematics = foundFiles;
+        }
+        if (noSchematic){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No schematic"));
             return true;
         }
@@ -116,19 +137,34 @@ public class StructureBoxCommand implements TabExecutor {
             }
             final File globalSchemDir = new File(StructureBoxes.getInstance().getWorldEditPlugin().getDataFolder().getAbsolutePath() + "/" + schematicDir);
             playerSchematicFile.renameTo(new File(globalSchemDir, playerSchematicFile.getName()));
-        } else if (!schematicFile.exists()){
+        } else if (!schematicFile.exists() && (foundRandomSchematics == null || foundRandomSchematics.length == 0)){
             schematicName = player.getUniqueId() + "/" + schematicName;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), schematicName);
-        if (Settings.MaxStructureSize > -1 && StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
-            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
-            return true;
+        if (Settings.MaxStructureSize > -1) {
+            if (foundRandomSchematics != null) {
+                for (String name : foundRandomSchematics) {
+                    clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(((Player) sender).getWorld()), name.replace(".schematic", "").replace(".schem", ""));
+                    if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
+                        sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
+                        return true;
+                    }
+                }
+            }
+            else if (StructureBoxes.getInstance().getWorldEditHandler().getStructureSize(clipboard) > Settings.MaxStructureSize) {
+                sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Structure too large") + " " + Settings.MaxStructureSize);
+                return true;
+            }
+
         }
         ItemStack structureBox = new ItemStack((Material) Settings.StructureBoxItem);
         List<String> lore = new ArrayList<>();
         ItemMeta meta = structureBox.getItemMeta();
         meta.setDisplayName(Settings.StructureBoxLore);
         lore.add(Settings.StructureBoxPrefix + schematicName);
+        if (expiry > -1) {
+            lore.add("Expires after: " + expiry);
+        }
         lore.addAll(Settings.StructureBoxInstruction);
         meta.setLore(lore);
         structureBox.setItemMeta(meta);
@@ -151,59 +187,20 @@ public class StructureBoxCommand implements TabExecutor {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission"));
             return true;
         }
+        final WorldEditHandler weHandler =  StructureBoxes.getInstance().getWorldEditHandler();
         Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
         if (structure == null){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
         }
+        if (Settings.IncrementalPlacement && structure.getIncrementalPlacementTask() != null) {
+            structure.getIncrementalPlacementTask().cancel();
+        }
         if (!structure.isProcessing()) {
             structure.setProcessing(true);
         }
         String schematicName = structure.getSchematicName();
-        Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
-        if (locationMaterialHashMap == null) {
-            sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
-            return true;
-        }
-        final Queue<Location> locations = new LinkedList<>();
-        for (Location loc : locationMaterialHashMap.keySet()) {
-            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(loc);
-            if (!BlockUtils.isFragile(bukkitLoc.getBlock()))
-                continue;
-            locations.add(loc);
-        }
-        for (Location loc : locationMaterialHashMap.keySet()) {
-            if (locations.contains(loc))
-                continue;
-            locations.add(loc);
-        }
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-            int queueSize = Math.min(locations.size(), 30000);
-            for (int i = 1 ; i <= queueSize ; i++) {
-                Location poll = locations.poll();
-                if (poll == null)
-                    break;
-                final Material origType = (Material) locationMaterialHashMap.get(poll);
-                Block b = MathUtils.sb2BukkitLoc(poll).getBlock();
-                if (b.getState() instanceof InventoryHolder){
-                    InventoryHolder holder = (InventoryHolder) b.getState();
-                    holder.getInventory().clear();
-                }
-                b.setType(origType);
-            }
-            if (locations.isEmpty()){
-                StructureManager.getInstance().removeStructure(structure);
-                if (structure.isProcessing()) {
-                    structure.setProcessing(false);
-                }
-                cancel();
-            }
-            }
-
-        }.runTaskTimer(StructureBoxes.getInstance(), 0, 3);
+        StructureBoxes.getInstance().clearStructure(structure);
 
 
 
@@ -287,7 +284,9 @@ public class StructureBoxCommand implements TabExecutor {
         }
         final TopicPaginator paginator = new TopicPaginator(title);
         for (Structure structure : sessions) {
-            paginator.addLine((title.startsWith("All") ? Bukkit.getOfflinePlayer(structure.getOwner()).getName()+ " " : "") + structure.getSchematicName() + ": " + (Settings.MaxSessionTime - (System.currentTimeMillis() - structure.getPlacementTime())/1000) + " seconds left");
+            if (structure.getPlacementTime() <= -1)
+                continue;
+            paginator.addLine((title.startsWith("All") ? Bukkit.getOfflinePlayer(structure.getOwner()).getName()+ " " : "") + structure.getSchematicName() + ": " + ((structure.getExpiry() > -1 ? structure.getExpiry() : Settings.MaxSessionTime) - (System.currentTimeMillis() - structure.getPlacementTime())/1000) + " seconds left");
         }
         if (!paginator.isInBounds(page)) {
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Pagination - Invalid page") + page);
@@ -327,7 +326,17 @@ public class StructureBoxCommand implements TabExecutor {
                 if (!schem.endsWith(".schematic") && !schem.endsWith(".schem")){
                     continue;
                 }
-                subCmds.add(schem.replace(".schematic", "").replace(".schem", ""));
+                final String schemName = schem.replace(".schematic", "").replace(".schem", "");
+                final String end = schemName.substring(schemName.lastIndexOf("_") + 1);
+                if (isInteger(end)) {
+                    final String start = schemName.replace(end, "");
+                    final String[] foundFiles = schemFolder.list( (dir, name) -> (name.endsWith(".schematic") || name.endsWith(".schem")) && name.startsWith(start) && isInteger(name.replace(start, "").replace(".schematic", "").replace(".schem", "")));
+                    final String entry = start + "#";
+                    if (foundFiles.length > 1 && !subCmds.contains(entry))
+                        subCmds.add(entry);
+                }
+
+                subCmds.add(schemName);
             }
             if (playerFolder.exists()) {
                 for (String schem : playerFolder.list()) {
@@ -346,5 +355,14 @@ public class StructureBoxCommand implements TabExecutor {
             completions.add(arg);
         }
         return completions;
+    }
+
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

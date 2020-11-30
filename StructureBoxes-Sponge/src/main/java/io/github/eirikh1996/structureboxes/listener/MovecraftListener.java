@@ -24,7 +24,7 @@ public class MovecraftListener {
     public void onCraftTranslate(CraftTranslateEvent event) {
         final Craft craft = event.getCraft();
         for (Vector3i loc : event.getOldHitBox()) {
-            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getUniqueId(), loc.getX(), loc.getY(), loc.getZ()));
+            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()));
             if (structure == null) {
                 continue;
             }
@@ -42,7 +42,7 @@ public class MovecraftListener {
     public void onCraftRotate(CraftRotateEvent event) {
         final Craft craft = event.getCraft();
         for (Vector3i loc : event.getOldHitBox()) {
-            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getUniqueId(), loc.getX(), loc.getY(), loc.getZ()));
+            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()));
             if (structure == null) {
                 continue;
             }
@@ -60,7 +60,7 @@ public class MovecraftListener {
     public void onCraftDetect(CraftDetectEvent event) {
         final Craft craft = event.getCraft();
         for (Vector3i loc : craft.getHitBox()) {
-            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getUniqueId(), loc.getX(), loc.getY(), loc.getZ()));
+            final Structure structure = StructureManager.getInstance().getStructureAt(new Location(craft.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()));
             if (structure == null) {
                 continue;
             }

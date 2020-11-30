@@ -11,30 +11,31 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
 import java.util.*;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
+import static org.bukkit.Bukkit.broadcastMessage;
 
 public class BlockListener implements Listener {
     private final HashMap<UUID, Long> playerTimeMap = new HashMap<>();
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(
+            priority = EventPriority.HIGHEST
+    )
     public void onBlockPlace(final BlockPlaceEvent event){
-        if (event.isCancelled()){
+        if (event.isCancelled()) {
             return;
         }
         final UUID id = event.getPlayer().getUniqueId();
@@ -62,6 +63,13 @@ public class BlockListener implements Listener {
         } else {
             schematicID = schematicID.replace(ChatColor.stripColor(Settings.StructureBoxPrefix), "");
         }
+        int expiry = -1;
+        for (String entry : lore) {
+            if (!entry.startsWith("Expires after:"))
+                continue;
+            expiry = Integer.parseInt(entry.split(":")[1].replace(" ", ""));
+            break;
+        }
         if (Settings.RequirePermissionPerStructureBox && !event.getPlayer().hasPermission("structureboxes.place." + schematicID)){
             event.getPlayer().sendMessage(String.format(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No permission for this ID"), schematicID));
             return;
@@ -71,6 +79,20 @@ public class BlockListener implements Listener {
             return;
         }
         Clipboard clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schematicID);
+        if (clipboard == null && schematicID.endsWith("_#")){
+            final String start = schematicID.replace("#", "");
+            File schemDir = StructureBoxes.getInstance().getWorldEditHandler().getSchemDir();
+            final String[] foundFiles = schemDir.list( (file, name) ->
+                    (name.endsWith(".schematic") || name.endsWith(".schem")) &&
+                    name.startsWith(start) &&
+                            isInteger(name.replace(start, "").replace(".schematic", "").replace(".schem", ""))
+            );
+            if (foundFiles.length == 0)
+                return;
+            final Random random = new Random();
+            String schemID = foundFiles[random.nextInt(foundFiles.length)].replace(".schematic", "").replace(".schem", "");
+            clipboard = StructureBoxes.getInstance().getWorldEditHandler().loadClipboardFromSchematic(new BukkitWorld(event.getBlockPlaced().getWorld()), schemID);
+        }
         if (clipboard == null){
             return;
         }
@@ -93,7 +115,7 @@ public class BlockListener implements Listener {
             }
         }
         if (Settings.Debug){
-            Bukkit.broadcastMessage("Restrict to regions: " + Settings.RestrictToRegionsEnabled + " Outside region: " + !isWithinRegion(placed) + " Not Exempt: " + !exemptFromRegionRestriction + " unable to bypass : " + !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction"));
+            broadcastMessage("Restrict to regions: " + Settings.RestrictToRegionsEnabled + " Outside region: " + !isWithinRegion(placed) + " Not Exempt: " + !exemptFromRegionRestriction + " unable to bypass : " + !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction"));
         }
 
         if (Settings.RestrictToRegionsEnabled && !isWithinRegion(placed) && !exemptFromRegionRestriction && !event.getPlayer().hasPermission("structureboxes.bypassregionrestriction")){
@@ -103,14 +125,14 @@ public class BlockListener implements Listener {
         }
         ItemManager.getInstance().addItem(event.getPlayer().getUniqueId(), event.getItemInHand());
         if (Settings.Debug){
-            Bukkit.broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
+            broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
-        final String schemID = schematicID;
 
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schemID, clipboard, angle, new IWorldEditLocation(placed))) {
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
             event.setCancelled(true);
             return;
         }
+        StructureManager.getInstance().getLatestStructure(event.getPlayer().getUniqueId()).setExpiry(expiry);
 
 
 
@@ -125,17 +147,6 @@ public class BlockListener implements Listener {
 
 
 
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onBlockPhysics(BlockPhysicsEvent event){
-        Block b = event.getBlock();
-        io.github.eirikh1996.structureboxes.utils.Location structureLoc = new io.github.eirikh1996.structureboxes.utils.Location(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ());
-        final Structure structure = StructureManager.getInstance().getStructureAt(structureLoc);
-        if (structure == null || !structure.isProcessing()){
-            return;
-        }
-        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -156,4 +167,12 @@ public class BlockListener implements Listener {
         }
     }
 
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

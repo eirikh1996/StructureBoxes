@@ -28,7 +28,7 @@ public class IWorldEditLocation implements WorldEditLocation {
 
     @Override
     public Location toSBloc() {
-        return new Location(worldID, x, y, z);
+        return new Location(world.getName(), x, y, z);
     }
 
     @Override

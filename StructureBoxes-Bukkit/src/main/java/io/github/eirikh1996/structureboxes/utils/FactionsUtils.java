@@ -20,4 +20,9 @@ public class FactionsUtils {
         return BoardColl.get().getFactionAt(PS.valueOf(location)) != FactionColl.get().getNone();
 
     }
+
+    public static boolean canPlaceStructureBox(Location location) {
+        final Faction f = BoardColl.get().getFactionAt(PS.valueOf(location));
+        return f != FactionColl.get().getNone() && f.getFlag("structurebox");
+    }
 }

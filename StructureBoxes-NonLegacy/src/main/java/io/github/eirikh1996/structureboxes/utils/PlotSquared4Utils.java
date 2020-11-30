@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes.utils;
 
 import com.github.intellectualsites.plotsquared.api.PlotAPI;
 import com.github.intellectualsites.plotsquared.plot.IPlotMain;
+import com.github.intellectualsites.plotsquared.plot.flag.BooleanFlag;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import org.bukkit.Bukkit;
@@ -14,11 +15,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class PlotSquared4Utils {
     private static Map<String, Object> worlds;
+    public static BooleanFlag StructureBoxFlag;
 
     public static void initialize() {
         final IPlotMain ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
@@ -33,7 +36,8 @@ public class PlotSquared4Utils {
         } catch (FileNotFoundException e) {
             throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
         }
-        worlds = (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
+        worlds = data == null ? new HashMap<>() : (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
+        StructureBoxFlag = new BooleanFlag("structurebox");
     }
 
     public static boolean canBuild(Player player, Location location){
@@ -53,7 +57,7 @@ public class PlotSquared4Utils {
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId());
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(StructureBoxFlag, false);
     }
 
     public static boolean withinPlot(Location location){
@@ -74,6 +78,26 @@ public class PlotSquared4Utils {
 
     public static boolean isPlotSquared(Plugin plugin){
         return plugin instanceof IPlotMain;
+    }
+
+    public static void registerFlag() {
+        new PlotAPI().addFlag(StructureBoxFlag);
+    }
+
+    public static boolean canPlaceStructureBox(Location loc) {
+        final PlotAPI plotAPI = new PlotAPI();
+        Set<PlotArea> plotAreas = plotAPI.getPlotAreas(loc.getWorld().getName());
+        Plot plot = null;
+        for (final PlotArea pArea : plotAreas){
+            plot = pArea.getPlot(bukkitToPSLoc(loc));
+            if (plot != null){
+                break;
+            }
+        }
+        if (plot == null) {
+            return true;
+        }
+        return plot.getFlag(StructureBoxFlag).get();
     }
 
     private static com.github.intellectualsites.plotsquared.plot.object.Location bukkitToPSLoc(Location location){

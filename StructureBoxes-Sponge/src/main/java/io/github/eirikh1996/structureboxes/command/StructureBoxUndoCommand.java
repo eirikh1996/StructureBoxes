@@ -5,7 +5,6 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.BlockUtils;
 import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.spongepowered.api.Sponge;
@@ -53,22 +52,12 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         }
         String schematicName = structure.getSchematicName();
         Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
-        final Queue<Location> locationQueue = new LinkedList<>();
         if (locationMaterialHashMap == null) {
             src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
-        for (Location loc : locationMaterialHashMap.keySet()) {
-            org.spongepowered.api.world.Location<World> spongeLoc = MathUtils.sbToSpongeLoc(loc);
-            if (!BlockUtils.isFragile(spongeLoc.getBlock()))
-                continue;
-            locationQueue.add(loc);
-        }
-        for (Location loc : locationMaterialHashMap.keySet()) {
-            if (locationQueue.contains(loc))
-                continue;
-            locationQueue.add(loc);
-        }
+        StructureBoxes.getInstance().clearStructure(structure);
+
 
 
 
@@ -92,7 +81,6 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         if (!structure.isProcessing()) {
             structure.setProcessing(true);
         }
-        Task.builder().execute(new StructureUndoTask(locationQueue, locationMaterialHashMap)).submit(StructureBoxes.getInstance());
 
 
         if (!pInv.getMain().canFit(structureBox)){
@@ -111,12 +99,12 @@ public class StructureBoxUndoCommand implements CommandExecutor {
         return CommandResult.success();
     }
 
-    private static class StructureUndoTask implements Consumer<Task> {
+    public static class StructureUndoTask implements Consumer<Task> {
         private final Queue<Location> locationQueue;
         private final Map<Location, Object> locationMaterialHashMap;
         private final HashSet<Location> structure;
 
-        private StructureUndoTask(Queue<Location> locationQueue, Map<Location, Object> locationMaterialHashMap) {
+        public StructureUndoTask(Queue<Location> locationQueue, Map<Location, Object> locationMaterialHashMap) {
             this.locationQueue = locationQueue;
             this.locationMaterialHashMap = locationMaterialHashMap;
             this.structure = new HashSet<>(locationQueue);

@@ -11,11 +11,15 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
     <name>StructureBoxes-Bukkit</name>
-    <version>2.14</version>
+    <version>3.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 <repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
     <repository>
         <id>spigot-repo</id>
         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -29,8 +33,9 @@
         <url>https://repo.codemc.org/repository/maven-public</url>
     </repository>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>savagelabs</id>
+        <url>https://nexus.savagelabs.net</url>
+        <layout>default</layout>
     </repository>
 </repositories>
 
@@ -181,7 +186,53 @@
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.iridium</groupId>
+            <artifactId>IridiumSkyblock</artifactId>
+            <version>2.5.6</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/IridiumSkyblock-2.6.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>pl.islandworld</groupId>
+            <artifactId>IslandWorld</artifactId>
+            <version>9.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/IslandWorld.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkitters</groupId>
+            <artifactId>SkyBlock</artifactId>
+            <version>1.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/SkyBlock.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>world.bentobox</groupId>
+            <artifactId>BentoBox</artifactId>
+            <version>1.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/bentobox-1.15.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.github.OmerBenGera</groupId>
+            <artifactId>SuperiorSkyblockAPI</artifactId>
+            <version>b18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wasteofplastic</groupId>
+            <artifactId>ASkyBlock</artifactId>
+            <version>3.0.9.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/askyblock.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.wasteofplastic</groupId>
+            <artifactId>AcidIsland</artifactId>
+            <version>3.0.9.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/bukkit/skyblock/acidisland.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
 

@@ -93,7 +93,7 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 @Plugin(id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
-        version = "2.4",
+        version = "3.0",
         authors = {"eirikh1996"},
         dependencies = {
                 @Dependency(id = "worldedit"),
@@ -152,7 +152,7 @@ public class StructureBoxes implements SBMain {
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
-        I18nSupport.initialize(getConfigDir().toFile());
+        I18nSupport.initialize(getConfigDir().toFile(), this);
         //Create command
         CommandSpec createCommand = CommandSpec.builder()
                 .permission("structureboxes.create")
@@ -329,6 +329,11 @@ public class StructureBoxes implements SBMain {
 
     public Platform getPlatform() {
         return Platform.SPONGE;
+    }
+
+    @Override
+    public void clearStructure(Structure structure) {
+        Task.builder().execute(new StructureBoxUndoCommand.StructureUndoTask(structure.getLocationsToRemove(), structure.getOriginalBlocks())).submit(StructureBoxes.getInstance());
     }
 
     public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
@@ -566,4 +571,6 @@ public class StructureBoxes implements SBMain {
     public Optional<NationsPlugin> getNationsPlugin() {
         return nationsPlugin;
     }
+
+
 }

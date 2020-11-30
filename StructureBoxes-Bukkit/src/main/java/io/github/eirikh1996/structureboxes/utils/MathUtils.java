@@ -3,9 +3,6 @@ package io.github.eirikh1996.structureboxes.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 public class MathUtils {
     public static double calculateRequiredRotation(BlockFace originalFace, float yaw){
         double angle = yaw > 0 ? yaw : 360f + yaw;
@@ -36,7 +33,7 @@ public class MathUtils {
     }
 
     public static Location bukkit2SBLoc(org.bukkit.Location bukkitLoc){
-        return new Location(bukkitLoc.getWorld().getUID(), bukkitLoc.getBlockX(), bukkitLoc.getBlockY(), bukkitLoc.getBlockZ());
+        return new Location(bukkitLoc.getWorld().getName(), bukkitLoc.getBlockX(), bukkitLoc.getBlockY(), bukkitLoc.getBlockZ());
     }
 
     public static org.bukkit.Location sb2BukkitLoc(Location location){

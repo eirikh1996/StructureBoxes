@@ -2,11 +2,12 @@ package io.github.eirikh1996.structureboxes.utils;
 
 import com.massivecraft.factions.*;
 import com.massivecraft.factions.perms.PermissibleAction;
-import org.bukkit.entity.Player;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class FactionsUUIDUtils {
+
 
     public static boolean canBuild(Player player, Location location) {
         final FLocation fLoc = new FLocation(location);
@@ -22,6 +23,10 @@ public class FactionsUUIDUtils {
     public static boolean isWithinRegion(Location location) {
         final FLocation fLoc = new FLocation(location);
         return Board.getInstance().getFactionAt(fLoc) != Factions.getInstance().getWilderness();
+    }
+
+    public static void structureBoxPermission() {
+
     }
 
     public static boolean isFactionsUUID(Plugin plugin) {
