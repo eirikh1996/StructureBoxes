@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * Common interface for the main classes of all editions of Structure Boxes
+ */
 public interface SBMain {
     WorldEditHandler getWorldEditHandler();
     boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations);

@@ -25,7 +25,7 @@ public class StructureBoxReloadCommand implements CommandExecutor {
         try {
             StructureBoxes.getInstance().loadLocales();
             StructureBoxes.getInstance().readConfig();
-            I18nSupport.initialize(StructureBoxes.getInstance().getConfigDir().toFile());
+            I18nSupport.initialize(StructureBoxes.getInstance().getConfigDir().toFile(), StructureBoxes.getInstance());
         } catch (ObjectMappingException | IOException e) {
             e.printStackTrace();
             return CommandResult.empty();

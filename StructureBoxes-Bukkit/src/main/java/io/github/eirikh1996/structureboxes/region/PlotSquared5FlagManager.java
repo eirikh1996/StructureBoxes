@@ -3,7 +3,7 @@ package io.github.eirikh1996.structureboxes.region;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.StructureBoxFlag;
+import io.github.eirikh1996.structureboxes.utils.StructureboxFlag;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -19,7 +19,7 @@ public class PlotSquared5FlagManager implements EventExecutor {
     Class<?> playerEventsClass;
     public PlotSquared5FlagManager() {
         try {
-            playerEventsClass = Class.forName("com.plotsquared.bukkit.listeners.BlockEventListener");
+            playerEventsClass = Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -48,7 +48,7 @@ public class PlotSquared5FlagManager implements EventExecutor {
         if (plot == null) {
             return;
         }
-        final boolean value = plot.getFlag(StructureBoxFlag.STRUCTUREBOX_FLAG_FALSE);
+        final boolean value = plot.getFlag(StructureboxFlag.STRUCTUREBOX_FLAG_FALSE);
         if (!value) {
             return;
         }

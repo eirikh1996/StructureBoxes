@@ -152,7 +152,7 @@ public class StructureBoxes implements SBMain {
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
-        I18nSupport.initialize(getConfigDir().toFile());
+        I18nSupport.initialize(getConfigDir().toFile(), this);
         //Create command
         CommandSpec createCommand = CommandSpec.builder()
                 .permission("structureboxes.create")

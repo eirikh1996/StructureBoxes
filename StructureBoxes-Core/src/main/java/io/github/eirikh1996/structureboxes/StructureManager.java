@@ -40,7 +40,7 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         while (iter.hasNext()) {
             final Structure structure = iter.next();
             long expiry = structure.getExpiry() > -1 ? structure.getExpiry() : Settings.MaxSessionTime;
-            if ((System.currentTimeMillis() - structure.getPlacementTime()) / 1000 < expiry) {
+            if (structure.getPlacementTime() <= -1 || (System.currentTimeMillis() - structure.getPlacementTime()) / 1000 < expiry) {
                 continue;
             }
             if (structure.getExpiry() > -1) {

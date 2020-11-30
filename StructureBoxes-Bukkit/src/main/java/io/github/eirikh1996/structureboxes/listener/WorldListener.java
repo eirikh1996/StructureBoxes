@@ -21,11 +21,11 @@ public class WorldListener implements Listener {
                 return;
             PlotSquaredUtils.initialize();
         } else if (Settings.UsePS5) {
-            if (!(generator instanceof com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper))
+            if (!(generator instanceof com.plotsquared.core.generator.GeneratorWrapper))
                 return;
             PlotSquared5Utils.initialize();
         } else {
-            if (!(generator instanceof com.plotsquared.core.generator.GeneratorWrapper))
+            if (!(generator instanceof com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper))
                 return;
             PlotSquared4Utils.initialize();
         }

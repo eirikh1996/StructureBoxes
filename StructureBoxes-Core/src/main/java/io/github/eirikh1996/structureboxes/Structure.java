@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Structure implements Iterable<Location> {
     private final UUID id;
     private int minX, minY, minZ, maxX, maxY, maxZ, expiry = -1;
-    private final long placementTime;
+    private long placementTime;
     private final String schematicName;
     private final Map<Location, Object> originalBlocks;
     private final UUID owner;
@@ -22,7 +22,7 @@ public class Structure implements Iterable<Location> {
         this.schematicName = schematicName;
         this.originalBlocks = originalBlocks;
         this.owner = owner;
-        placementTime = System.currentTimeMillis();
+        placementTime = -1;
         id = UUID.randomUUID();
         for (Location loc : originalBlocks.keySet()) {
             if (minX > loc.getX()) {
@@ -57,6 +57,10 @@ public class Structure implements Iterable<Location> {
 
     public long getPlacementTime() {
         return placementTime;
+    }
+
+    public void setPlacementTime(long placementTime) {
+        this.placementTime = placementTime;
     }
 
     public Set<Location> getStructure() {

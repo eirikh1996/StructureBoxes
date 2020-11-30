@@ -139,11 +139,14 @@ public class IWorldEditHandler extends WorldEditHandler {
                             boundingBox.add(loc);
                         }
                         BaseBlock baseBlock = clipboard.getFullBlock(BlockVector3.at(minX + x, minY + y, minZ + z));
+                        if (priority != priorityMap.getOrDefault(baseBlock.getBlockType(), MultiStageReorder.PlacementPriority.FIRST))
+                            continue;
+                        locationQueue.add(loc);
                         if (
                                 baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:air") ||
                                 baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:cave_air") ||
-                                baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:void_air") ||
-                                priority != priorityMap.getOrDefault(baseBlock.getBlockType(), MultiStageReorder.PlacementPriority.FIRST)){
+                                baseBlock.getBlockType().getId().equalsIgnoreCase("minecraft:void_air")
+                                ){
                             continue;
                         }
 
@@ -152,7 +155,7 @@ public class IWorldEditHandler extends WorldEditHandler {
                             blockHashMap.put(loc, baseBlock);
                         }
 
-                        locationQueue.add(loc);
+
 
                         structureLocs.add(loc);
                     }
@@ -172,6 +175,7 @@ public class IWorldEditHandler extends WorldEditHandler {
             queue.addAll(CollectionUtils.neighbors(invertedStructure, node));
         }
         Collection<Location> confirmed = new HashSet<>(visited);
+        locationQueue.removeAll(confirmed);
         final Collection<Location> interior = CollectionUtils.filter(invertedStructure, confirmed);
         structureLocs.addAll(interior);
         if (!sbMain.isFreeSpace(playerID, schematicName, structureLocs)){
@@ -206,6 +210,7 @@ public class IWorldEditHandler extends WorldEditHandler {
                         sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Complete"));
                         cancel();
                         playerIncrementPlacementMap.remove(playerID);
+                        structure.setPlacementTime(System.currentTimeMillis());
                         return;
                     }
                     for (int i = 1 ; i <= Settings.IncrementalPlacementBlocksPerTick; i++) {
@@ -216,7 +221,7 @@ public class IWorldEditHandler extends WorldEditHandler {
 
                         placedBlocks++;
                         final float percent = ((float) placedBlocks / (float) queueSize) * 100f;
-                        if (percent % 10 == 0) {
+                        if ((int) percent % 10 == 0) {
                             sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress") + ": " + percent );
                         }
                         placedLocations.add(poll);
@@ -254,6 +259,7 @@ public class IWorldEditHandler extends WorldEditHandler {
                 Operations.complete(builder.build());
                 session.flushSession();
                 sbMain.clearInterior(interior);
+                structure.setPlacementTime(System.currentTimeMillis());
             } catch (WorldEditException e) {
                 e.printStackTrace();
             }

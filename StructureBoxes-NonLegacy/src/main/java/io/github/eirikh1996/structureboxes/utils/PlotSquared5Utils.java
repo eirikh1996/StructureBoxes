@@ -39,7 +39,7 @@ public class PlotSquared5Utils {
     }
 
     public static void registerFlag() {
-        GlobalFlagContainer.getInstance().addFlag(StructureBoxFlag.STRUCTUREBOX_FLAG_FALSE);
+        GlobalFlagContainer.getInstance().addFlag(StructureboxFlag.STRUCTUREBOX_FLAG_FALSE);
     }
 
     public static boolean canBuild(Player player, Location location){
@@ -59,7 +59,7 @@ public class PlotSquared5Utils {
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId()) || plot.getFlag(StructureBoxFlag.class);
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(StructureboxFlag.class);
     }
 
     public static boolean withinPlot(Location location){

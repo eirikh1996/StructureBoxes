@@ -9,6 +9,7 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -105,8 +106,8 @@ public class IWorldEditHandler extends WorldEditHandler {
         fClipboard.setOrigin(clipboard.getOrigin());
         LinkedList<Location> placeLater = new LinkedList<>();
         LinkedList<Location> placeLast = new LinkedList<>();
-        for (int x = 0 ; x <= xLength ; x++){
-            for (int y = 0 ; y <= yLength ; y++){
+        for (int y = 0 ; y <= yLength ; y++){
+            for (int x = 0 ; x <= xLength ; x++){
                 for (int z = 0 ; z <= zLength ; z++){
                     Location loc = minPoint.add(x, y, z).rotate(theta, pasteLoc.toSBloc());
                     solidStructure.add(loc);
@@ -116,9 +117,6 @@ public class IWorldEditHandler extends WorldEditHandler {
                     Vector pos = new Vector(minX + x, minY + y, minZ + z);
                     BaseBlock baseBlock = clipboard.getBlock(pos);
                     int type = baseBlock.getType();
-                    if (type == 0){
-                        continue;
-                    }
                     if (BlockType.shouldPlaceLast(baseBlock.getId()))
                         placeLater.add(loc);
                     else if (BlockType.shouldPlaceFinal(baseBlock.getId()))
@@ -126,7 +124,11 @@ public class IWorldEditHandler extends WorldEditHandler {
                     else
                         locationQueue.add(loc);
                     if (Settings.IncrementalPlacement) {
+                        baseBlock = BlockTransformExtent.transform(baseBlock, transform, world.getWorldData().getBlockRegistry());
                         blockHashMap.put(loc, baseBlock);
+                    }
+                    if (type == 0){
+                        continue;
                     }
                     structureLocs.add(loc);
                 }
@@ -148,6 +150,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         }
         Collection<Location> confirmed = new HashSet<>(visited);
         final Collection<Location> interior = CollectionUtils.filter(invertedStructure, confirmed);
+        locationQueue.removeAll(confirmed);
         structureLocs.addAll(interior);
         final boolean freeSpace = sbMain.isFreeSpace(playerID, schematicName, structureLocs);
         if (!freeSpace){
@@ -184,6 +187,8 @@ public class IWorldEditHandler extends WorldEditHandler {
                         sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Complete"));
                         cancel();
                         playerIncrementPlacementMap.remove(playerID);
+                        structure.setPlacementTime(System.currentTimeMillis());
+                        sbMain.clearInterior(interior);
                         return;
                     }
                     for (int i = 1 ; i <= Settings.IncrementalPlacementBlocksPerTick; i++) {
@@ -193,14 +198,14 @@ public class IWorldEditHandler extends WorldEditHandler {
                         final BaseBlock block = blockHashMap.remove(poll);
                         placedBlocks++;
                         final float percent = ((float) placedBlocks / (float) queueSize) * 100f;
-                        if ((int) percent % 5 == 0) {
-                            sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress").replace("{PERCENTAGE}", String.valueOf(percent)));
+                        if ((int) percent % 15 == 0) {
+                            sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress") + ": " + percent );
                         }
                         placedLocations.add(poll);
                         sbMain.scheduleSyncTask(() -> {
                             try {
                                 structure.getLocationsToRemove().add(poll);
-                                world.setBlock(vectorFromLocation(poll), block, true);
+                                world.setBlock(vectorFromLocation(poll), block, false);
                             } catch (WorldEditException e) {
                                 e.printStackTrace();
                             }
@@ -226,12 +231,11 @@ public class IWorldEditHandler extends WorldEditHandler {
                 Operations.completeLegacy(op);
                 session.flushQueue();
                 sbMain.clearInterior(interior);
+                structure.setPlacementTime(System.currentTimeMillis());
             } catch (WorldEditException e) {
                 e.printStackTrace();
             }
-            if (structure != null) {
-                structure.setProcessing(false);
-            }
+            structure.setProcessing(false);
             StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
             if (Settings.Debug){
                 final long end = System.currentTimeMillis();

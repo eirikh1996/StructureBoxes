@@ -189,18 +189,18 @@ public class StructureBoxCommand implements TabExecutor {
         }
         final WorldEditHandler weHandler =  StructureBoxes.getInstance().getWorldEditHandler();
         Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
-        if (Settings.IncrementalPlacement && structure.getIncrementalPlacementTask() != null) {
-            structure.getIncrementalPlacementTask().cancel();
-        }
         if (structure == null){
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return true;
+        }
+        if (Settings.IncrementalPlacement && structure.getIncrementalPlacementTask() != null) {
+            structure.getIncrementalPlacementTask().cancel();
         }
         if (!structure.isProcessing()) {
             structure.setProcessing(true);
         }
         String schematicName = structure.getSchematicName();
-
+        StructureBoxes.getInstance().clearStructure(structure);
 
 
 
@@ -284,7 +284,9 @@ public class StructureBoxCommand implements TabExecutor {
         }
         final TopicPaginator paginator = new TopicPaginator(title);
         for (Structure structure : sessions) {
-            paginator.addLine((title.startsWith("All") ? Bukkit.getOfflinePlayer(structure.getOwner()).getName()+ " " : "") + structure.getSchematicName() + ": " + (Settings.MaxSessionTime - (System.currentTimeMillis() - structure.getPlacementTime())/1000) + " seconds left");
+            if (structure.getPlacementTime() <= -1)
+                continue;
+            paginator.addLine((title.startsWith("All") ? Bukkit.getOfflinePlayer(structure.getOwner()).getName()+ " " : "") + structure.getSchematicName() + ": " + ((structure.getExpiry() > -1 ? structure.getExpiry() : Settings.MaxSessionTime) - (System.currentTimeMillis() - structure.getPlacementTime())/1000) + " seconds left");
         }
         if (!paginator.isInBounds(page)) {
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Pagination - Invalid page") + page);

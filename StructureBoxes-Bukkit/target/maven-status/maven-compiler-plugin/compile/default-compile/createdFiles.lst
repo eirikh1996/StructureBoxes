@@ -32,8 +32,8 @@ io\github\eirikh1996\structureboxes\region\WorldGuardFlagManager.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker.class
 io\github\eirikh1996\structureboxes\utils\FactionsUtils.class
 io\github\eirikh1996\structureboxes\listener\BlockListener.class
+io\github\eirikh1996\structureboxes\StructureBoxes$2.class
 io\github\eirikh1996\structureboxes\region\FactionsFlagManager.class
-io\github\eirikh1996\structureboxes\commands\StructureBoxCommand$1.class
 io\github\eirikh1996\structureboxes\region\PlotSquaredFlagManager.class
 io\github\eirikh1996\structureboxes\utils\GriefPreventionUtils.class
 io\github\eirikh1996\structureboxes\utils\UpdateChecker$1.class

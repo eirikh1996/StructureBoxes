@@ -100,6 +100,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void onLoad() {
         instance = this;
+        String packageName = getServer().getClass().getPackage().getName();
+        String version = packageName.substring(packageName.lastIndexOf(".") + 1);
+        Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -110,10 +113,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     @Override
     public void onEnable() {
-        String packageName = getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf(".") + 1);
-        Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
-        final String[] LOCALES = {"en", "no", "it"};
+        final String[] LOCALES = {"en", "no", "it", "zhcn"};
         for (String locale : LOCALES){
             final File langFile = new File(getDataFolder().getAbsolutePath() + "/localisation/lang_" + locale + ".properties");
             if (langFile.exists()){
@@ -130,7 +130,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             saveDefaultConfig();
         }
         readConfig();
-        if (!I18nSupport.initialize(getDataFolder())){
+
+        if (!I18nSupport.initialize(getDataFolder(), this)){
             return;
         }
         worldEditPlugin = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
@@ -289,8 +290,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     );
                 } else if (Settings.UsePS5){
                     PlotSquared5Utils.initialize();
+
+                    PlotSquared5Utils.registerFlag();
                     try {
-                        Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listeners.BlockEventListener");
+                        Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
                         final Listener listener = blockEventListener.getConstructor().newInstance();
                         HandlerList.unregisterAll(listener);
                         getServer().getPluginManager().registerEvents(listener, ps);
@@ -309,7 +312,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     PlotSquared4Utils.initialize();
                     PlotSquared4Utils.registerFlag();
                     try {
-                        Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listeners.PlayerEvents");
+                        Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listener.PlayerEvents");
                         final Listener listener = playerEvents.getConstructor().newInstance();
                         HandlerList.unregisterAll(listener);
                         getServer().getPluginManager().registerEvents(listener, ps);
@@ -737,7 +740,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             if (bukkitLoc.getBlock().getType().name().endsWith("AIR")){
                 continue;
             }
-            bukkitLoc.getBlock().setType(Material.AIR);
+            bukkitLoc.getBlock().setType(Material.AIR, false);
         }
     }
 
