@@ -30,7 +30,12 @@ public class InventoryListener implements Listener {
         if (!(event.getPlayer() instanceof Player))
             return;
         final Player p = (Player) event.getPlayer();
-        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(event.getInventory().getLocation()));
+
+        Location inv = event.getInventory().getLocation();
+        if(inv == null) // Plugins such as DTLTraders cause InventoryOpenEvents with null locations.
+            return;
+
+        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(inv));
         if (structure == null)
             return;
         if (!playerTimeMap.containsKey(p.getUniqueId()) || currentTimeMillis() - playerTimeMap.get(p.getUniqueId()) > 5000) {
@@ -43,6 +48,9 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onItemMove(InventoryMoveItemEvent event) {
         Inventory source = event.getSource();
+        if(source.getLocation() == null)
+            return; // Probably good to check this as well.
+
         Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(source.getLocation()));
         if (structure == null)
             return;
