@@ -13,6 +13,8 @@
         <module>StructureBoxes-WE6</module>
         <module>StructureBoxes-NonLegacy</module>
         <module>StructureBoxes-WE7</module>
+        <module>StructureBoxes-Bukkit-Movecraft-7</module>
+        <module>StructureBoxes-Bukkit-Movecraft-8</module>
         <module>StructureBoxes-Bukkit</module>
         <module>StructureBoxes-Sponge</module>
         <module>StructureBoxes-FactionsUUID</module>

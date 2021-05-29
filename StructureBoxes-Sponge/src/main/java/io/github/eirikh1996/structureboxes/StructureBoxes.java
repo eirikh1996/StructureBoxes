@@ -90,12 +90,14 @@ import java.util.logging.Level;
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 
-@Plugin(id = "structureboxes",
+@Plugin(
+        id = "structureboxes",
         name = "StructureBoxes",
         description = "A plugin that adds placable blocks that turn into pre-made structures",
         version = "3.0",
         authors = {"eirikh1996"},
-        dependencies = {
+        dependencies =
+            {
                 @Dependency(id = "worldedit"),
                 @Dependency(id = "redprotect", optional = true),
                 @Dependency(id = "griefprevention", optional = true),
@@ -103,7 +105,9 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
                 @Dependency(id = "eaglefactions", optional = true),
                 @Dependency(id = "universeguard", optional = true),
                 @Dependency(id = "nations-updated", optional = true),
-                @Dependency(id = "movecraft", optional = true)})
+                @Dependency(id = "movecraft", optional = true)
+            }
+        )
 public class StructureBoxes implements SBMain {
 
     private static StructureBoxes instance;
@@ -156,7 +160,7 @@ public class StructureBoxes implements SBMain {
         //Create command
         CommandSpec createCommand = CommandSpec.builder()
                 .permission("structureboxes.create")
-                .arguments(GenericArguments.string(Text.of()))
+                .arguments(GenericArguments.string(Text.of()), GenericArguments.flags().flag("m").buildWith(GenericArguments.none()), GenericArguments.flags().flag("e").buildWith(GenericArguments.integer(Text.EMPTY)))
                 .executor(new StructureBoxCreateCommand())
                 .build();
 
@@ -333,7 +337,17 @@ public class StructureBoxes implements SBMain {
 
     @Override
     public void clearStructure(Structure structure) {
-        Task.builder().execute(new StructureBoxUndoCommand.StructureUndoTask(structure.getLocationsToRemove(), structure.getOriginalBlocks())).submit(StructureBoxes.getInstance());
+        final Task.Builder taskBuilder = Task
+                .builder()
+                .execute(
+                        new StructureBoxUndoCommand.StructureUndoTask(
+                                structure.getLocationsToRemove(),
+                                structure.getOriginalBlocks())
+                );
+        if (Settings.IncrementalPlacement) {
+            taskBuilder.intervalTicks(Settings.IncrementalPlacementDelay);
+        }
+        taskBuilder.submit(this);
     }
 
     public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {

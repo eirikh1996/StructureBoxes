@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
     <name>StructureBoxes-Bukkit</name>
-    <version>3.0</version>
+    <version>3.2</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
         </dependency>
         <!--WorldEdit-->
         <dependency>
@@ -171,7 +171,7 @@
             <artifactId>Movecraft</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/bukkit/Movecraft.jar</systemPath>
+            <systemPath>${project.basedir}/../libs/bukkit/Movecraft-v7.jar</systemPath>
         </dependency>
         <!--bStats-->
         <dependency>
@@ -232,6 +232,18 @@
             <version>3.0.9.4</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/bukkit/skyblock/acidisland.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-bukkit-movecraft-7</artifactId>
+            <version>Movecraft-7</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-bukkit-movecraft-8</artifactId>
+            <version>Movecraft-8</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>

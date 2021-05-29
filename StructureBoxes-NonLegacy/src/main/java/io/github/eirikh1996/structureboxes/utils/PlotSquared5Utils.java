@@ -42,6 +42,19 @@ public class PlotSquared5Utils {
         GlobalFlagContainer.getInstance().addFlag(StructureboxFlag.STRUCTUREBOX_FLAG_FALSE);
     }
 
+    public static boolean canPlaceStructureBox(Location loc) {
+        final PlotAPI plotAPI = new PlotAPI();
+        Set<PlotArea> plotAreas = plotAPI.getPlotAreas(loc.getWorld().getName());
+        Plot plot = null;
+        for (final PlotArea pArea : plotAreas){
+            plot = pArea.getPlot(bukkitToPSLoc(loc));
+            if (plot != null){
+                break;
+            }
+        }
+        return plot != null && plot.getFlag(StructureboxFlag.class);
+    }
+
     public static boolean canBuild(Player player, Location location){
 
         if (worlds == null || !worlds.containsKey(location.getWorld().getName())){

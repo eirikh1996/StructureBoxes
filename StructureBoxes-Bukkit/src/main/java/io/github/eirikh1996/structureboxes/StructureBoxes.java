@@ -15,12 +15,12 @@ import com.wasteofplastic.askyblock.ASkyBlock;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.InventoryListener;
-import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.listener.WorldListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.region.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
+import lombok.SneakyThrows;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
@@ -111,6 +111,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
     }
 
+    @SneakyThrows
     @Override
     public void onEnable() {
         final String[] LOCALES = {"en", "no", "it", "zhcn"};
@@ -365,7 +366,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
         if (movecraft instanceof Movecraft) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
-            getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
+            boolean movecraft8;
+            try {
+                Class.forName("net.countercraft.movecraft.craft.BaseCraft");
+                movecraft8 = true;
+            } catch (ClassNotFoundException e) {
+                movecraft8 = false;
+            }
+            Class<?> clazz = Class.forName("io.github.eirikh1996.structureboxes.movecraft.v" + (movecraft8 ? "8" : "7") + ".MovecraftListener");
+            if (Listener.class.isAssignableFrom(clazz)) {
+                getServer().getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
+            }
+
             movecraftPlugin = (Movecraft) movecraft;
             foundRegionProvider = true;
         }
@@ -634,6 +646,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             }
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
+
+            if (RegionUtils.canPlaceStructure(p, bukkitLoc)) {
+                continue;
+            }
 
             if ((getRedProtectPlugin() != null && !RedProtectUtils.canBuild(p, bukkitLoc))){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect"));

@@ -178,6 +178,7 @@ public class IWorldEditHandler extends WorldEditHandler {
             final int queueSize = locationQueue.size();
             IncrementalPlacementTask task = new IncrementalPlacementTask(){
                 int placedBlocks = 0;
+                int lastPercentage = 0;
                 /**
                  * The action to be performed by this timer task.
                  */
@@ -197,8 +198,9 @@ public class IWorldEditHandler extends WorldEditHandler {
                             break;
                         final BaseBlock block = blockHashMap.remove(poll);
                         placedBlocks++;
-                        final float percent = ((float) placedBlocks / (float) queueSize) * 100f;
-                        if ((int) percent % 15 == 0) {
+                        final int percent =(int) (((float) placedBlocks / (float) queueSize) * 100f);
+                        if (percent % 15 == 0 && lastPercentage < percent) {
+                            lastPercentage = percent;
                             sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Placement - Progress") + ": " + percent );
                         }
                         placedLocations.add(poll);

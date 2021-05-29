@@ -1,7 +1,8 @@
-package io.github.eirikh1996.structureboxes.utils;
+package io.github.eirikh1996.structureboxes.movecraft.v8;
 
+import io.github.eirikh1996.structureboxes.utils.Location;
 import net.countercraft.movecraft.MovecraftLocation;
-import net.countercraft.movecraft.utils.HitBox;
+import net.countercraft.movecraft.util.hitboxes.HitBox;
 import org.bukkit.World;
 
 import java.util.HashSet;

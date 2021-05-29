@@ -57,13 +57,6 @@ public class StructureBoxUndoCommand implements CommandExecutor {
             return CommandResult.success();
         }
         StructureBoxes.getInstance().clearStructure(structure);
-
-
-
-
-
-
-
         ItemStack structureBox = ItemStack.builder().fromBlockState(((BlockType) Settings.StructureBoxItem).getDefaultState()).build();
         List<Text> lore = new ArrayList<>();
         structureBox.offer(Keys.DISPLAY_NAME, Text.of(Settings.StructureBoxLore));
@@ -112,7 +105,7 @@ public class StructureBoxUndoCommand implements CommandExecutor {
 
         @Override
         public void accept(Task task) {
-            int queueSize = Math.min(locationQueue.size(), 30000);
+            int queueSize = Math.min(locationQueue.size(), Settings.IncrementalPlacement ? Settings.IncrementalPlacementBlocksPerTick : 30000);
             for (int i = 1 ; i <= queueSize ; i++){
                 final Location location = locationQueue.poll();
                 if (location == null)
@@ -132,6 +125,7 @@ public class StructureBoxUndoCommand implements CommandExecutor {
                 StructureManager.getInstance().removeStructure(StructureManager.getInstance().getCorrespondingStructure(structure));
                 task.cancel();
             }
+
         }
     }
 }

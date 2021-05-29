@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class InventoryListener implements Listener {
         final Player p = (Player) event.getPlayer();
 
         Location inv = event.getInventory().getLocation();
-        if(inv == null) // Plugins such as DTLTraders cause InventoryOpenEvents with null locations.
+        if(inv == null || !(inv.getBlock().getState() instanceof InventoryHolder)) // Plugins such as DTLTraders cause InventoryOpenEvents with null locations.
             return;
 
         Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(inv));
@@ -48,7 +49,7 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onItemMove(InventoryMoveItemEvent event) {
         Inventory source = event.getSource();
-        if(source.getLocation() == null)
+        if(source.getLocation() == null || !(source.getLocation().getBlock().getState() instanceof InventoryHolder))
             return; // Probably good to check this as well.
 
         Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(source.getLocation()));
@@ -68,7 +69,7 @@ public class InventoryListener implements Listener {
         if (inv == null)
             return;
         final Location loc = inv.getLocation();
-        if (loc == null)
+        if (loc == null || !(loc.getBlock().getState() instanceof InventoryHolder))
             return;
         Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(loc));
         if (structure == null)

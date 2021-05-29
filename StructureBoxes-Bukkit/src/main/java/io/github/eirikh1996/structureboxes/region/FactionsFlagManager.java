@@ -2,9 +2,10 @@ package io.github.eirikh1996.structureboxes.region;
 
 import com.massivecraft.factions.engine.EnginePermBuild;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.FactionsUtils;
+import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -28,6 +29,7 @@ public class FactionsFlagManager implements EventExecutor {
         if (!(event instanceof Cancellable) || !((Cancellable) event).isCancelled()) {
             return;
         }
+        Player player;
         Cancellable can = (Cancellable) event;
         Block b;
         ItemStack handItem;
@@ -36,17 +38,19 @@ public class FactionsFlagManager implements EventExecutor {
             BlockPlaceEvent placeEvent = (BlockPlaceEvent) event;
             b = placeEvent.getBlockPlaced();
             handItem = placeEvent.getItemInHand();
+            player = placeEvent.getPlayer();
             place = true;
         } else if (event instanceof PlayerInteractEvent) {
             PlayerInteractEvent interactEvent = (PlayerInteractEvent) event;
             b = interactEvent.getClickedBlock();
             handItem = interactEvent.getItem();
+            player = interactEvent.getPlayer();
         } else {
             return;
         }
 
 
-        if (b == null || !FactionsUtils.canPlaceStructureBox(b.getLocation())) {
+        if (b == null || !RegionUtils.canPlaceStructure(player, b.getLocation())) {
             return;
         }
         if (place ? !b.getType().equals(Settings.StructureBoxItem) : !handItem.getType().equals(Settings.StructureBoxItem)) {

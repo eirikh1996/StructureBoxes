@@ -5,6 +5,7 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import br.net.fabiozumbi12.RedProtect.Bukkit.listeners.BlockListener;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
 import org.bukkit.event.Listener;
@@ -36,7 +37,7 @@ public class RedProtectFlagManager implements EventExecutor {
             return;
         }
         final Region region = api.getRegion(pe.getBlockPlaced().getLocation());
-        if (region == null || !region.getFlagBool("structurebox")) {
+        if (region == null || !RegionUtils.canPlaceStructure(pe.getPlayer(), pe.getBlockPlaced().getLocation())) {
             return;
         }
         pe.setCancelled(false);

@@ -1,9 +1,7 @@
 package io.github.eirikh1996.structureboxes.region;
 
-import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.PlotSquared4Utils;
+import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -44,14 +42,8 @@ public class PlotSquared4FlagManager implements EventExecutor {
             return;
         }
         final Block placed = pe.getBlockPlaced();
-        final Plot plot = Plot.getPlot(new Location(placed.getWorld().getName(), placed.getX(), placed.getY(), placed.getZ()));
-        if (plot == null) {
+        if (!RegionUtils.canPlaceStructure(pe.getPlayer(), placed.getLocation()))
             return;
-        }
-        final boolean value = plot.getFlag(PlotSquared4Utils.StructureBoxFlag, false);
-        if (!value) {
-            return;
-        }
         pe.setCancelled(false);
     }
 }

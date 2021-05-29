@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes.region;
 
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import io.github.eirikh1996.structureboxes.utils.WorldGuardUtils;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
@@ -33,7 +34,7 @@ public class WorldGuardFlagManager implements EventExecutor {
             return;
         }
         final Block placed = placeEvent.getBlockPlaced();
-        if (WorldGuardUtils.getRegions(placed.getLocation()).size() == 0 || !WorldGuardUtils.canPlaceStructureBox(placeEvent.getPlayer(), placed.getLocation())) {
+        if (WorldGuardUtils.getRegions(placed.getLocation()).size() == 0 || !RegionUtils.canPlaceStructure(placeEvent.getPlayer(), placed.getLocation())) {
             return;
         }
         placeEvent.setCancelled(false);

@@ -57,7 +57,7 @@ public class StructureBoxCreateCommand implements CommandExecutor {
         List<Text> lore = new ArrayList<>();
         lore.add(0, Text.of(Settings.StructureBoxPrefix + arg));
         for (int i = 0 ; i < Settings.StructureBoxInstruction.size() ; i++) {
-            lore.add(i + 1, Text.of(Settings.StructureBoxInstruction.get(i)));
+            lore.add(Text.of(Settings.StructureBoxInstruction.get(i)));
         }
         structureBox.offer(Keys.ITEM_LORE, lore);
         PlayerInventory pInv = (PlayerInventory) player.getInventory();
