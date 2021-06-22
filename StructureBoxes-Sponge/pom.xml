@@ -121,6 +121,12 @@
                 <artifactId>RedProtect-Sponge-56</artifactId>
                 <version>LATEST</version>
                 <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.dynmap</groupId>
+                        <artifactId>DynmapCoreAPI</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         <dependency>
             <groupId>org.bstats</groupId>

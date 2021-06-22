@@ -154,12 +154,12 @@
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <artifactId>spongeapi</artifactId>
-          <groupId>org.spongepowered</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>DynmapCoreAPI</artifactId>
           <groupId>org.dynmap</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spongeapi</artifactId>
+          <groupId>org.spongepowered</groupId>
         </exclusion>
       </exclusions>
     </dependency>

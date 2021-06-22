@@ -647,78 +647,76 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
 
-            if (RegionUtils.canPlaceStructure(p, bukkitLoc)) {
-                continue;
-            }
 
-            if ((getRedProtectPlugin() != null && !RedProtectUtils.canBuild(p, bukkitLoc))){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect"));
-                return false;
-            }
-            if (getGriefPreventionPlugin() != null && GriefPreventionUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
-                return false;
-            }
-            if (getFactionsPlugin() != null && ((Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
-                return false;
-            }
-            if (isFactionsUUIDInstalled() && !FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
-                return false;
-            }
-            if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
-                return false;
-            }
-            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
-                return false;
-            }
-            if (getTownyPlugin() != null && !TownyUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Towny"));
-                return false;
-            }
-            if (getLandClaimingPlugin() != null && !LandClaimingUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "LandClaiming"));
-                return false;
-            }
-            if (getCivsPlugin() != null && !CivsUtils.allowBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Civs"));
-                return false;
-            }
-            if (getLandsPlugin() != null && !LandsUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Lands"));
-                return false;
-            }
-            if (getSuperiorSkyblockPlugin() != null && !SuperiorSkyblockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SuperiorSkyblock"));
-                return false;
-            }
-            if (getSkyBlockPlugin() != null && !SkyBlockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SkyBlock"));
-                return false;
-            }
-            if (getIslandWorldPlugin() != null && !IslandWorldUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "IslandWorld"));
-                return false;
-            }
-            if (getBentoBoxPlugin() != null && !BentoBoxUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "BentoBox"));
-                return false;
-            }
-            if (getAcidIslandPlugin() != null && !AcidIslandUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "AcidIsland"));
-                return false;
-            }
-            if (getaSkyBlockPlugin() != null && !ASkyBlockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "ASkyBlock"));
-                return false;
-            }
-            if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
-                continue;
-            }
-            if (!Settings.CheckFreeSpace){
+            if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test) || !Settings.CheckFreeSpace){
+                if (RegionUtils.canPlaceStructure(p, bukkitLoc)) {
+                    continue;
+                }
+
+                if ((getRedProtectPlugin() != null && !RedProtectUtils.canBuild(p, bukkitLoc))){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect"));
+                    return false;
+                }
+                if (getGriefPreventionPlugin() != null && GriefPreventionUtils.canBuild(p, bukkitLoc)){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
+                    return false;
+                }
+                if (getFactionsPlugin() != null && ((Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
+                    return false;
+                }
+                if (isFactionsUUIDInstalled() && !FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
+                    return false;
+                }
+                if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
+                    return false;
+                }
+                if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
+                    return false;
+                }
+                if (getTownyPlugin() != null && !TownyUtils.canBuild(p, bukkitLoc)){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Towny"));
+                    return false;
+                }
+                if (getLandClaimingPlugin() != null && !LandClaimingUtils.canBuild(p, bukkitLoc)){
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "LandClaiming"));
+                    return false;
+                }
+                if (getCivsPlugin() != null && !CivsUtils.allowBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Civs"));
+                    return false;
+                }
+                if (getLandsPlugin() != null && !LandsUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Lands"));
+                    return false;
+                }
+                if (getSuperiorSkyblockPlugin() != null && !SuperiorSkyblockUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SuperiorSkyblock"));
+                    return false;
+                }
+                if (getSkyBlockPlugin() != null && !SkyBlockUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SkyBlock"));
+                    return false;
+                }
+                if (getIslandWorldPlugin() != null && !IslandWorldUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "IslandWorld"));
+                    return false;
+                }
+                if (getBentoBoxPlugin() != null && !BentoBoxUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "BentoBox"));
+                    return false;
+                }
+                if (getAcidIslandPlugin() != null && !AcidIslandUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "AcidIsland"));
+                    return false;
+                }
+                if (getaSkyBlockPlugin() != null && !ASkyBlockUtils.canBuild(p, bukkitLoc)) {
+                    p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "ASkyBlock"));
+                    return false;
+                }
                 continue;
             }
             p.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - No free space") );

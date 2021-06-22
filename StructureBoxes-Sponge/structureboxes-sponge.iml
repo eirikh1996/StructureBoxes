@@ -70,7 +70,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-core:3.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-gson:3.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: ninja.leaping.configurate:configurate-yaml:3.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.dynmap:DynmapCoreAPI:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.bstats:bstats-sponge:1.5" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: io.github.aquerr:EagleFactions:LATEST">

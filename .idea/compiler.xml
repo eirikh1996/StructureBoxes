@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -20,13 +21,13 @@
     <bytecodeTargetLevel>
       <module name="StructureBoxes" target="1.5" />
       <module name="structureboxes-bukkit" target="1.8" />
-      <module name="structureboxes-bukkit-movecraft-7" target="7" />
+      <module name="structureboxes-bukkit-movecraft-7" target="8" />
       <module name="structureboxes-bukkit-movecraft-8" target="7" />
       <module name="StructureBoxes-Core" target="1.8" />
       <module name="StructureBoxes-Fabric" target="1.5" />
       <module name="StructureBoxes-FactionsUUID" target="8" />
       <module name="structureboxes-main" target="1.8" />
-      <module name="StructureBoxes-NonLegacy" target="8" />
+      <module name="StructureBoxes-NonLegacy" target="1.8" />
       <module name="structureboxes-sponge" target="8" />
       <module name="StructureBoxes-WE6" target="1.8" />
       <module name="StructureBoxes-WE7" target="1.8" />
