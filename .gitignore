@@ -1,4 +1,4 @@
 # Project exclude paths
 /.idea/
-target/
+*target/
 *dependency-reduced-pom.xml

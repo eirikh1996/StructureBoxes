@@ -6,6 +6,7 @@
         <artifactId>structureboxes-parent</artifactId>
         <groupId>io.github.eirikh1996</groupId>
         <version>Parent</version>
+        <relativePath>/../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

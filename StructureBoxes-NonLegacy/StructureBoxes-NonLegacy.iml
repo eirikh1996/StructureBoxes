@@ -9,7 +9,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_16">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -59,6 +59,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-gson:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-legacy:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-plain:3.0.2" level="project" />
+    <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />
