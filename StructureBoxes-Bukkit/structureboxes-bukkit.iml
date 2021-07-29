@@ -23,166 +23,22 @@
     <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.23" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.8.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-Core" />
-    <orderEntry type="module" module-name="StructureBoxes-WE6" />
     <orderEntry type="module" module-name="StructureBoxes-WE7" />
-    <orderEntry type="module" module-name="StructureBoxes-NonLegacy" />
-    <orderEntry type="library" name="Maven: com.github.intellectualsites.plotsquared:PlotSquared-API:latest" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.6" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-api:3.0.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-adapter-bukkit:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.Sauilitired:Jenkins4J:2.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.retrofit2:retrofit:2.4.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okhttp3:okhttp:3.14.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okio:okio:2.2.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.3.30" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.30" level="project" />
-    <orderEntry type="library" name="Maven: com.plotsquared:PlotSquared:5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-gson:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-legacy:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-plain:3.0.2" level="project" />
-    <orderEntry type="module" module-name="StructureBoxes-FactionsUUID" />
-    <orderEntry type="module-library">
-      <library name="Maven: com.massivecraft:MassiveCore:LATEST">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/MassiveCore.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.massivecraft:Factions:LATEST">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/Factions.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-yaml:3.6.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-hocon:3.6.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-core:3.6.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.typesafe:config:1.3.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.2" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/GriefPrevention.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.plotsquared:plotsquared-api:latest">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/PlotSquared-Bukkit-19.09.07-f27e556-781.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: me.zombie_striker:LandClaiming:LATEST">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/LandClaiming.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.palmergames.bukkit.towny:Towny:0.95.0.0">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/Towny-0.95.0.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: org.redcastlemedia.multitallented:Civs:1.5.8">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/civs-1.5.8.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.Angeschossen:LandsAPI:4.7.3" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: net.countercraft:Movecraft:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/Movecraft.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="Maven: org.bstats:bstats-bukkit:1.5" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: com.iridium:IridiumSkyblock:2.5.6">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/IridiumSkyblock-2.6.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: pl.islandworld:IslandWorld:9.5">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/IslandWorld.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: org.bukkitters:SkyBlock:1.1">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/SkyBlock.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: world.bentobox:BentoBox:1.1">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/bentobox-1.15.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="Maven: com.github.OmerBenGera:SuperiorSkyblockAPI:b18" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: com.wasteofplastic:ASkyBlock:3.0.9.4">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/askyblock.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.wasteofplastic:AcidIsland:3.0.9.4">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/skyblock/acidisland.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../Movecraft/target/Movecraft.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -69,18 +69,6 @@
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
-    <repository>
-      <id>redprotect-repo</id>
-      <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
-    </repository>
-    <repository>
-      <id>CodeMC</id>
-      <url>https://repo.codemc.org/repository/maven-public</url>
-    </repository>
-    <repository>
-      <id>savagelabs</id>
-      <url>https://nexus.savagelabs.net</url>
-    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -102,54 +90,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>br.net.fabiozumbi12.RedProtect</groupId>
-      <artifactId>RedProtect-Core</artifactId>
-      <version>LATEST</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>configurate-yaml</artifactId>
-          <groupId>org.spongepowered</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>configurate-hocon</artifactId>
-          <groupId>org.spongepowered</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>configurate-core</artifactId>
-          <groupId>org.spongepowered</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>config</artifactId>
-          <groupId>com.typesafe</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>br.net.fabiozumbi12.RedProtect</groupId>
-      <artifactId>RedProtect-Spigot</artifactId>
-      <version>LATEST</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.Angeschossen</groupId>
-      <artifactId>LandsAPI</artifactId>
-      <version>4.7.3</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.8.5</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.OmerBenGera</groupId>
-      <artifactId>SuperiorSkyblockAPI</artifactId>
-      <version>b18</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>com.sk89q.worldedit</groupId>
       <artifactId>worldedit-core</artifactId>
       <version>7.0.1-SNAPSHOT</version>
@@ -168,102 +108,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>com.massivecraft</groupId>
-      <artifactId>MassiveCore</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/MassiveCore.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.massivecraft</groupId>
-      <artifactId>Factions</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/Factions.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>me.ryanhamshire</groupId>
-      <artifactId>GriefPrevention</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/GriefPrevention.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.plotsquared</groupId>
-      <artifactId>plotsquared-api</artifactId>
-      <version>latest</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>me.zombie_striker</groupId>
-      <artifactId>LandClaiming</artifactId>
-      <version>LATEST</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/LandClaiming.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.palmergames.bukkit.towny</groupId>
-      <artifactId>Towny</artifactId>
-      <version>0.95.0.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/Towny-0.95.0.0.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>org.redcastlemedia.multitallented</groupId>
-      <artifactId>Civs</artifactId>
-      <version>1.5.8</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/civs-1.5.8.jar</systemPath>
-    </dependency>
-    <dependency>
       <groupId>net.countercraft</groupId>
       <artifactId>Movecraft</artifactId>
       <version>LATEST</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/Movecraft.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.iridium</groupId>
-      <artifactId>IridiumSkyblock</artifactId>
-      <version>2.5.6</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/IridiumSkyblock-2.6.0.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>pl.islandworld</groupId>
-      <artifactId>IslandWorld</artifactId>
-      <version>9.5</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/IslandWorld.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>org.bukkitters</groupId>
-      <artifactId>SkyBlock</artifactId>
-      <version>1.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/SkyBlock.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>world.bentobox</groupId>
-      <artifactId>BentoBox</artifactId>
-      <version>1.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/bentobox-1.15.2.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.wasteofplastic</groupId>
-      <artifactId>ASkyBlock</artifactId>
-      <version>3.0.9.4</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/askyblock.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.wasteofplastic</groupId>
-      <artifactId>AcidIsland</artifactId>
-      <version>3.0.9.4</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../libs/bukkit/skyblock/acidisland.jar</systemPath>
+      <systemPath>${project.basedir}/../../Movecraft/target/Movecraft.jar</systemPath>
     </dependency>
   </dependencies>
   <properties>

@@ -1,31 +1,17 @@
 package io.github.eirikh1996.structureboxes;
 
-import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
-import com.iridium.iridiumskyblock.IridiumSkyblock;
-import com.massivecraft.factions.Factions;
-import com.massivecraft.factions.engine.EnginePermBuild;
-import com.massivecraft.factions.entity.MFlag;
-import com.palmergames.bukkit.towny.Towny;
-import com.plotsquared.bukkit.listeners.PlayerEvents;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
-import com.wasteofplastic.askyblock.ASkyBlock;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.InventoryListener;
 import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
-import io.github.eirikh1996.structureboxes.listener.WorldListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.region.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
-import org.Bukkitters.SkyBlock.Main;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -35,18 +21,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.redcastlemedia.multitallented.civs.Civs;
 import org.yaml.snakeyaml.Yaml;
-import pl.islandworld.IslandWorld;
-import world.bentobox.bentobox.BentoBox;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,27 +45,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private WorldGuardPlugin worldGuardPlugin;
     private WorldEditPlugin worldEditPlugin;
     private WorldEditHandler worldEditHandler;
-    private Factions factionsPlugin;
-    private RedProtect redProtectPlugin;
-    private GriefPrevention griefPreventionPlugin;
-    private LandClaiming landClaimingPlugin;
-    private Towny townyPlugin;
 
-    //Skyblock plugins
-    private IridiumSkyblock iridiumSkyblockPlugin;
-    private IslandWorld islandWorldPlugin;
-    private Main skyBlockPlugin;
-    private BentoBox bentoBoxPlugin;
-    private SuperiorSkyblock superiorSkyblockPlugin;
-    private ASkyBlock aSkyBlockPlugin;
-    private com.wasteofplastic.acidisland.ASkyBlock acidIslandPlugin;
-
-    private boolean plotSquaredInstalled = false;
-    private boolean factionsUUIDInstalled = false;
-    private Civs civsPlugin;
-    private Plugin landsPlugin;
     private Movecraft movecraftPlugin;
-    private Metrics metrics;
     private boolean startup = true;
 
     private static Method GET_MATERIAL;
@@ -199,168 +161,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     EventPriority.NORMAL,
                     new WorldGuardFlagManager(), this);
         }
-        Plugin f = getServer().getPluginManager().getPlugin("Factions");
-        try {
-            Class.forName("com.massivecraft.factions.FactionsPlugin");
-            factionsUUIDInstalled = true;
-        } catch (ClassNotFoundException e) {
-            factionsUUIDInstalled = false;
-        }
-        //Check for Factions
-        if (!factionsUUIDInstalled && f instanceof Factions){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
-            factionsPlugin = (Factions) f;
-            MFlag.getCreative(
-                    16000,
-                    "structurebox",
-                    "structurebox",
-                    "Can players place structure boxes in this faction's territory?",
-                    "Players can place structure boxes",
-                    "Players cannot place structure boxes",
-                    false,
-                    false,
-                    true);
-            foundRegionProvider = true;
-            getServer().getPluginManager().registerEvent(
-                    BlockPlaceEvent.class,
-                    EnginePermBuild.get(),
-                    EventPriority.NORMAL,
-                    FactionsFlagManager.getInstance(),
-                    this);
-            getServer().getPluginManager().registerEvent(
-                    PlayerInteractEvent.class,
-                    EnginePermBuild.get(),
-                    EventPriority.NORMAL,
-                    FactionsFlagManager.getInstance(),
-                    this);
-        } else if (FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
-            foundRegionProvider = true;
-            factionsUUIDInstalled = true;
-        } else {
-            factionsUUIDInstalled = false;
-        }
-        //Check for RedProtect
-        Plugin rp = getServer().getPluginManager().getPlugin("RedProtect");
-        if (rp instanceof RedProtect){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - RedProtect detected"));
-            redProtectPlugin = (RedProtect) rp;
-            foundRegionProvider = true;
-            redProtectPlugin.getAPI().addFlag("structurebox", false, false);
-            getServer().getPluginManager().registerEvent(
-                    BlockPlaceEvent.class,
-                    new br.net.fabiozumbi12.RedProtect.Bukkit.listeners.BlockListener(),
-                    EventPriority.HIGH,
-                    new RedProtectFlagManager(),
-                    this
-            );
-        }
-        //Check for GriefPrevention
-        Plugin gp = getServer().getPluginManager().getPlugin("GriefPrevention");
-        if (gp instanceof GriefPrevention){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - GriefPrevention detected"));
-            griefPreventionPlugin = (GriefPrevention) gp;
-            foundRegionProvider = true;
-        }
-        //Check for PlotSquared
-        Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
-        if (ps != null) {
-            if (!Settings.IsLegacy) {
-                try { //Check if PlotSquared 5 is installed
-                    Class.forName("com.plotsquared.bukkit.BukkitMain");
-                    Settings.UsePS5 = true;
-                } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
-                    Settings.UsePS5 = false;
-                }
-            }
-            if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
-                getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
-                if (Settings.IsLegacy) {
-                    PlotSquaredUtils.initialize();
-                    PlotSquaredUtils.registerFlag();
-                    PlayerEvents events = new PlayerEvents();
-                    HandlerList.unregisterAll(events);
-                    getServer().getPluginManager().registerEvents(events, ps);
-                    getServer().getPluginManager().registerEvent(
-                            BlockPlaceEvent.class,
-                            events,
-                            EventPriority.HIGHEST,
-                            new PlotSquaredFlagManager(),
-                            this
-                    );
-                } else if (Settings.UsePS5){
-                    PlotSquared5Utils.initialize();
 
-                    PlotSquared5Utils.registerFlag();
-                    try {
-                        Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
-                        final Listener listener = blockEventListener.getConstructor().newInstance();
-                        HandlerList.unregisterAll(listener);
-                        getServer().getPluginManager().registerEvents(listener, ps);
-                        getServer().getPluginManager().registerEvent(
-                            BlockPlaceEvent.class,
-                            listener,
-                            EventPriority.HIGHEST,
-                            new PlotSquared5FlagManager(),
-                            this
-                        );
-                    } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    PlotSquared4Utils.initialize();
-                    PlotSquared4Utils.registerFlag();
-                    try {
-                        Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listener.PlayerEvents");
-                        final Listener listener = playerEvents.getConstructor().newInstance();
-                        HandlerList.unregisterAll(listener);
-                        getServer().getPluginManager().registerEvents(listener, ps);
-                        getServer().getPluginManager().registerEvent(
-                                BlockPlaceEvent.class,
-                                listener,
-                                EventPriority.HIGHEST,
-                                new PlotSquared4FlagManager(),
-                                this
-                        );
-                    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-                plotSquaredInstalled = true;
-                foundRegionProvider = true;
-            }
-            getServer().getPluginManager().registerEvents(new WorldListener(), this);
-        }
-
-        //Check for landClaiming
-        Plugin lp = getServer().getPluginManager().getPlugin("LandClaiming");
-        if (lp instanceof LandClaiming){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - LandClaiming detected"));
-            landClaimingPlugin = (LandClaiming) lp;
-            foundRegionProvider = true;
-        }
-        //Check for Towny
-        Plugin tp = getServer().getPluginManager().getPlugin("Towny");
-        if (tp instanceof Towny){
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - Towny detected"));
-            townyPlugin = (Towny) tp;
-            foundRegionProvider = true;
-        }
-        //Check for Civs
-        Plugin cp = getServer().getPluginManager().getPlugin("Civs");
-        if (cp instanceof Civs) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - Civs detected"));
-            civsPlugin = (Civs) cp;
-            foundRegionProvider = true;
-        }
-        //Check for Lands
-        Plugin lands = getServer().getPluginManager().getPlugin("Lands");
-        if (lands != null) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - Lands detected"));
-            landsPlugin = lands;
-            foundRegionProvider = true;
-        }
         //Check for Movecraft
         Plugin movecraft = getServer().getPluginManager().getPlugin("Movecraft");
         if (movecraft instanceof Movecraft) {
@@ -369,113 +170,22 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             movecraftPlugin = (Movecraft) movecraft;
             foundRegionProvider = true;
         }
-        //Check for Iridium Skyblock
-        Plugin iSkyBlock = getServer().getPluginManager().getPlugin("IridiumSkyblock");
-        if (iSkyBlock instanceof IridiumSkyblock) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - IridiumSkyblock detected"));
-            iridiumSkyblockPlugin = (IridiumSkyblock) iSkyBlock;
-            foundRegionProvider = true;
-        }
-        //Check for Island World
-        Plugin iw = getServer().getPluginManager().getPlugin("IslandWorld");
-        if (iw instanceof IslandWorld) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - IslandWorld detected"));
-            islandWorldPlugin = (IslandWorld) iw;
-            foundRegionProvider = true;
-        }
-        //Check for SkyBlock
-        Plugin skyblock= getServer().getPluginManager().getPlugin("SkyBlock");
-        if (skyblock instanceof Main) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - SkyBlock detected"));
-            skyBlockPlugin = (Main) skyblock;
-            foundRegionProvider = true;
-        }
-        //Check for BentoBox
-        Plugin bb= getServer().getPluginManager().getPlugin("BentoBox");
-        if (bb instanceof BentoBox) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - BentoBox detected"));
-            bentoBoxPlugin = (BentoBox) bb;
-            foundRegionProvider = true;
-        }
-        Plugin ssb = getServer().getPluginManager().getPlugin("SuperiorSkyblock");
-        if (ssb instanceof SuperiorSkyblock) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - SuperiorSkyblock detected"));
-            superiorSkyblockPlugin = (SuperiorSkyblock) ssb;
-            foundRegionProvider = true;
-        }
-        Plugin ai = getServer().getPluginManager().getPlugin("AcidIsland");
-        if (ai instanceof com.wasteofplastic.acidisland.ASkyBlock) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - AcidIsland detected"));
-            acidIslandPlugin = (com.wasteofplastic.acidisland.ASkyBlock) ai;
-            foundRegionProvider = true;
-        }
-        Plugin asb = getServer().getPluginManager().getPlugin("ASkyBlock");
-        if (asb instanceof ASkyBlock) {
-            getLogger().info(I18nSupport.getInternationalisedString("Startup - ASkyBlock detected"));
-            aSkyBlockPlugin = (ASkyBlock) asb;
-            foundRegionProvider = true;
-        }
         //If no compatible protection plugin is found, disable region restriction if it is on
         if (Settings.RestrictToRegionsEnabled && !foundRegionProvider){
             getLogger().warning(I18nSupport.getInternationalisedString("Startup - Restrict to regions no compatible protection plugin"));
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
-        if (Settings.Metrics) {
-            metrics = new Metrics(this);
-            final boolean noRegionProvider = !foundRegionProvider;
-            metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<Map<String, Integer>>() {
-                @Override
-                public Map<String, Integer> call() throws Exception {
-                    Map<String, Integer> valueMap = new HashMap<>();
-                    if (getFactionsPlugin() != null) {
-                        valueMap.put("Factions", 1);
-                    }
-                    if (getTownyPlugin() != null) {
-                        valueMap.put("Towny", 1);
-                    }
-                    if (getWorldGuardPlugin() != null) {
-                        valueMap.put("WorldGuard", 1);
-                    }
-                    if (isPlotSquaredInstalled()) {
-                        valueMap.put("PlotSquared", 1);
-                    }
-                    if (getRedProtectPlugin() != null) {
-                        valueMap.put("RedProtect", 1);
-                    }
-                    if (getGriefPreventionPlugin() != null) {
-                        valueMap.put("GriefPrevention", 1);
-                    }
-                    if (getLandClaimingPlugin() != null) {
-                        valueMap.put("LandClaiming", 1);
-                    }
-                    if (getCivsPlugin() != null) {
-                        valueMap.put("Civs", 1);
-                    }
-                    if (getLandsPlugin() != null) {
-                        valueMap.put("Lands", 1);
-                    }
-                    if (noRegionProvider) {
-                        valueMap.put("None", 1);
-                    }
-                    return valueMap;
-                }
-            }));
-            metrics.addCustomChart(new Metrics.SimplePie("localisation", () -> Settings.locale));
-        }
 
         this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
-        getServer().getPluginManager().registerEvents(UpdateChecker.getInstance(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         StructureManager.getInstance().setSbMain(this);
         if (startup){
             getServer().getScheduler().runTaskTimerAsynchronously(this, StructureManager.getInstance(), 0, 20);
-            UpdateChecker.getInstance().runTaskTimerAsynchronously(this, 120, 36000);
             startup = false;
         }
-
     }
 
     @Override
@@ -492,42 +202,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public WorldEditPlugin getWorldEditPlugin() {
         return worldEditPlugin;
-    }
-
-    public Factions getFactionsPlugin() {
-        return factionsPlugin;
-    }
-
-    public RedProtect getRedProtectPlugin() {
-        return redProtectPlugin;
-    }
-
-    public GriefPrevention getGriefPreventionPlugin() {
-        return griefPreventionPlugin;
-    }
-
-    public LandClaiming getLandClaimingPlugin() {
-        return landClaimingPlugin;
-    }
-
-    public Towny getTownyPlugin() {
-        return townyPlugin;
-    }
-
-    public boolean isPlotSquaredInstalled() {
-        return plotSquaredInstalled;
-    }
-
-    public Civs getCivsPlugin() {
-        return civsPlugin;
-    }
-
-    public Plugin getLandsPlugin() {
-        return landsPlugin;
-    }
-
-    public Metrics getMetrics() {
-        return metrics;
     }
 
     @Override
@@ -635,68 +309,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
 
-            if ((getRedProtectPlugin() != null && !RedProtectUtils.canBuild(p, bukkitLoc))){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "RedProtect"));
-                return false;
-            }
-            if (getGriefPreventionPlugin() != null && GriefPreventionUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
-                return false;
-            }
-            if (getFactionsPlugin() != null && ((Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
-                return false;
-            }
-            if (isFactionsUUIDInstalled() && !FactionsUUIDUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
-                return false;
-            }
             if (getWorldGuardPlugin() != null && !WorldGuardUtils.allowBuild(p, bukkitLoc)){
                 p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
-                return false;
-            }
-            if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
-                return false;
-            }
-            if (getTownyPlugin() != null && !TownyUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Towny"));
-                return false;
-            }
-            if (getLandClaimingPlugin() != null && !LandClaimingUtils.canBuild(p, bukkitLoc)){
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "LandClaiming"));
-                return false;
-            }
-            if (getCivsPlugin() != null && !CivsUtils.allowBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Civs"));
-                return false;
-            }
-            if (getLandsPlugin() != null && !LandsUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Lands"));
-                return false;
-            }
-            if (getSuperiorSkyblockPlugin() != null && !SuperiorSkyblockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SuperiorSkyblock"));
-                return false;
-            }
-            if (getSkyBlockPlugin() != null && !SkyBlockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "SkyBlock"));
-                return false;
-            }
-            if (getIslandWorldPlugin() != null && !IslandWorldUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "IslandWorld"));
-                return false;
-            }
-            if (getBentoBoxPlugin() != null && !BentoBoxUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "BentoBox"));
-                return false;
-            }
-            if (getAcidIslandPlugin() != null && !AcidIslandUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "AcidIsland"));
-                return false;
-            }
-            if (getaSkyBlockPlugin() != null && !ASkyBlockUtils.canBuild(p, bukkitLoc)) {
-                p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "ASkyBlock"));
                 return false;
             }
             if (test.name().endsWith("AIR") || Settings.blocksToIgnore.contains(test)){
@@ -838,37 +452,5 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     public Movecraft getMovecraftPlugin() {
         return movecraftPlugin;
-    }
-
-    public boolean isFactionsUUIDInstalled() {
-        return factionsUUIDInstalled;
-    }
-
-    public IridiumSkyblock getIridiumSkyblockPlugin() {
-        return iridiumSkyblockPlugin;
-    }
-
-    public IslandWorld getIslandWorldPlugin() {
-        return islandWorldPlugin;
-    }
-
-    public Main getSkyBlockPlugin() {
-        return skyBlockPlugin;
-    }
-
-    public BentoBox getBentoBoxPlugin() {
-        return bentoBoxPlugin;
-    }
-
-    public SuperiorSkyblock getSuperiorSkyblockPlugin() {
-        return superiorSkyblockPlugin;
-    }
-
-    public com.wasteofplastic.acidisland.ASkyBlock getAcidIslandPlugin() {
-        return acidIslandPlugin;
-    }
-
-    public ASkyBlock getaSkyBlockPlugin() {
-        return aSkyBlockPlugin;
     }
 }
