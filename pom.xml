@@ -22,7 +22,6 @@
             <id>p2-repo</id>
             <url>http://ci.athion.net/job/PlotSquared-Legacy/ws/mvn/</url>
         </repository>
-
     </repositories>
     <dependencies>
         <dependency>
@@ -40,7 +39,5 @@
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
         </dependency>
-
     </dependencies>
-
 </project>
