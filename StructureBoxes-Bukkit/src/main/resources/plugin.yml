@@ -1,29 +1,13 @@
 name: StructureBoxes
 main: io.github.eirikh1996.structureboxes.StructureBoxes
 version: '${project.version}'
-api-version: 1.13
+api-version: 1.14
 author: eirikh1996
 depend:
   - WorldEdit
 softdepend:
   - WorldGuard
-  - RedProtect
-  - Factions
-  - Civs
-  - Lands
-  - LandClaiming
-  - GriefPrevention
-  - Kingdoms
-  - Towny
   - Movecraft
-  - PlotSquared
-  - IridiumSkyblock
-  - SkyBlock
-  - BentoBox
-  - SuperiorSkyblock
-  - IslandWorld
-  - AcidIsland
-  - ASkyBlock
 commands:
   structurebox:
     aliases:
