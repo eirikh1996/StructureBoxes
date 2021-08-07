@@ -60,10 +60,9 @@
         <!--Movecraft-->
         <dependency>
             <groupId>net.countercraft</groupId>
-            <artifactId>Movecraft</artifactId>
+            <artifactId>movecraft</artifactId>
             <version>LATEST</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../../Movecraft/target/Movecraft.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>

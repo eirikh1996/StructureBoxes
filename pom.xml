@@ -22,6 +22,17 @@
             <id>p2-repo</id>
             <url>http://ci.athion.net/job/PlotSquared-Legacy/ws/mvn/</url>
         </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub APDevTeam/Movecraft Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/APDevTeam/Movecraft</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
