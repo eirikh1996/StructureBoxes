@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>structureboxes-bukkit</artifactId>
   <name>StructureBoxes-Bukkit</name>
-  <version>3.3</version>
+  <version>3.4</version>
   <build>
     <resources>
       <resource>
@@ -32,7 +32,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -62,12 +62,12 @@
   </build>
   <repositories>
     <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-    <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
     <repository>
       <id>redprotect-repo</id>
@@ -84,9 +84,9 @@
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.16.5-R0.1-SNAPSHOT</version>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.18.1-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

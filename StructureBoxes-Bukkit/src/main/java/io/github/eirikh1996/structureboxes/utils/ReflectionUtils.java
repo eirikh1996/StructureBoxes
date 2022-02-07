@@ -21,7 +21,7 @@ public class ReflectionUtils {
         try {
             return clazz.getDeclaredMethod(methodName, params);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }

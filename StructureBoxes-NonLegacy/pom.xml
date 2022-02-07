@@ -14,8 +14,8 @@
     <name>StructureBoxes-NonLegacy</name>
     <version>NonLegacy</version>
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>16</java.version>
     </properties>
     <repositories>

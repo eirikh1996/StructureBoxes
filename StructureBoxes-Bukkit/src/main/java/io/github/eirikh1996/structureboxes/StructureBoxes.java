@@ -20,7 +20,6 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.region.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.*;
-import lombok.SneakyThrows;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
@@ -111,7 +110,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
     }
 
-    @SneakyThrows
     @Override
     public void onEnable() {
         final String[] LOCALES = {"en", "no", "it", "zhcn"};
@@ -186,7 +184,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
         boolean foundRegionProvider = false;
-        Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (worldGuardPlugin != null){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - WorldGuard detected"));
@@ -234,7 +231,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     EventPriority.NORMAL,
                     FactionsFlagManager.getInstance(),
                     this);
-        } else if (FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
+        } else if (factionsUUIDInstalled && FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             foundRegionProvider = true;
             factionsUUIDInstalled = true;
@@ -373,10 +370,16 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             } catch (ClassNotFoundException e) {
                 movecraft8 = false;
             }
-            Class<?> clazz = Class.forName("io.github.eirikh1996.structureboxes.movecraft.v" + (movecraft8 ? "8" : "7") + ".MovecraftListener");
-            if (Listener.class.isAssignableFrom(clazz)) {
-                getServer().getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
+            Class<?> clazz = null;
+            try {
+                clazz = Class.forName("io.github.eirikh1996.structureboxes.movecraft.v" + (movecraft8 ? "8" : "7") + ".MovecraftListener");
+                if (Listener.class.isAssignableFrom(clazz)) {
+                    getServer().getPluginManager().registerEvents((Listener) clazz.getDeclaredConstructor().newInstance(), this);
+                }
+            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
+
 
             movecraftPlugin = (Movecraft) movecraft;
             foundRegionProvider = true;

@@ -20,12 +20,20 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.16.5-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.27" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:31.0.1-jre" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:3.12.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" name="Maven: net.md-5:bungeecord-chat:1.16-R0.4" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.30" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.13.2-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.8.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
@@ -36,20 +44,15 @@
     <orderEntry type="module" module-name="StructureBoxes-WE7" />
     <orderEntry type="module" module-name="StructureBoxes-NonLegacy" />
     <orderEntry type="library" name="Maven: com.github.intellectualsites.plotsquared:PlotSquared-API:latest" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.6" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-api:3.0.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-adapter-bukkit:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.github.Sauilitired:Jenkins4J:2.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.retrofit2:retrofit:2.4.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okhttp3:okhttp:3.14.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.squareup.okio:okio:2.2.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.3.30" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.30" level="project" />
-    <orderEntry type="library" name="Maven: com.plotsquared:PlotSquared:5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.projectlombok:lombok:1.18.12" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-api:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-gson:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-legacy:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-plain:3.0.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.3.61" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.61" level="project" />
+    <orderEntry type="library" name="Maven: com.plotsquared:PlotSquared:5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-FactionsUUID" />
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:LATEST">
@@ -73,7 +76,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-yaml:3.6.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-hocon:3.6.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-core:3.6.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.checkerframework:checker-qual:2.4.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.typesafe:config:1.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3" level="project" />
     <orderEntry type="module-library">
