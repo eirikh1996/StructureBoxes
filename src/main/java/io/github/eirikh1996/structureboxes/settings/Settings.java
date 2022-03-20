@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class Settings {
     public static String locale;
-    public static boolean FAWE, IsLegacy, UsePS5, Debug;
+    public static boolean FAWE, Debug;
     public static Object StructureBoxItem;
     public static String StructureBoxLore;
     public static String StructureBoxPrefix, PluginPrefix;
@@ -16,7 +16,7 @@ public class Settings {
     public static List<String> AlternativePrefixes = new ArrayList<>();
     public static boolean RestrictToRegionsEnabled, RequirePermissionPerStructureBox, IncrementalPlacement = false;
     public static List<String> RestrictToRegionsExceptions = new ArrayList<>();
-    public static Set blocksToIgnore = new HashSet<>();
+    public static Set<Object> blocksToIgnore = new HashSet<>();
     public static int MaxStructureSize;
     public static long MaxSessionTime;
     public static int IncrementalPlacementDelay = 1;

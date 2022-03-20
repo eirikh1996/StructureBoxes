@@ -63,7 +63,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         instance = this;
         String packageName = getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf(".") + 1);
-        Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -85,11 +84,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
 
-        if (Settings.IsLegacy){
-            saveLegacyConfig();
-        } else {
-            saveDefaultConfig();
-        }
+        saveDefaultConfig();
         readConfig();
 
         if (!I18nSupport.initialize(getDataFolder()))
@@ -105,18 +100,16 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             return;
         }
         //if on 1.13 and up, Check if FAWE is installed
-        if (!Settings.IsLegacy) {
-            try {
-                Class.forName("com.boydti.fawe.bukkit.FaweBukkit");
-                Settings.FAWE = true;
-            } catch (ClassNotFoundException e) {
-                Settings.FAWE = false;
-            }
+        try {
+            Class.forName("com.boydti.fawe.bukkit.FaweBukkit");
+            Settings.FAWE = true;
+        }
+        catch (ClassNotFoundException e) {
+            Settings.FAWE = false;
         }
 
         String weVersion = worldEditPlugin.getDescription().getVersion();
 
-        int versionNumber = Settings.IsLegacy ? 6 : 7;
         final Map data;
         try {
             File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
@@ -130,24 +123,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
         File schemDir = new File(worldEditPlugin.getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
-
-        //Check if there is a compatible version of WorldEdit
-        try {
-            final Class weHandler = Class.forName("io.github.eirikh1996.structureboxes.compat.we" + versionNumber + ".IWorldEditHandler");
-            if (WorldEditHandler.class.isAssignableFrom(weHandler)){
-                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(File.class, SBMain.class).newInstance(schemDir , this);
-            }
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            getLogger().severe(I18nSupport.getInternationalisedString("Startup - Unsupported WorldEdit"));
-            getLogger().severe(String.format(I18nSupport.getInternationalisedString("Startup - Requires WorldEdit 6.0.0 or 7.0.0"), weVersion));
-            getLogger().severe(I18nSupport.getInternationalisedString("Startup - Will be disabled"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        worldEditHandler = new WorldEditHandler(schemDir, this);
 
         boolean foundRegionProvider = false;
-        Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
-        //Check for WorldGuard
+        // Check for WorldGuard
         if (worldGuardPlugin != null){
             getLogger().info(I18nSupport.getInternationalisedString("Startup - WorldGuard detected"));
             foundRegionProvider = true;
@@ -176,7 +155,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
 
-        this.getCommand("structurebox").setExecutor(new StructureBoxCommand());
+        getCommand("structurebox").setExecutor(new StructureBoxCommand());
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);

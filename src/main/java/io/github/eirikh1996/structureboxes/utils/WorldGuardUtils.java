@@ -66,17 +66,7 @@ public class WorldGuardUtils {
 
     public static void registerFlag() {
         FlagRegistry flags;
-        if (Settings.IsLegacy) {
-            try {
-                final Method getFlagRegistry = WorldGuardPlugin.class.getDeclaredMethod("getFlagRegistry");
-                flags = (FlagRegistry) getFlagRegistry.invoke(StructureBoxes.getInstance().getWorldGuardPlugin());
-            } catch (Exception e) {
-                return;
-            }
-
-        } else {
-            flags = WorldGuard.getInstance().getFlagRegistry();
-        }
+        flags = WorldGuard.getInstance().getFlagRegistry();
         flags.register(STRUCTUREBOX_FLAG);
     }
 
