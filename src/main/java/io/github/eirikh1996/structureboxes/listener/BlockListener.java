@@ -8,9 +8,8 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
-import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +21,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 import static io.github.eirikh1996.structureboxes.utils.RegionUtils.isWithinRegion;
@@ -122,10 +126,6 @@ public class BlockListener implements Listener {
             event.getPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Must be within region"));
             event.setCancelled(true);
             return;
-        }
-        ItemManager.getInstance().addItem(event.getPlayer().getUniqueId(), event.getItemInHand());
-        if (Settings.Debug){
-            broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
 
         if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new WorldEditLocation(placed))) {

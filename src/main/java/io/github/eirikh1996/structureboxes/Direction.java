@@ -7,21 +7,22 @@ public enum Direction {
     WEST(270);
 
     private final int angle;
+
     Direction(int angle){
         this.angle = angle;
     }
+
     public static Direction fromYaw(final float yaw){
         Direction dir = null;
         double angle = yaw > 0 ? yaw : 360f + yaw;
-        if (angle > 315f || angle <=45f){
+        if (angle > 315f || angle <=45f)
             dir = SOUTH;
-        } else if (angle > 45f && angle <=135f){
+        else if (angle > 45f && angle <=135f)
             dir = WEST;
-        } else if (angle > 135f && angle <=225f){
+        else if (angle > 135f && angle <=225f)
             dir = NORTH;
-        } else if (angle > 225f && angle <=315f){
+        else if (angle > 225f && angle <=315f)
             dir = EAST;
-        }
         return dir;
     }
 
@@ -94,28 +95,5 @@ public enum Direction {
                 break;
         }
         return angle;
-    }
-
-    public int getAngle() {
-        return angle;
-    }
-
-    public Direction getOpposite(){
-        Direction ret = null;
-        switch (this){
-            case EAST:
-                ret = WEST;
-                break;
-            case WEST:
-                ret = EAST;
-                break;
-            case NORTH:
-                ret = SOUTH;
-                break;
-            case SOUTH:
-                ret = NORTH;
-                break;
-        }
-        return ret;
     }
 }

@@ -5,8 +5,4 @@ import java.util.TimerTask;
 
 public abstract class IncrementalPlacementTask extends TimerTask {
     protected final LinkedList<Location> placedLocations = new LinkedList<>();
-
-    public LinkedList<Location> getPlacedLocations() {
-        return placedLocations;
-    }
 }

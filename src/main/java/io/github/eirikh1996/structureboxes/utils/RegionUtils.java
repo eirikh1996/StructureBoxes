@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class RegionUtils {
-
     public static boolean isWithinRegion(Location location){
         boolean worldguard = false;
         StructureBoxes structureBoxes = StructureBoxes.getInstance();
@@ -15,14 +14,4 @@ public class RegionUtils {
 
         return worldguard;
     }
-
-    public static boolean canPlaceStructure(Player player, Location loc) {
-        boolean worldguard = false;
-        final StructureBoxes sb = StructureBoxes.getInstance();
-        if (sb.getWorldGuardPlugin() != null) {
-            worldguard = WorldGuardUtils.canPlaceStructureBox(player, loc);
-        }
-        return worldguard;
-    }
-
 }

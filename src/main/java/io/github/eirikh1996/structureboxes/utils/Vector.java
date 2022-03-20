@@ -52,7 +52,7 @@ public class Vector implements Comparable<Vector>, Serializable, Cloneable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    protected Object clone() {
         return new Vector(x, y, z);
     }
 }

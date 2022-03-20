@@ -32,37 +32,21 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.logging.Level;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
-public class StructureBoxes extends JavaPlugin implements SBMain {
+public class StructureBoxes extends JavaPlugin {
     private static StructureBoxes instance;
     private WorldGuardPlugin worldGuardPlugin;
     private WorldEditPlugin worldEditPlugin;
     private WorldEditHandler worldEditHandler;
 
-    private Movecraft movecraftPlugin;
     private boolean startup = true;
-
-    private static Method GET_MATERIAL;
-
-    static {
-        try {
-            GET_MATERIAL = Material.class.getDeclaredMethod("getMaterial", int.class);
-        } catch (NoSuchMethodException e) {
-            GET_MATERIAL = null;
-        }
-    }
 
     @Override
     public void onLoad() {
         instance = this;
-        String packageName = getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf(".") + 1);
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -108,8 +92,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.FAWE = false;
         }
 
-        String weVersion = worldEditPlugin.getDescription().getVersion();
-
         final Map data;
         try {
             File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
@@ -145,7 +127,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         if (movecraft instanceof Movecraft) {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Movecraft detected"));
             getServer().getPluginManager().registerEvents(new MovecraftListener(), this);
-            movecraftPlugin = (Movecraft) movecraft;
             foundRegionProvider = true;
         }
         //If no compatible protection plugin is found, disable region restriction if it is on
@@ -182,12 +163,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return worldEditPlugin;
     }
 
-    @Override
     public WorldEditHandler getWorldEditHandler() {
         return worldEditHandler;
     }
 
-    @Override
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
         boolean withinRegion = true;
         for (Location loc : locations){
@@ -217,12 +196,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return true;
     }
 
-    @Override
-    public Platform getPlatform() {
-        return Platform.BUKKIT;
-    }
-
-    @Override
     public void clearStructure(Structure structure) {
         final Player sender = Bukkit.getPlayer(structure.getOwner());
         Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
@@ -273,7 +246,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }.runTaskTimer(StructureBoxes.getInstance(), 0, Settings.IncrementalPlacement ? Settings.IncrementalPlacementDelay : 3);
     }
 
-    @Override
     public boolean isFreeSpace(UUID playerID, String schematicName, Collection<Location> locations) {
         final HashMap<Location, Object> originalBlocks = new HashMap<>();
         @NotNull final Player p = getServer().getPlayer(playerID);
@@ -304,27 +276,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         return true;
     }
 
-    private void saveLegacyConfig(){
-
-        File configFile = new File(getDataFolder(), "config.yml");
-        if (configFile.exists())
-            return;
-        saveResource("src/main/resources/config_legacy.yml", false);
-        File legacyConfigFile = new File(getDataFolder(), "src/main/resources/config_legacy.yml");
-        legacyConfigFile.renameTo(configFile);
-    }
-
-    @Override
     public void sendMessageToPlayer(UUID recipient, String message) {
         Bukkit.getPlayer(recipient).sendMessage(I18nSupport.getInternationalisedString(message));
     }
 
-    @Override
-    public void logMessage(Level level, String message) {
-        getLogger().log(level, message);
-    }
-
-    @Override
     public void clearInterior(Collection<Location> interior) {
         for (Location location : interior){
             org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
@@ -336,24 +291,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
     }
 
-    @Override
     public void scheduleSyncTask(final Runnable runnable) {
         getServer().getScheduler().runTask(this, runnable);
     }
 
-    @Override
-    public void scheduleSyncTaskLater(Runnable runnable, long delay) {
-        long ticks = (delay / 1000) * 20;
-        ticks = Math.max(ticks, 1);
-        getServer().getScheduler().runTaskLater(this, runnable, ticks);
-    }
-
-    @Override
-    public void scheduleAsyncTask(final Runnable runnable) {
-        getServer().getScheduler().runTaskAsynchronously(this, runnable);
-    }
-
-    @Override
     public void broadcast(String s) {
         getServer().broadcastMessage(s);
     }
@@ -393,29 +334,18 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         Settings.MaxStructureSize = getConfig().getInt("Max Structure Size", 10000);
         Settings.Debug = getConfig().getBoolean("Debug", false);
         ConfigurationSection freeSpace = getConfig().getConfigurationSection("Free space");
-        List materials = freeSpace.getList("Blocks to ignore");
+        List<?> materials = freeSpace.getList("Blocks to ignore");
         for (Object obj : materials) {
-            Material type = null;
-            if (obj == null){
-                continue;
-            }
-            else if (obj instanceof Integer) {
-                int id = (int) obj;
-                if (GET_MATERIAL == null){
-                    throw new IllegalArgumentException("Numerical block IDs are not supported by this server version: " + getServer().getVersion());
-                }
-                try {
-                    type = (Material) GET_MATERIAL.invoke(Material.class, id);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            } else if (obj instanceof String){
+            Material type;
+            if (obj instanceof String) {
                 String str = (String) obj;
                 type = Material.getMaterial(str.toUpperCase());
             }
-            if (type == null){
+            else
                 continue;
-            }
+
+            if (type == null)
+                continue;
             Settings.blocksToIgnore.add(type);
         }
         Settings.CheckFreeSpace = freeSpace.getBoolean("Require free space", true);
@@ -425,10 +355,5 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.IncrementalPlacementBlocksPerTick = incrementalPlacement.getInt("Blocks per tick", 1);
             Settings.IncrementalPlacementDelay = incrementalPlacement.getInt("Delay", 1);
         }
-
-    }
-
-    public Movecraft getMovecraftPlugin() {
-        return movecraftPlugin;
     }
 }

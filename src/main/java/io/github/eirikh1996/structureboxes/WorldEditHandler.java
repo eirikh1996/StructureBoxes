@@ -37,7 +37,7 @@ import static java.lang.Math.PI;
 
 public class WorldEditHandler {
     protected final File schemDir;
-    protected final SBMain sbMain;
+    protected final StructureBoxes sbMain;
     protected final Map<UUID, IncrementalPlacementTask> playerIncrementPlacementMap = new HashMap<>();
 
     @NotNull private static final Map<BlockType, MultiStageReorder.PlacementPriority> priorityMap;
@@ -56,7 +56,7 @@ public class WorldEditHandler {
     }
 
 
-    public WorldEditHandler(File schemDir, SBMain sbMain){
+    public WorldEditHandler(File schemDir, StructureBoxes sbMain) {
        this.schemDir = schemDir;
        this.sbMain = sbMain;
     }

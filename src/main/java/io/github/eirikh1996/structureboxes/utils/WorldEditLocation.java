@@ -25,10 +25,6 @@ public class WorldEditLocation {
         return world;
     }
 
-    public UUID getWorldID() {
-        return worldID;
-    }
-
     public io.github.eirikh1996.structureboxes.utils.Location toSBloc() {
         return new io.github.eirikh1996.structureboxes.utils.Location(getWorld().getName(), getX(), getY(), getZ());
     }

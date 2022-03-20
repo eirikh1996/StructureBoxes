@@ -10,18 +10,8 @@ public class StructureManager implements Iterable<Structure>, Runnable {
     private final Set<Structure> structures = new HashSet<>();
     private Map<UUID, Collection<Location>> structurePlayerMap = new HashMap<>();
     private final Map<UUID,  LinkedList<AbstractMap.SimpleImmutableEntry<Long,AbstractMap.SimpleImmutableEntry<String, HashMap<Location, Object>>>>> playerTimeStructureMap = new HashMap<>();
-    private SBMain sbMain;
+    private StructureBoxes sbMain;
     private StructureManager() {}
-
-    public boolean isPartOfStructure(Location location){
-        for (Structure structure : structures) {
-            if (!structure.getStructure().contains(location)) {
-                continue;
-            }
-            return true;
-        }
-        return false;
-    }
 
     public Structure getCorrespondingStructure(Collection<Location> locations) {
         for (Structure structure : structures) {
@@ -95,10 +85,6 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         return null;
     }
 
-    public void addStructure(Structure structure){
-        structures.add(structure);
-    }
-
     public void removeStructure(Structure structure){
         structures.remove(structure);
     }
@@ -113,10 +99,6 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         return StructureManagerHolder.instance;
     }
 
-    public Collection<Location> getStructureByPlayer(UUID id){
-        return structurePlayerMap.get(id);
-    }
-
     public void addStructureByPlayer(UUID id, Collection<Location> structure){
         structurePlayerMap.put(id, structure);
     }
@@ -126,11 +108,7 @@ public class StructureManager implements Iterable<Structure>, Runnable {
         processRemovalOfSavedStructures();
     }
 
-    public SBMain getSbMain() {
-        return sbMain;
-    }
-
-    public void setSbMain(SBMain sbMain) {
+    public void setSbMain(StructureBoxes sbMain) {
         this.sbMain = sbMain;
     }
 
