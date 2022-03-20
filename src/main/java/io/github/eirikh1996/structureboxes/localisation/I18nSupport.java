@@ -1,17 +1,16 @@
 package io.github.eirikh1996.structureboxes.localisation;
 
-import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class I18nSupport {
     private static Properties languageFile;
-    private static SBMain main;
 
-    public static boolean initialize(File datafolder, SBMain sbmain){
-        main = sbmain;
+    public static boolean initialize(File datafolder){
         languageFile = new Properties();
         final File file = new File(datafolder.getAbsolutePath() + "/localisation/lang_" + Settings.locale + ".properties");
         try {

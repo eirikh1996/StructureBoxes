@@ -92,9 +92,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         readConfig();
 
-        if (!I18nSupport.initialize(getDataFolder(), this)){
+        if (!I18nSupport.initialize(getDataFolder()))
             return;
-        }
+
         worldEditPlugin = (WorldEditPlugin) getServer().getPluginManager().getPlugin("WorldEdit");
         //This plugin requires WorldEdit in order to load. Therefore, assert that WorldEdit is not null when this enables
         assert worldEditPlugin != null;
