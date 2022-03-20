@@ -5,6 +5,7 @@ import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.utils.MovecraftUtils;
 import net.countercraft.movecraft.MovecraftLocation;
+import net.countercraft.movecraft.craft.PilotedCraft;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftRotateEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
@@ -19,15 +20,15 @@ public class MovecraftListener implements Listener {
 
     @EventHandler
     public void onCraftDetect(CraftDetectEvent event) {
-        if (event.getCraft().getNotificationPlayer() == null) {
+        if (!(event.getCraft() instanceof PilotedCraft))
             return;
-        }
+
         Structure structure;
         HitBox hitbox = event.getCraft().getHitBox();
         for (MovecraftLocation ml : hitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
-                event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Session will expire"));
+                ((PilotedCraft) event.getCraft()).getPilot().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Session will expire"));
                 break;
             }
         }
@@ -35,15 +36,15 @@ public class MovecraftListener implements Listener {
 
     @EventHandler
     public void onCraftTranslate(CraftTranslateEvent event) {
-        if (event.getCraft().getNotificationPlayer() == null) {
+        if (!(event.getCraft() instanceof PilotedCraft))
             return;
-        }
+
         Structure structure;
         HitBox oldHitbox = event.getOldHitBox();
         for (MovecraftLocation ml : oldHitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
-                event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
+                ((PilotedCraft) event.getCraft()).getPilot().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
                 StructureManager.getInstance().removeStructure(structure);
                 break;
             }
@@ -52,15 +53,15 @@ public class MovecraftListener implements Listener {
 
     @EventHandler
     public void onCraftRotate(CraftRotateEvent event) {
-        if (event.getCraft().getNotificationPlayer() == null) {
+        if (!(event.getCraft() instanceof PilotedCraft))
             return;
-        }
+
         Structure structure;
         HitBox oldHitbox = event.getOldHitBox();
         for (MovecraftLocation ml : oldHitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
-                event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
+                ((PilotedCraft) event.getCraft()).getPilot().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
                 StructureManager.getInstance().removeStructure(structure);
                 break;
             }
@@ -69,15 +70,15 @@ public class MovecraftListener implements Listener {
 
     @EventHandler
     public void onSink(CraftSinkEvent event) {
-        if (event.getCraft().getNotificationPlayer() == null) {
+        if (!(event.getCraft() instanceof PilotedCraft))
             return;
-        }
+
         Structure structure;
         HitBox hitbox = event.getCraft().getHitBox();
         for (MovecraftLocation ml : hitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
-                event.getCraft().getNotificationPlayer().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
+                ((PilotedCraft) event.getCraft()).getPilot().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion"));
                 StructureManager.getInstance().removeStructure(structure);
                 break;
             }
