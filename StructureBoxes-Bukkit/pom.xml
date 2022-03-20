@@ -24,6 +24,21 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.sk89q.com/repo</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub APDevTeam/Movecraft Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/APDevTeam/Movecraft</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <dependencies>
         <!--Spigot API-->
@@ -54,18 +69,10 @@
             <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
-        <!--StructureBoxes dependencies-->
         <dependency>
-            <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-core</artifactId>
-            <version>Core</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-we7</artifactId>
-            <version>WE7</version>
-            <type>jar</type>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.0.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -85,7 +92,7 @@
                 </includes>
             </resource>
         </resources>
-        <finalName>StructureBoxes-Bukkit</finalName>
+        <finalName>StructureBoxes</finalName>
         <directory>target</directory>
         <plugins>
             <plugin>
@@ -93,8 +100,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.7.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>13</source>
+                    <target>13</target>
                 </configuration>
             </plugin>
             <plugin>
