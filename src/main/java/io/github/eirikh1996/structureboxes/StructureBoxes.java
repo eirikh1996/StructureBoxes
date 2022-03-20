@@ -67,7 +67,6 @@ public class StructureBoxes extends JavaPlugin {
 
         }
 
-
         saveDefaultConfig();
         readConfig();
 
