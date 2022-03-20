@@ -330,8 +330,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         File configFile = new File(getDataFolder(), "config.yml");
         if (configFile.exists())
             return;
-        saveResource("config_legacy.yml", false);
-        File legacyConfigFile = new File(getDataFolder(), "config_legacy.yml");
+        saveResource("src/main/resources/config_legacy.yml", false);
+        File legacyConfigFile = new File(getDataFolder(), "src/main/resources/config_legacy.yml");
         legacyConfigFile.renameTo(configFile);
     }
 
