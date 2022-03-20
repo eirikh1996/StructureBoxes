@@ -1,7 +1,6 @@
 package io.github.eirikh1996.structureboxes.utils;
 
 import io.github.eirikh1996.structureboxes.StructureBoxes;
-import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
