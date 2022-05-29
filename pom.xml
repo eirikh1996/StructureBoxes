@@ -7,7 +7,7 @@
     <groupId>io.github.eirikh1996</groupId>
     <artifactId>structureboxes</artifactId>
     <name>StructureBoxes</name>
-    <version>3.0.0-alpha.1</version>
+    <version>4.0.0-a.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
