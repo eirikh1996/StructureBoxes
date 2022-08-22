@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/StructureBoxes.iml" filepath="$PROJECT_DIR$/.idea/StructureBoxes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Bukkit-PS6/StructureBoxes-Bukkit-PS6.iml" filepath="$PROJECT_DIR$/StructureBoxes-Bukkit-PS6/StructureBoxes-Bukkit-PS6.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-Core/StructureBoxes-Core.iml" filepath="$PROJECT_DIR$/StructureBoxes-Core/StructureBoxes-Core.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-FactionsUUID/StructureBoxes-FactionsUUID.iml" filepath="$PROJECT_DIR$/StructureBoxes-FactionsUUID/StructureBoxes-FactionsUUID.iml" />
       <module fileurl="file://$PROJECT_DIR$/StructureBoxes-NonLegacy/StructureBoxes-NonLegacy.iml" filepath="$PROJECT_DIR$/StructureBoxes-NonLegacy/StructureBoxes-NonLegacy.iml" />

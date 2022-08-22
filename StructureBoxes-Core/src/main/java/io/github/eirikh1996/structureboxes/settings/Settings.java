@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class Settings {
     public static String locale;
-    public static boolean FAWE, IsLegacy, UsePS5, Debug;
+    public static boolean FAWE, IsLegacy, Is1_17, UsePS5, UsePS6, Debug;
     public static Object StructureBoxItem;
     public static String StructureBoxLore;
     public static String StructureBoxPrefix, PluginPrefix;

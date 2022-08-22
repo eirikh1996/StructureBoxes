@@ -9,7 +9,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -28,7 +28,7 @@
     <orderEntry type="module-library">
       <library name="Maven: net.countercraft:Movecraft:LATEST">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/Movecraft-v8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../libs/bukkit/Movecraft-8.0.0-a.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

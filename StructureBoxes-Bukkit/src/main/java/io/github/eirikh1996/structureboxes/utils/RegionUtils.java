@@ -40,7 +40,7 @@ public class RegionUtils {
             griefprevention = GriefPreventionUtils.withinClaim(location);
         }
         if (structureBoxes.isPlotSquaredInstalled()){
-            plotSquared = Settings.IsLegacy ? PlotSquaredUtils.withinPlot(location) : (Settings.UsePS5 ? PlotSquared5Utils.withinPlot(location) : PlotSquared4Utils.withinPlot(location)) ;
+            plotSquared = Settings.IsLegacy ? PlotSquaredUtils.withinPlot(location) : (Settings.UsePS6 ? PlotSquared6Utils.withinPlot(location) : (Settings.UsePS5 ? PlotSquared5Utils.withinPlot(location) : PlotSquared4Utils.withinPlot(location))) ;
         }
         if (structureBoxes.getLandClaimingPlugin() != null){
             landClaiming = LandClaimingUtils.insideClaimedLand(location);
@@ -106,7 +106,9 @@ public class RegionUtils {
             worldguard = WorldGuardUtils.canPlaceStructureBox(player, loc);
         }
         if (sb.isPlotSquaredInstalled()) {
-            if (Settings.UsePS5) {
+            if (Settings.UsePS6)
+                plotSquared = PlotSquared6Utils.canPlaceStructureBox(loc);
+            else if (Settings.UsePS5) {
                 plotSquared = PlotSquared5Utils.canPlaceStructureBox(loc);
             } else if (!Settings.IsLegacy) {
                 plotSquared = PlotSquared4Utils.canPlaceStructureBox(loc);

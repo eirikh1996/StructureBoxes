@@ -2,6 +2,7 @@ package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.google.inject.Injector;
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.engine.EnginePermBuild;
@@ -39,6 +40,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -102,6 +104,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         String packageName = getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf(".") + 1);
         Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
+        Settings.Is1_17 = Integer.parseInt(version.split("_")[1]) <= 17;
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -270,8 +273,14 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
                     Settings.UsePS5 = false;
                 }
+                try {
+                    Class.forName("com.plotsquared.bukkit.BukkitPlatform");
+                    Settings.UsePS6 = true;
+                } catch (ClassNotFoundException e) {
+                    Settings.UsePS6 = false;
+                }
             }
-            if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps))){
+            if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : (Settings.UsePS6 ? PlotSquared6Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)) )){
                 getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
                 if (Settings.IsLegacy) {
                     PlotSquaredUtils.initialize();
@@ -305,6 +314,34 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
+
+                } else if (Settings.UsePS6) {
+                    PlotSquared6Utils.initialize();
+                    PlotSquared6Utils.registerFlag();
+
+
+                    final List<RegisteredListener> registeredListeners = HandlerList.getRegisteredListeners(ps);
+                    try {
+                        Class<Listener> blockEventListenerClass = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
+                        Listener listener = null;
+                        for (RegisteredListener rl : registeredListeners) {
+                            if (!blockEventListenerClass.isInstance(rl.getListener()) || rl.getPlugin() != ps) {
+                                continue;
+                            }
+                            listener = rl.getListener();
+                            break;
+                        }
+                        getServer().getPluginManager().registerEvent(
+                                BlockPlaceEvent.class,
+                                listener,
+                                EventPriority.HIGHEST,
+                                new PlotSquared6FlagManager(),
+                                this
+                        );
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
 
                 } else {
                     PlotSquared4Utils.initialize();
@@ -676,7 +713,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                     return false;
                 }
-                if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : ( Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc)))){
+                if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : (Settings.UsePS6 ? PlotSquared6Utils.canBuild(p, bukkitLoc) : (Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc))))){
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
                     return false;
                 }

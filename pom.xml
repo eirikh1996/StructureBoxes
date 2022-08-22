@@ -18,6 +18,7 @@
         <module>StructureBoxes-NonLegacy</module>
         <module>StructureBoxes-Bukkit</module>
         <module>StructureBoxes-Sponge</module>
+        <module>StructureBoxes-Bukkit-PS6</module>
     </modules>
     <repositories>
         <repository>

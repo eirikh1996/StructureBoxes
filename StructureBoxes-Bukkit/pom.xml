@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>structureboxes-bukkit</artifactId>
     <name>StructureBoxes-Bukkit</name>
-    <version>3.4</version>
+    <version>3.5</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -40,11 +40,11 @@
 </repositories>
 
     <dependencies>
-        <!--Bukkit-->
+        <!--Spigot-->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.19.1-R0.1-SNAPSHOT</version>
         </dependency>
         <!--WorldEdit-->
         <dependency>
@@ -85,10 +85,36 @@
         </dependency>
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-bukkit-movecraft-7</artifactId>
+            <version>Movecraft-7</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-bukkit-movecraft-8</artifactId>
+            <version>Movecraft-8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
+            <artifactId>structureboxes-bukkit-ps6</artifactId>
+            <version>PS6</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.eirikh1996</groupId>
             <artifactId>structureboxes-factionsuuid</artifactId>
             <version>FactionsUUID</version>
             <type>jar</type>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.inject/guice -->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+
         <!--MassiveCore-->
         <dependency>
             <groupId>com.massivecraft</groupId>
@@ -232,18 +258,6 @@
             <version>3.0.9.4</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/bukkit/skyblock/acidisland.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-bukkit-movecraft-7</artifactId>
-            <version>Movecraft-7</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-bukkit-movecraft-8</artifactId>
-            <version>Movecraft-8</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
