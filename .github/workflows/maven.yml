@@ -7,16 +7,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout StructureBoxes
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: StructureBoxes
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2
@@ -33,7 +33,7 @@ jobs:
       - name: Rename jar
         run: mv staging/StructureBoxes*.jar staging/StructureBoxes_$GITHUB_SHA.jar
       - name: Upload jar
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: StructureBoxes_Dev-Build
           path: staging/StructureBoxes_*.jar
