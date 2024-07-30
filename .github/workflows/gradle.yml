@@ -1,0 +1,58 @@
+name: Gradle CI
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  release:
+    types: [created, prereleased]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout StructureBoxes
+        uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
+
+      - name: Build with Gradle
+        run: ./gradlew clean build --parallel
+
+      - name: Publish to GitHub Packages
+        if: ${{ github.event_name == 'release' }}
+        run: ./gradlew publish --parallel
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Stage jar for Actions
+        if: ${{ github.event_name != 'release' }}
+        run: mkdir staging && cp build/libs/StructureBoxes.jar staging && mv staging/StructureBoxes.jar staging/StructureBoxes_$GITHUB_SHA.jar
+      - name: Upload jar to Actions
+        if: ${{ github.event_name != 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: StructureBoxes_Dev-Build
+          path: staging/StructureBoxes_*.jar
+
+      - name: Stage jar for Release
+        if: ${{ github.event_name == 'release' }}
+        run: mkdir staging && cp build/libs/StructureBoxes.jar staging && mv staging/StructureBoxes.jar staging/StructureBoxes_${{ github.event.release.tag_name }}.jar
+      - name: Upload jar to Release
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: staging/StructureBoxes_${{ github.event.release.tag_name }}.jar

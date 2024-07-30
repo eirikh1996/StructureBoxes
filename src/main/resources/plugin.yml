@@ -1,7 +1,7 @@
 name: StructureBoxes
 main: io.github.eirikh1996.structureboxes.StructureBoxes
-version: '${project.version}'
-api-version: 1.14
+version: '${projectVersion}'
+api-version: 1.18
 author: eirikh1996
 depend:
   - WorldEdit
