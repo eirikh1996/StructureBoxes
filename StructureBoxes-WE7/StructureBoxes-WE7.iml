@@ -21,8 +21,8 @@
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.26" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-Core" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
   </component>

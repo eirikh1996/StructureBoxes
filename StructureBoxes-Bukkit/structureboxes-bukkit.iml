@@ -20,46 +20,60 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.spigotmc:spigot-api:1.19.1-R0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:31.0.1-jre" level="project" />
+    <orderEntry type="library" name="Maven: org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:32.1.2-jre" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
-    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:3.12.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.7.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
-    <orderEntry type="library" name="Maven: net.md-5:bungeecord-chat:1.16-R0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.30" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.13.2-R0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.8.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.18.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.joml:joml:1.10.5" level="project" />
+    <orderEntry type="library" name="Maven: net.md-5:bungeecord-chat:1.20-R0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.3.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-Core" />
     <orderEntry type="module" module-name="StructureBoxes-WE6" />
     <orderEntry type="module" module-name="StructureBoxes-WE7" />
     <orderEntry type="module" module-name="StructureBoxes-NonLegacy" />
-    <orderEntry type="library" name="Maven: com.github.intellectualsites.plotsquared:PlotSquared-API:latest" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.projectlombok:lombok:1.18.12" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-api:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-gson:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-legacy:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: net.kyori:text-serializer-plain:3.0.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.3.61" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.61" level="project" />
-    <orderEntry type="library" name="Maven: com.plotsquared:PlotSquared:5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20190722" level="project" />
+    <orderEntry type="library" name="Maven: org.bukkit:bukkit:1.14.4-R0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="module" module-name="structureboxes-bukkit-movecraft-7" />
     <orderEntry type="module" module-name="structureboxes-bukkit-movecraft-8" />
-    <orderEntry type="module" module-name="StructureBoxes-Bukkit-PS6" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.plotsquared:plotsquared-core:7.3.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-api:4.17.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-key:4.17.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:examination-api:1.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:examination-string:1.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-text-minimessage:4.17.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.inject.extensions:guice-assistedinject:7.0.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.spotbugs:spotbugs-annotations:4.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.prtree:PRTree:2.0.1" level="project" />
+    <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: cloud.commandframework:cloud-services:1.8.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.leangen.geantyref:geantyref:1.3.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.arkitektonika:Arkitektonika-Client:2.1.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.http:HTTP4J:1.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.paster:Paster:1.1.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.informative-annotations:informative-annotations:1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.checkerframework:checker-qual:3.45.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.19.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.intellectualsites.plotsquared:plotsquared-bukkit:7.3.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.papermc:paperlib:1.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.enginehub:squirrelid:0.3.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: dev.notmyfault.serverlib:ServerLib:2.3.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-platform-bukkit:4.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-platform-api:4.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-text-serializer-bungeecord:4.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-text-serializer-legacy:4.13.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-nbt:4.13.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-text-serializer-gson:4.13.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-text-serializer-gson-legacy-impl:4.13.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-platform-facet:4.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.kyori:adventure-platform-viaversion:4.3.3" level="project" />
     <orderEntry type="module" module-name="StructureBoxes-FactionsUUID" />
     <orderEntry type="library" name="Maven: com.google.inject:guice:5.1.0" level="project" />
     <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.massivecraft:MassiveCore:LATEST">
         <CLASSES>
@@ -78,25 +92,13 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-yaml:3.6.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-hocon:3.6.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.spongepowered:configurate-core:3.6.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.typesafe:config:1.3.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3" level="project" />
+    <orderEntry type="library" name="Maven: io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.1" level="project" />
+    <orderEntry type="library" name="Maven: io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.1" level="project" />
+    <orderEntry type="library" name="Maven: io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:javadoc:8.1.1" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: me.ryanhamshire:GriefPrevention:LATEST">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/bukkit/GriefPrevention.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="Maven: com.plotsquared:plotsquared-api:latest">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../libs/bukkit/PlotSquared-Bukkit-19.09.07-f27e556-781.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -196,14 +198,21 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: de.schlichtherle:truezip:6.8.3" level="project" />
-    <orderEntry type="library" name="Maven: org.mozilla:rhino:1.7.11" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.26" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.4.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.4.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4:4.13.1" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:ST4:4.3.4" level="project" />
+    <orderEntry type="library" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.ibm.icu:icu4j:72.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mozilla:rhino-runtime:1.7.13" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q.lib:jlibnoise:1.0.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: it.unimi.dsi:fastutil:8.5.12" level="project" />
+    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.13.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
   </component>

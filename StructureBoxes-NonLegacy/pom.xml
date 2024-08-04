@@ -19,24 +19,10 @@
         <java.version>16</java.version>
     </properties>
     <repositories>
-        <!-- PlotSquared repository -->
-        <repository>
-            <id>p2-repo</id>
-            <url>https://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/</url>
-        </repository>
-        <repository>
-            <id>plotsquared</id>
-            <url>https://plotsquared.com/mvn/</url>
-        </repository>
         <!-- Jenkins4J -->
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
-        </repository>
-        <!-- WorldEdit -->
-        <repository>
-            <id>sk89q</id>
-            <url>https://maven.sk89q.com/repo/</url>
         </repository>
     </repositories>
     <build>
@@ -68,17 +54,6 @@
             <version>3.2.3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/bukkit/Factions 3.2.3/Factions.jar</systemPath>
-        </dependency>
-        <!-- PlotSquared API -->
-        <dependency>
-            <groupId>com.github.intellectualsites.plotsquared</groupId>
-            <artifactId>PlotSquared-API</artifactId>
-            <version>latest</version>
-        </dependency>
-        <dependency>
-            <groupId>com.plotsquared</groupId>
-            <artifactId>PlotSquared</artifactId>
-            <version>5.1</version> <!-- Or 'latest' -->
         </dependency>
         <dependency>
             <groupId>io.github.eirikh1996</groupId>

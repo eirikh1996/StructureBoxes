@@ -1,80 +1,49 @@
 package io.github.eirikh1996.structureboxes.utils;
 
 
-import com.intellectualcrafters.plot.IPlotMain;
-import com.intellectualcrafters.plot.api.PlotAPI;
-import com.intellectualcrafters.plot.flag.BooleanFlag;
-import com.intellectualcrafters.plot.object.Plot;
-import org.bukkit.Bukkit;
+
+import com.plotsquared.bukkit.generator.BukkitPlotGenerator;
+import com.plotsquared.core.PlotAPI;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.flag.FlagContainer;
+import com.plotsquared.core.plot.flag.GlobalFlagContainer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 public class PlotSquaredUtils {
     private static Map<String, Object> worlds;
-    private static IPlotMain ps;
-    public static final BooleanFlag STRUCTUREBOX_FLAG = new BooleanFlag("structurebox");
+    public static final StructureboxFlag STRUCTUREBOX_FLAG = new StructureboxFlag();
     private PlotSquaredUtils() {
 
-    }
-    public static void initialize(){
-        ps = (IPlotMain) Bukkit.getServer().getPluginManager().getPlugin("PlotSquared");
-        final File worldsFile = new File(ps.getDirectory(), "config/worlds.yml");
-        if (!worldsFile.exists()) {
-            return;
-        }
-        Yaml yaml = new Yaml();
-        final Map data;
-        try {
-            data = yaml.load(new FileInputStream(worldsFile));
-        } catch (FileNotFoundException e) {
-            throw new PlotSquaredWorldsConfigException("Something went wrong when loading PlotSquared worlds file", e);
-        }
-        worlds = data == null ? new HashMap<>() : (Map<String, Object>) data.getOrDefault("worlds", Collections.emptyMap());
     }
 
     public static boolean canBuild(Player player, org.bukkit.Location location){
 
-        if (worlds == null || !worlds.containsKey(location.getWorld().getName())){
+        if (!(location.getWorld().getGenerator() instanceof BukkitPlotGenerator)){
             return true;
         }
 
         final PlotAPI plotAPI = new PlotAPI();
 
-        Plot plot = plotAPI.getPlot(location);
+        Plot plot = Plot.getPlot(bukkitToPSLoc(location));
         if (plot == null){
             return false;
         }
-        return plot.isAdded(player.getUniqueId()) || plot.getFlag(STRUCTUREBOX_FLAG, false);
+        return plot.isAdded(player.getUniqueId()) || plot.getFlag(STRUCTUREBOX_FLAG);
     }
 
-    public static boolean withinPlot(org.bukkit.Location location){
+    public static boolean withinPlot(Location location){
         if (worlds == null || !worlds.containsKey(location.getWorld().getName())){
             return false;
         }
-        final PlotAPI plotAPI = new PlotAPI();
-        Plot plot = plotAPI.getPlot(location);
+        Plot plot = Plot.getPlot(bukkitToPSLoc(location));
         return plot != null;
     }
 
-    public static boolean isPlotSquared(Plugin plugin){
-        return plugin instanceof IPlotMain;
-    }
-
-    private static com.intellectualcrafters.plot.object.Location bukkitToPSLoc(Location location){
-        return new com.intellectualcrafters.plot.object.Location(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
-    }
-
-    public static void registerFlag() {
-        new PlotAPI().addFlag(STRUCTUREBOX_FLAG);
+    private static com.plotsquared.core.location.Location bukkitToPSLoc(Location location){
+        return com.plotsquared.core.location.Location.at(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public static boolean canPlaceStructureBox(Location loc) {

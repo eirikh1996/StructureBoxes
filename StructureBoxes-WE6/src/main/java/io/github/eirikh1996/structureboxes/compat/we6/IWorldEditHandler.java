@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 import static com.sk89q.worldedit.WorldEdit.getInstance;
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
@@ -171,7 +172,7 @@ public class IWorldEditHandler extends WorldEditHandler {
         }
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
-            sbMain.broadcast("Structure algorithm took (ms): " + (end - start));
+            sbMain.logMessage(Level.INFO,"Structure algorithm took (ms): " + (end - start));
         }
 
         if (Settings.IncrementalPlacement) {
@@ -241,7 +242,7 @@ public class IWorldEditHandler extends WorldEditHandler {
             StructureManager.getInstance().addStructureByPlayer(playerID, structureLocs);
             if (Settings.Debug){
                 final long end = System.currentTimeMillis();
-                sbMain.broadcast("Structure placement took (ms): " + (end - startTime));
+                sbMain.logMessage(Level.INFO, "Structure placement took (ms): " + (end - startTime));
             }
         });
         return true;

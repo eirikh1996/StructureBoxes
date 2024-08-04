@@ -7,7 +7,6 @@ io\github\eirikh1996\structureboxes\Direction.class
 io\github\eirikh1996\structureboxes\utils\IncrementalPlacementTask.class
 io\github\eirikh1996\structureboxes\utils\TopicPaginator.class
 io\github\eirikh1996\structureboxes\SBMain.class
-io\github\eirikh1996\structureboxes\Direction$1.class
 io\github\eirikh1996\structureboxes\utils\StructureBlock.class
 io\github\eirikh1996\structureboxes\utils\ChatUtils.class
 io\github\eirikh1996\structureboxes\utils\CollectionUtils.class

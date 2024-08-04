@@ -15,48 +15,62 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-<repositories>
-    <repository>
-        <id>spigot-repo</id>
-        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    </repository>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-    <repository>
-        <id>redprotect-repo</id>
-        <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
-    </repository>
-    <repository>
-        <id>CodeMC</id>
-        <url>https://repo.codemc.org/repository/maven-public</url>
-    </repository>
-    <repository>
-        <id>savagelabs</id>
-        <url>https://nexus.savagelabs.net</url>
-        <layout>default</layout>
-    </repository>
-</repositories>
-
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>redprotect-repo</id>
+            <url>https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+        <repository>
+            <id>savagelabs</id>
+            <url>https://nexus.savagelabs.net</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.intellectualsites.bom</groupId>
+                <artifactId>bom-newest</artifactId>
+                <version>1.47</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <!--Spigot-->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.1-R0.1-SNAPSHOT</version>
+            <version>1.20.6-R0.1-SNAPSHOT</version>
         </dependency>
         <!--WorldEdit-->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>7.0.1-SNAPSHOT</version>
+            <version>7.3.0-SNAPSHOT</version>
         </dependency>
         <!--WorldGuard-->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.1-SNAPSHOT</version>
+            <version>7.1.0-SNAPSHOT</version>
         </dependency>
         <!--StructureBoxes dependencies-->
         <dependency>
@@ -96,10 +110,21 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>io.github.eirikh1996</groupId>
-            <artifactId>structureboxes-bukkit-ps6</artifactId>
-            <version>PS6</version>
-            <type>jar</type>
+            <groupId>com.intellectualsites.plotsquared</groupId>
+            <artifactId>plotsquared-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.intellectualsites.plotsquared</groupId>
+            <artifactId>plotsquared-bukkit</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>plotsquared-core</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.github.eirikh1996</groupId>
@@ -132,17 +157,39 @@
             <systemPath>${project.basedir}/../libs/bukkit/Factions.jar</systemPath>
         </dependency>
         <!--RedProtect-->
+        <!-- Core is not needed but allow access to all region methods -->
         <dependency>
-            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
+            <groupId>io.github.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Core</artifactId>
-            <version>LATEST</version>
-            <scope>provided</scope>
+            <version>8.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <!-- We don't need any of the dependencies -->
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>br.net.fabiozumbi12.RedProtect</groupId>
+            <groupId>io.github.fabiozumbi12.RedProtect</groupId>
             <artifactId>RedProtect-Spigot</artifactId>
-            <version>LATEST</version>
-            <scope>provided</scope>
+            <version>8.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <!-- We don't need any of the dependencies -->
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Import Javadocs -->
+        <dependency>
+            <groupId>io.github.fabiozumbi12.RedProtect</groupId>
+            <artifactId>RedProtect-Spigot</artifactId>
+            <version>8.1.1</version>
+            <classifier>javadoc</classifier>
         </dependency>
         <!--GriefPrevention-->
         <dependency>
@@ -151,14 +198,6 @@
             <version>LATEST</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/../libs/bukkit/GriefPrevention.jar</systemPath>
-        </dependency>
-        <!-- PlotSquared legacy API -->
-        <dependency>
-            <groupId>com.plotsquared</groupId>
-            <artifactId>plotsquared-api</artifactId>
-            <version>latest</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/bukkit/PlotSquared-Bukkit-19.09.07-f27e556-781.jar</systemPath>
         </dependency>
         <!--LandClaiming-->
         <dependency>

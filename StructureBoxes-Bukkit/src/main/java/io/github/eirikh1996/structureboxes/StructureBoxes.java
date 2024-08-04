@@ -2,13 +2,12 @@ package io.github.eirikh1996.structureboxes;
 
 import br.net.fabiozumbi12.RedProtect.Bukkit.RedProtect;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
-import com.google.inject.Injector;
 import com.iridium.iridiumskyblock.IridiumSkyblock;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.engine.EnginePermBuild;
 import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
-import com.plotsquared.bukkit.listeners.PlayerEvents;
+import com.plotsquared.bukkit.BukkitPlatform;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
@@ -16,7 +15,6 @@ import com.wasteofplastic.askyblock.ASkyBlock;
 import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.InventoryListener;
-import io.github.eirikh1996.structureboxes.listener.WorldListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.region.*;
 import io.github.eirikh1996.structureboxes.settings.Settings;
@@ -40,7 +38,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +67,8 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     private GriefPrevention griefPreventionPlugin;
     private LandClaiming landClaimingPlugin;
     private Towny townyPlugin;
+
+    private BukkitPlatform plotSquaredPlugin;
 
     //Skyblock plugins
     private IridiumSkyblock iridiumSkyblockPlugin;
@@ -126,11 +125,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
 
 
-        if (Settings.IsLegacy){
-            saveLegacyConfig();
-        } else {
             saveDefaultConfig();
-        }
         readConfig();
 
         if (!I18nSupport.initialize(getDataFolder(), this)){
@@ -173,18 +168,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         File schemDir = new File(worldEditPlugin.getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
 
         //Check if there is a compatible version of WorldEdit
-        try {
-            final Class weHandler = Class.forName("io.github.eirikh1996.structureboxes.compat.we" + versionNumber + ".IWorldEditHandler");
-            if (WorldEditHandler.class.isAssignableFrom(weHandler)){
-                worldEditHandler = (WorldEditHandler) weHandler.getConstructor(File.class, SBMain.class).newInstance(schemDir , this);
-            }
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            getLogger().severe(I18nSupport.getInternationalisedString("Startup - Unsupported WorldEdit"));
-            getLogger().severe(String.format(I18nSupport.getInternationalisedString("Startup - Requires WorldEdit 6.0.0 or 7.0.0"), weVersion));
-            getLogger().severe(I18nSupport.getInternationalisedString("Startup - Will be disabled"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        worldEditHandler = new WorldEditHandler(schemDir, this);
 
         boolean foundRegionProvider = false;
         //Check for WorldGuard
@@ -265,107 +249,11 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         //Check for PlotSquared
         Plugin ps = getServer().getPluginManager().getPlugin("PlotSquared");
-        if (ps != null) {
-            if (!Settings.IsLegacy) {
-                try { //Check if PlotSquared 5 is installed
-                    Class.forName("com.plotsquared.bukkit.BukkitMain");
-                    Settings.UsePS5 = true;
-                } catch (ClassNotFoundException e) { //If not, use PlotSquared 4 instead
-                    Settings.UsePS5 = false;
-                }
-                try {
-                    Class.forName("com.plotsquared.bukkit.BukkitPlatform");
-                    Settings.UsePS6 = true;
-                } catch (ClassNotFoundException e) {
-                    Settings.UsePS6 = false;
-                }
-            }
-            if (Settings.IsLegacy ? PlotSquaredUtils.isPlotSquared(ps) : (Settings.UsePS5 ? PlotSquared5Utils.isPlotSquared(ps) : (Settings.UsePS6 ? PlotSquared6Utils.isPlotSquared(ps) : PlotSquared4Utils.isPlotSquared(ps)) )){
-                getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
-                if (Settings.IsLegacy) {
-                    PlotSquaredUtils.initialize();
-                    PlotSquaredUtils.registerFlag();
-                    PlayerEvents events = new PlayerEvents();
-                    HandlerList.unregisterAll(events);
-                    getServer().getPluginManager().registerEvents(events, ps);
-                    getServer().getPluginManager().registerEvent(
-                            BlockPlaceEvent.class,
-                            events,
-                            EventPriority.HIGHEST,
-                            new PlotSquaredFlagManager(),
-                            this
-                    );
-                } else if (Settings.UsePS5){
-                    PlotSquared5Utils.initialize();
-
-                    PlotSquared5Utils.registerFlag();
-                    try {
-                        Class<Listener> blockEventListener = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
-                        final Listener listener = blockEventListener.getConstructor().newInstance();
-                        HandlerList.unregisterAll(listener);
-                        getServer().getPluginManager().registerEvents(listener, ps);
-                        getServer().getPluginManager().registerEvent(
-                            BlockPlaceEvent.class,
-                            listener,
-                            EventPriority.HIGHEST,
-                            new PlotSquared5FlagManager(),
-                            this
-                        );
-                    } catch (InstantiationException | ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-
-                } else if (Settings.UsePS6) {
-                    PlotSquared6Utils.initialize();
-                    PlotSquared6Utils.registerFlag();
-
-
-                    final List<RegisteredListener> registeredListeners = HandlerList.getRegisteredListeners(ps);
-                    try {
-                        Class<Listener> blockEventListenerClass = (Class<Listener>) Class.forName("com.plotsquared.bukkit.listener.BlockEventListener");
-                        Listener listener = null;
-                        for (RegisteredListener rl : registeredListeners) {
-                            if (!blockEventListenerClass.isInstance(rl.getListener()) || rl.getPlugin() != ps) {
-                                continue;
-                            }
-                            listener = rl.getListener();
-                            break;
-                        }
-                        getServer().getPluginManager().registerEvent(
-                                BlockPlaceEvent.class,
-                                listener,
-                                EventPriority.HIGHEST,
-                                new PlotSquared6FlagManager(),
-                                this
-                        );
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-
-                } else {
-                    PlotSquared4Utils.initialize();
-                    PlotSquared4Utils.registerFlag();
-                    try {
-                        Class<Listener> playerEvents = (Class<Listener>) Class.forName("com.github.intellectualsites.plotsquared.bukkit.listener.PlayerEvents");
-                        final Listener listener = playerEvents.getConstructor().newInstance();
-                        HandlerList.unregisterAll(listener);
-                        getServer().getPluginManager().registerEvents(listener, ps);
-                        getServer().getPluginManager().registerEvent(
-                                BlockPlaceEvent.class,
-                                listener,
-                                EventPriority.HIGHEST,
-                                new PlotSquared4FlagManager(),
-                                this
-                        );
-                    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
+        if (ps instanceof BukkitPlatform) {
                 plotSquaredInstalled = true;
                 foundRegionProvider = true;
-            }
-            getServer().getPluginManager().registerEvents(new WorldListener(), this);
+                StructureboxFlag.register();
+                getLogger().info(I18nSupport.getInternationalisedString("Startup - PlotSquared detected"));
         }
 
         //Check for landClaiming
@@ -713,7 +601,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "WorldGuard"));
                     return false;
                 }
-                if (isPlotSquaredInstalled() && !(Settings.IsLegacy ? PlotSquaredUtils.canBuild(p, bukkitLoc) : (Settings.UsePS6 ? PlotSquared6Utils.canBuild(p, bukkitLoc) : (Settings.UsePS5 ? PlotSquared5Utils.canBuild(p, bukkitLoc) : PlotSquared4Utils.canBuild(p, bukkitLoc))))){
+                if (isPlotSquaredInstalled() && PlotSquaredUtils.canBuild(p, bukkitLoc)){
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "PlotSquared"));
                     return false;
                 }
