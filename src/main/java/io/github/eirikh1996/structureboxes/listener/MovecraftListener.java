@@ -5,14 +5,18 @@ import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.utils.MovecraftUtils;
 import net.countercraft.movecraft.MovecraftLocation;
+import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PilotedCraft;
-import net.countercraft.movecraft.events.CraftDetectEvent;
-import net.countercraft.movecraft.events.CraftRotateEvent;
-import net.countercraft.movecraft.events.CraftSinkEvent;
-import net.countercraft.movecraft.events.CraftTranslateEvent;
+import net.countercraft.movecraft.events.*;
+import net.countercraft.movecraft.processing.MovecraftWorld;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
+import org.bukkit.ChatColor;
+import org.bukkit.Tag;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
@@ -30,6 +34,37 @@ public class MovecraftListener implements Listener {
             if (structure != null) {
                 ((PilotedCraft) event.getCraft()).getPilot().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Session will expire"));
                 break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onCraftPilot(@NotNull CraftPilotEvent e) {
+        Craft craft = e.getCraft();
+        MovecraftWorld world = e.getCraft().getMovecraftWorld();
+        for (MovecraftLocation ml : craft.getHitBox()) {
+            if (!Tag.SIGNS.isTagged(world.getMaterial(ml)))
+                continue;
+
+            BlockState state = world.getState(ml);
+            if (!(state instanceof Sign sign))
+                continue;
+
+            if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("<<Private>>")) {
+                sign.setLine(0, "[Private]");
+                if (craft instanceof PilotedCraft pilotedCraft)
+                    sign.setLine(1, pilotedCraft.getPilot().getName());
+                sign.update();
+            }
+            else if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("<<More Users>>")) {
+                sign.setLine(0, "[More Users]");
+                sign.update();
+            }
+            else if (ChatColor.stripColor(sign.getLine(0)).equalsIgnoreCase("<<Pilot>>")) {
+                sign.setLine(0, "Pilot:");
+                if (craft instanceof PilotedCraft pilotedCraft)
+                    sign.setLine(1, pilotedCraft.getPilot().getName());
+                sign.update();
             }
         }
     }
