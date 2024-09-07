@@ -91,31 +91,12 @@ public class StructureBoxes extends JavaPlugin {
             Settings.FAWE = false;
         }
 
-        String schemDirName = null;
+        String schemDirName;
         try {
-            // Try loading from config by file
-            File weConfig = new File(worldEditPlugin.getDataFolder(), (Settings.FAWE ? "worldedit-" : "") + "config" + ".yml");
-            Map<?, ?> data = new Yaml().load(new FileInputStream(weConfig));
-            data = (Map<?, ?>) data.get("saving");
-            schemDirName = (String) data.get("dir");
-        } catch (Exception e){
+            // Try loading from API
+            schemDirName = worldEditPlugin.getLocalConfiguration().saveDir;
+        } catch (Exception e) {
             e.printStackTrace();
-            try {
-                // Try loading from API
-                schemDirName = worldEditPlugin.getLocalConfiguration().saveDir;
-            } catch (Exception e2){
-                e2.printStackTrace();
-                try {
-                    // Try loading from config by plugin
-                    Map<?, ?> data = (Map<?, ?>) worldEditPlugin.getConfig().get("saving");
-                    schemDirName = (String) data.get("dir");
-                } catch (Exception e3){
-                    e3.printStackTrace();
-                }
-            }
-        }
-
-        if (schemDirName == null) {
             getLogger().severe(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -152,7 +133,7 @@ public class StructureBoxes extends JavaPlugin {
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
 
-        getCommand("structurebox").setExecutor(new StructureBoxCommand());
+        getCommand("structurebox").setExecutor(new StructureBoxCommand(schemDirName));
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);

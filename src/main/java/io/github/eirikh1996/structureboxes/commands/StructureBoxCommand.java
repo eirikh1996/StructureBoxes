@@ -31,8 +31,8 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 
 public class StructureBoxCommand implements TabExecutor {
     private final String schematicDir;
-    public StructureBoxCommand(){
-        schematicDir = StructureBoxes.getInstance().getWorldEditPlugin().getConfig().getConfigurationSection("saving").getString("dir");
+    public StructureBoxCommand(String schematicDirName) {
+        schematicDir = schematicDirName;
     }
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
