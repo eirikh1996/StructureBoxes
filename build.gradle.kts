@@ -16,16 +16,16 @@ repositories {
 
 dependencies {
     api("org.jetbrains:annotations-java5:24.1.0")
-    compileOnly("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     api("com.sk89q.worldedit:worldedit-core:7.2.9")
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     compileOnly("net.countercraft:movecraft:+")
 }
 
 group = "io.github.eirikh1996"
-version = "4.0.0_beta-2_dev-1"
+version = "4.0.0_beta-2_dev-2"
 description = "StructureBoxes"
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 tasks.jar {
     archiveBaseName.set("StructureBoxes")

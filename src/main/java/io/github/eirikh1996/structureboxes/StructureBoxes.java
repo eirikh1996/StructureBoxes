@@ -93,7 +93,7 @@ public class StructureBoxes extends JavaPlugin {
 
         final Map data;
         try {
-            File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
+            File weConfig = new File(getWorldEditPlugin().getDataFolder(),  (Settings.FAWE ? "worldedit-" : "") + "config" + ".yml");
             Yaml yaml = new Yaml();
             data = yaml.load(new FileInputStream(weConfig));
         } catch (IOException e){
@@ -253,7 +253,7 @@ public class StructureBoxes extends JavaPlugin {
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             if (Settings.Debug) {
-                world.spawnParticle(Particle.VILLAGER_ANGRY, bukkitLoc, 1);
+                world.spawnParticle(Particle.ANGRY_VILLAGER, bukkitLoc, 1);
             }
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
