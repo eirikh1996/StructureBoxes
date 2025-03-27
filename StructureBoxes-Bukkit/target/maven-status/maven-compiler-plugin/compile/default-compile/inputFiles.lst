@@ -18,7 +18,6 @@ C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\i
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\SkyBlockUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\MathUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\AcidIslandUtils.java
-C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\listener\WorldListener.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\RedProtectUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\IWorldEditLocation.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\LandClaimingUtils.java
@@ -26,6 +25,7 @@ C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\i
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\FactionsUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\PlotSquaredUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\UpdateChecker.java
+C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\StructureboxFlag.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\BentoBoxUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\GriefPreventionUtils.java
 C:\Users\eirik\IdeaProjects\StructureBoxes\StructureBoxes-Bukkit\src\main\java\io\github\eirikh1996\structureboxes\utils\IridiumSkyblockUtils.java

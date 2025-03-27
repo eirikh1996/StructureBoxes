@@ -1,7 +1,7 @@
 package io.github.eirikh1996.structureboxes.region;
 
-import com.intellectualcrafters.plot.api.PlotAPI;
-import com.plotsquared.bukkit.listeners.PlayerEvents;
+import com.plotsquared.bukkit.listener.BlockEventListener;
+import com.plotsquared.core.PlotAPI;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import org.bukkit.block.Block;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class PlotSquaredFlagManager implements EventExecutor {
     @Override
     public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
-        if (!(listener instanceof PlayerEvents && event instanceof BlockPlaceEvent)) {
+        if (!(listener instanceof BlockEventListener && event instanceof BlockPlaceEvent)) {
             return;
         }
         final BlockPlaceEvent pe = (BlockPlaceEvent) event;

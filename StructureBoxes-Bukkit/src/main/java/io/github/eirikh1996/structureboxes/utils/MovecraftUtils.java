@@ -1,4 +1,4 @@
-package io.github.eirikh1996.structureboxes.movecraft.v8;
+package io.github.eirikh1996.structureboxes.utils;
 
 import io.github.eirikh1996.structureboxes.utils.Location;
 import net.countercraft.movecraft.MovecraftLocation;

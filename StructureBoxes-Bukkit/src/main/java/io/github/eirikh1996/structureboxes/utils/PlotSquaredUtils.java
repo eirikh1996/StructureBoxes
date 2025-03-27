@@ -47,9 +47,8 @@ public class PlotSquaredUtils {
     }
 
     public static boolean canPlaceStructureBox(Location loc) {
-        final PlotAPI plotAPI = new PlotAPI();
-        Plot plot = plotAPI.getPlot(loc);
-        return (boolean) plot.getFlag(STRUCTUREBOX_FLAG).get();
+        Plot plot = Plot.getPlot(bukkitToPSLoc(loc));
+        return plot.getFlag(STRUCTUREBOX_FLAG).booleanValue();
     }
 
     private static class PlotSquaredWorldsConfigException extends RuntimeException {
