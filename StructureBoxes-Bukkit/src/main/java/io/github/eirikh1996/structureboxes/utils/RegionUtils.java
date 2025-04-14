@@ -106,15 +106,7 @@ public class RegionUtils {
             worldguard = WorldGuardUtils.canPlaceStructureBox(player, loc);
         }
         if (sb.isPlotSquaredInstalled()) {
-            if (Settings.UsePS6)
-                plotSquared = PlotSquared6Utils.canPlaceStructureBox(loc);
-            else if (Settings.UsePS5) {
-                plotSquared = PlotSquared5Utils.canPlaceStructureBox(loc);
-            } else if (!Settings.IsLegacy) {
-                plotSquared = PlotSquared4Utils.canPlaceStructureBox(loc);
-            } else {
-                plotSquared = PlotSquaredUtils.canPlaceStructureBox(loc);
-            }
+            plotSquared = PlotSquaredUtils.canPlaceStructureBox(loc);
         }
         return worldguard || factions || redprotect || plotSquared;
 

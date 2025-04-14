@@ -24,7 +24,6 @@ import io.github.eirikh1996.structureboxes.utils.ASkyBlockUtils;
 import io.github.eirikh1996.structureboxes.utils.AcidIslandUtils;
 import io.github.eirikh1996.structureboxes.utils.BentoBoxUtils;
 import io.github.eirikh1996.structureboxes.utils.CivsUtils;
-import io.github.eirikh1996.structureboxes.utils.Factions3Utils;
 import io.github.eirikh1996.structureboxes.utils.FactionsUUIDUtils;
 import io.github.eirikh1996.structureboxes.utils.FactionsUtils;
 import io.github.eirikh1996.structureboxes.utils.GriefPreventionUtils;
@@ -392,9 +391,9 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         if (Settings.Metrics) {
             metrics = new Metrics(this);
             final boolean noRegionProvider = !foundRegionProvider;
-            metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<Map<String, Integer>>() {
+            metrics.addCustomChart(new Metrics.AdvancedPie("region_providers", new Callable<>() {
                 @Override
-                public Map<String, Integer> call() throws Exception {
+                public Map<String, Integer> call() {
                     Map<String, Integer> valueMap = new HashMap<>();
                     if (getFactionsPlugin() != null) {
                         valueMap.put("Factions", 1);
@@ -444,10 +443,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             startup = false;
         }
 
-    }
-
-    @Override
-    public void onDisable(){
     }
 
     public static StructureBoxes getInstance(){
@@ -598,7 +593,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             World world = getServer().getWorld(location.getWorld());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             if (Settings.Debug) {
-                world.spawnParticle(Particle.VILLAGER_ANGRY, bukkitLoc, 1);
+                world.spawnParticle(Particle.ANGRY_VILLAGER, bukkitLoc, 1);
             }
             Material test = bukkitLoc.getBlock().getType();
             originalBlocks.put(location, test);
@@ -617,7 +612,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "GriefPrevention"));
                     return false;
                 }
-                if (getFactionsPlugin() != null && ((Settings.IsLegacy ? !FactionsUtils.allowBuild(p, bukkitLoc) : !Factions3Utils.allowBuild(p, bukkitLoc))) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
+                if (getFactionsPlugin() != null && (!FactionsUtils.allowBuild(p, bukkitLoc)) && !FactionsUtils.canPlaceStructureBox(bukkitLoc)){
                     p.sendMessage(COMMAND_PREFIX + String.format(I18nSupport.getInternationalisedString("Place - Forbidden Region"), "Factions"));
                     return false;
                 }
