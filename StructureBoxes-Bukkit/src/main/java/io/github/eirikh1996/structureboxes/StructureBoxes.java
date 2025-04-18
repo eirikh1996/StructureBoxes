@@ -45,6 +45,8 @@ import io.github.eirikh1996.structureboxes.utils.WorldGuardUtils;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.Bukkitters.SkyBlock.Main;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -513,10 +515,10 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         final Player player = getServer().getPlayer(playerID);
         if (Settings.Debug){
-            Bukkit.broadcastMessage("Within region: " + withinRegion);
-            Bukkit.broadcastMessage("Exempt: " + exempt);
-            Bukkit.broadcastMessage("Can bypass: " + player.hasPermission("structureboxes.bypassregionrestriction"));
-            Bukkit.broadcastMessage("Entire structure enabled: " + Settings.RestrictToRegionsEntireStructure);
+            Bukkit.broadcast(Component.text("Within region: " + withinRegion));
+            Bukkit.broadcast(Component.text("Exempt: " + exempt));
+            Bukkit.broadcast(Component.text("Can bypass: " + player.hasPermission("structureboxes.bypassregionrestriction")));
+            Bukkit.broadcast(Component.text("Entire structure enabled: " + Settings.RestrictToRegionsEntireStructure));
         }
         if (!withinRegion && !exempt && Settings.RestrictToRegionsEntireStructure && !player.hasPermission("structureboxes.bypassregionrestriction")){
             player.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Structure must be in region"));
@@ -534,6 +536,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     public void clearStructure(Structure structure) {
         final Player sender = Bukkit.getPlayer(structure.getOwner());
         Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
+
         if (locationMaterialHashMap == null) {
             sender.sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired"));
             return;
@@ -725,7 +728,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
 
     @Override
     public void broadcast(String s) {
-        getServer().broadcastMessage(s);
+        getServer().broadcast(Component.text(s));
     }
 
     public void readConfig() {

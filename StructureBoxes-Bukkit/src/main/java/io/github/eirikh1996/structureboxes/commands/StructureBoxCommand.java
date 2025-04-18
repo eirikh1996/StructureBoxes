@@ -9,6 +9,7 @@ import io.github.eirikh1996.structureboxes.WorldEditHandler;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.TopicPaginator;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -222,7 +223,7 @@ public class StructureBoxCommand implements TabExecutor {
 
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
-            Bukkit.broadcastMessage("Undo took (ms): " + (end - start));
+            Bukkit.broadcast(Component.text("Undo took (ms): " + (end - start)));
         }
 
         return true;

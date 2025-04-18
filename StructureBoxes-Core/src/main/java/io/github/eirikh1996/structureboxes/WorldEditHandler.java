@@ -115,7 +115,7 @@ public class WorldEditHandler {
     private static Location rotate(final Location toRotate, final double theta, final Location centre){
         final int xRot = (int) (centre.getX() + cos(theta) * (toRotate.getBlockX() - centre.getX()) - sin(theta) * (toRotate.getBlockZ() - centre.getZ()));
         final int zRot = (int) (centre.getZ() + sin(theta) * (toRotate.getBlockX() - centre.getX()) + cos(theta) * (toRotate.getBlockZ() - centre.getZ()));
-        return new Location(centre.getExtent(), xRot, centre.getBlockY(), zRot);
+        return new Location(toRotate.getExtent(), xRot, toRotate.getBlockY(), zRot);
     }
 
     public boolean pasteClipboard(@NotNull UUID playerID, @NotNull String schematicName, @NotNull Clipboard clipboard, double angle, Location pasteLoc) {
@@ -142,7 +142,6 @@ public class WorldEditHandler {
         final Collection<Location> boundingBox = new HashSet<>();
         final HashMap<Location, BaseBlock> blockHashMap = new HashMap<>();
         final LinkedList<Location> locationQueue = new LinkedList<>();
-
         for (MultiStageReorder.PlacementPriority priority : MultiStageReorder.PlacementPriority.values()) {
             for (int y = 0 ; y <= yLength ; y++){
                 for (int x = 0 ; x <= xLength ; x++){
@@ -201,11 +200,11 @@ public class WorldEditHandler {
         }
         final Structure structure = StructureManager.getInstance().getCorrespondingStructure(structureLocs);
         for (Location loc : structureLocs) {
-            if (loc.getY() > (Settings.Is1_17 ? world.getMaxY() : 255)) {
+            if (loc.getY() > world.getMaxY()) {
                 sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - World height exceeded"));
                 return false;
             }
-            if (loc.getY() > (Settings.Is1_17 ? world.getMinY() : 0)) {
+            if (loc.getY() < world.getMinY()) {
                 sbMain.sendMessageToPlayer(playerID, COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - World height exceeded"));
                 return false;
             }
