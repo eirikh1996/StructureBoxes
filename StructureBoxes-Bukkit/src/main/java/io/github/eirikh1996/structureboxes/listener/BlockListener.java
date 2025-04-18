@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import io.github.eirikh1996.structureboxes.Direction;
@@ -8,7 +9,6 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.ItemManager;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import org.bukkit.ChatColor;
@@ -97,7 +97,7 @@ public class BlockListener implements Listener {
             return;
         }
         final Location placed = event.getBlockPlaced().getLocation();
-        Direction clipboardDir = StructureBoxes.getInstance().getWorldEditHandler().getClipboardFacingFromOrigin(clipboard, MathUtils.bukkit2SBLoc(placed));
+        Direction clipboardDir = StructureBoxes.getInstance().getWorldEditHandler().getClipboardFacingFromOrigin(clipboard, BukkitAdapter.adapt(placed));
         Direction playerDir = Direction.fromYaw(event.getPlayer().getLocation().getYaw());
         int angle = playerDir.getAngle(clipboardDir);
         final Location loc = event.getBlockPlaced().getLocation();
@@ -128,7 +128,7 @@ public class BlockListener implements Listener {
             broadcastMessage("Player direction: " + playerDir.name() + " Structure direction: " + clipboardDir.name());
         }
 
-        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
+        if (!StructureBoxes.getInstance().getWorldEditHandler().pasteClipboard(event.getPlayer().getUniqueId(), schematicID, clipboard, angle, BukkitAdapter.adapt(placed))) {
             event.setCancelled(true);
             return;
         }
@@ -158,7 +158,7 @@ public class BlockListener implements Listener {
         Iterator<Structure> iter = sessions.iterator();
         while (iter.hasNext()) {
             Structure next = iter.next();
-            if (!next.getStructure().contains(MathUtils.bukkit2SBLoc(event.getBlock().getLocation()))){
+            if (!next.getStructure().contains(BukkitAdapter.adapt(event.getBlock().getLocation()))){
                 continue;
             }
             iter.remove();

@@ -1,5 +1,7 @@
 package io.github.eirikh1996.structureboxes.utils;
 
+import com.sk89q.worldedit.util.Location;
+
 import java.util.LinkedList;
 import java.util.TimerTask;
 

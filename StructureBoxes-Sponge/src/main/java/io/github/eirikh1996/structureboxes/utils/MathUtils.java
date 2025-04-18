@@ -17,17 +17,24 @@
 
 package io.github.eirikh1996.structureboxes.utils;
 
+import com.sk89q.worldedit.sponge.SpongeWorld;
+import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
+import io.github.eirikh1996.structureboxes.StructureBoxes;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.WorldManager;
+import com.sk89q.worldedit.util.Location;
 
 public class MathUtils {
 
-    public static Location<World> sbToSpongeLoc(io.github.eirikh1996.structureboxes.utils.Location sbLoc){
-        return new Location<>(Sponge.getServer().getWorld(sbLoc.getWorld()).get(), sbLoc.getX(), sbLoc.getY(), sbLoc.getZ());
+    private static final SpongeImplAdapter ADAPTER = StructureBoxes.getInstance().getWorldEditPlugin().getAdapter();
+
+    public static ServerLocation weToSpongeLoc(Location sbLoc){
+        return ServerLocation.of((ServerWorld) ((SpongeWorld) sbLoc.getExtent()).getWorld(), sbLoc.getX(), sbLoc.getY(), sbLoc.getZ());
     }
 
-    public static io.github.eirikh1996.structureboxes.utils.Location spongeToSBLoc(Location<World> spongeLoc){
-        return new io.github.eirikh1996.structureboxes.utils.Location(spongeLoc.getExtent().getName(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
+    public static Location spongeToWELoc(ServerLocation spongeLoc){
+        return new Location(ADAPTER.getWorld(), spongeLoc.getBlockX(), spongeLoc.getBlockY(), spongeLoc.getBlockZ());
     }
 }

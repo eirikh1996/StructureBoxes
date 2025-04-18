@@ -1,6 +1,6 @@
 package io.github.eirikh1996.structureboxes;
 
-import io.github.eirikh1996.structureboxes.utils.Location;
+import com.sk89q.worldedit.util.Location;
 
 import java.util.Collection;
 import java.util.Map;

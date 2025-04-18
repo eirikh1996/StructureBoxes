@@ -1,7 +1,6 @@
 package io.github.eirikh1996.structureboxes.utils;
 
 import com.massivecraft.factions.*;
-import com.massivecraft.factions.perms.PermissibleAction;
 import com.massivecraft.factions.perms.PermissibleActions;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

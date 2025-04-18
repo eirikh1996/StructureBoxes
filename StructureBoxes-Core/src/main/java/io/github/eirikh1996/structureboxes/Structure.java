@@ -1,7 +1,7 @@
 package io.github.eirikh1996.structureboxes;
 
+import com.sk89q.worldedit.util.Location;
 import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
-import io.github.eirikh1996.structureboxes.utils.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -25,23 +25,23 @@ public class Structure implements Iterable<Location> {
         placementTime = -1;
         id = UUID.randomUUID();
         for (Location loc : originalBlocks.keySet()) {
-            if (minX > loc.getX()) {
-                minX = loc.getX();
+            if (minX > loc.getBlockX()) {
+                minX = loc.getBlockX();
             }
-            if (minY > loc.getY()) {
-                minY = loc.getY();
+            if (minY > loc.getBlockY()) {
+                minY = loc.getBlockY();
             }
-            if (minZ > loc.getZ()) {
-                minZ = loc.getZ();
+            if (minZ > loc.getBlockZ()) {
+                minZ = loc.getBlockZ();
             }
-            if (maxX < loc.getX()) {
-                maxX = loc.getX();
+            if (maxX < loc.getBlockX()) {
+                maxX = loc.getBlockX();
             }
-            if (maxY < loc.getY()) {
-                maxY = loc.getY();
+            if (maxY < loc.getBlockY()) {
+                maxY = loc.getBlockY();
             }
-            if (maxZ < loc.getZ()) {
-                maxZ = loc.getZ();
+            if (maxZ < loc.getBlockZ()) {
+                maxZ = loc.getBlockZ();
             }
         }
         processing = new AtomicBoolean(true);

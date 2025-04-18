@@ -28,8 +28,8 @@ public class MovecraftListener {
             if (structure == null) {
                 continue;
             }
-            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getOriginalPilot());
-            if (!pilot.isPresent()) {
+            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getCommander());
+            if (pilot.isEmpty()) {
                 return;
             }
             pilot.get().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion")));
@@ -46,7 +46,7 @@ public class MovecraftListener {
             if (structure == null) {
                 continue;
             }
-            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getOriginalPilot());
+            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getCommander());
             if (!pilot.isPresent()) {
                 return;
             }
@@ -64,7 +64,7 @@ public class MovecraftListener {
             if (structure == null) {
                 continue;
             }
-            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getOriginalPilot());
+            final Optional<Player> pilot = Sponge.getServer().getPlayer(craft.getCommander());
             if (!pilot.isPresent()) {
                 return;
             }

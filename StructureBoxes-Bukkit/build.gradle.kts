@@ -3,13 +3,12 @@
  */
 
 plugins {
-    id("io.github.goooler.shadow") version "8.1.8"
+    id("com.gradleup.shadow") version "8.3.5"
     id("buildlogic.java-conventions")
     //id("io.github.0ffz.github-packages") version "1.2.1" // This plugin will allow us to authenticate to GitHub Packages automatically.
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-
 
 repositories {
     mavenCentral()
@@ -21,14 +20,12 @@ repositories {
     maven("https://nexus.iridiumdevelopment.net/repository/maven-releases/")
     maven("https://maven.enginehub.org/repo/")
     maven("https://repo.bg-software.com/repository/api/")
-
-
 }
 
 
 dependencies {
+    implementation(project(":structureboxes-factionsuuid"))
     implementation(project(":structureboxes-core"))
-    runtimeOnly(project(":structureboxes-factionsuuid"))
     //paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     api("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     api("com.sk89q.worldedit:worldedit-bukkit:7.3.10-SNAPSHOT")
@@ -54,6 +51,7 @@ dependencies {
         "/../libs/bukkit/skyblock/IslandWorld.jar",
         "/../libs/bukkit/skyblock/SkyBlock.jar"
     ))
+    implementation("org.bstats:bstats-bukkit:3.1.0")
 }
 
 java {
@@ -61,4 +59,16 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+tasks.shadowJar {
+    archiveBaseName.set("StructureBoxes")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    dependencies {
+        include(project(":structureboxes-core"))
+        include(project(":structureboxes-factionsuuid"))
+    }
+    relocate("org.bstats", "io.github.eirikh1996.bstats")
+}
+
 description = "StructureBoxes-Bukkit"
+

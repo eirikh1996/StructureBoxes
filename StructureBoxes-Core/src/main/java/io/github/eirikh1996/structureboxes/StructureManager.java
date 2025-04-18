@@ -1,7 +1,7 @@
 package io.github.eirikh1996.structureboxes;
 
+import com.sk89q.worldedit.util.Location;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

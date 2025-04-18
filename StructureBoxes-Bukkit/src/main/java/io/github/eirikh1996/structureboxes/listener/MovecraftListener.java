@@ -10,8 +10,7 @@ import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftRotateEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
 import net.countercraft.movecraft.events.CraftTranslateEvent;
-import net.countercraft.movecraft.libs.net.kyori.adventure.text.Component;
-import net.countercraft.movecraft.libs.net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +25,7 @@ public class MovecraftListener implements Listener {
         Structure structure;
         HitBox hitbox = event.getCraft().getHitBox();
         for (MovecraftLocation ml : hitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils. movecraftToWEloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
                 event.getCraft().getAudience().sendMessage(Component.empty().content(ChatUtils.COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Session will expire")));
                 break;
@@ -42,7 +41,7 @@ public class MovecraftListener implements Listener {
         Structure structure;
         HitBox oldHitbox = event.getOldHitBox();
         for (MovecraftLocation ml : oldHitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils. movecraftToWEloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
                 event.getCraft().getAudience().sendMessage(Component.empty().content(ChatUtils.COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion")));
                 StructureManager.getInstance().removeStructure(structure);
@@ -59,7 +58,7 @@ public class MovecraftListener implements Listener {
         Structure structure;
         HitBox oldHitbox = event.getOldHitBox();
         for (MovecraftLocation ml : oldHitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils. movecraftToWEloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
                 event.getCraft().getAudience().sendMessage(Component.empty().content(ChatUtils.COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion")));
                 StructureManager.getInstance().removeStructure(structure);
@@ -76,7 +75,7 @@ public class MovecraftListener implements Listener {
         Structure structure;
         HitBox hitbox = event.getCraft().getHitBox();
         for (MovecraftLocation ml : hitbox) {
-            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils.movecraftToSBloc(event.getCraft().getW(), ml));
+            structure = StructureManager.getInstance().getStructureAt(MovecraftUtils. movecraftToWEloc(event.getCraft().getWorld(), ml));
             if (structure != null) {
                 event.getCraft().getAudience().sendMessage(Component.empty().content(ChatUtils.COMMAND_PREFIX + I18nSupport.getInternationalisedString("Movecraft - Removed due to motion")));
                 StructureManager.getInstance().removeStructure(structure);

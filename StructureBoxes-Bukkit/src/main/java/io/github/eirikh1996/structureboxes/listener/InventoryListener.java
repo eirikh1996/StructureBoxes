@@ -1,5 +1,6 @@
 package io.github.eirikh1996.structureboxes.listener;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -36,7 +37,7 @@ public class InventoryListener implements Listener {
         if(inv == null || !(inv.getBlock().getState() instanceof InventoryHolder)) // Plugins such as DTLTraders cause InventoryOpenEvents with null locations.
             return;
 
-        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(inv));
+        Structure structure = StructureManager.getInstance().getStructureAt(BukkitAdapter.adapt(inv));
         if (structure == null)
             return;
         if (!playerTimeMap.containsKey(p.getUniqueId()) || currentTimeMillis() - playerTimeMap.get(p.getUniqueId()) > 5000) {
@@ -52,7 +53,7 @@ public class InventoryListener implements Listener {
         if(source.getLocation() == null || !(source.getLocation().getBlock().getState() instanceof InventoryHolder))
             return; // Probably good to check this as well.
 
-        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(source.getLocation()));
+        Structure structure = StructureManager.getInstance().getStructureAt(BukkitAdapter.adapt(source.getLocation()));
         if (structure == null)
             return;
         Player p = Bukkit.getPlayer(structure.getOwner());
@@ -71,7 +72,7 @@ public class InventoryListener implements Listener {
         final Location loc = inv.getLocation();
         if (loc == null || !(loc.getBlock().getState() instanceof InventoryHolder))
             return;
-        Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.bukkit2SBLoc(loc));
+        Structure structure = StructureManager.getInstance().getStructureAt(BukkitAdapter.adapt(loc));
         if (structure == null)
             return;
         event.getWhoClicked().sendMessage(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - Expired due to editing inventory"));

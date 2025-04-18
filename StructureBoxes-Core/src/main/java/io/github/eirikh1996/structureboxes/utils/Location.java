@@ -5,17 +5,18 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 public final class Location implements Comparable<Location>, Serializable {
-    private final String world;
+    private final UUID world;
     private final int x;
     private final int y;
     private final int z;
 
-    public Location(String world, int x, int y, int z) {
+    public Location(UUID world, int x, int y, int z) {
         this.world = world;
         this.x = x;
         this.y = y;
@@ -45,7 +46,7 @@ public final class Location implements Comparable<Location>, Serializable {
         return new Location(getWorld(), getX() - x, getY() - y, getZ() - z);
     }
 
-    public String getWorld() {
+    public UUID getWorld() {
         return world;
     }
 
@@ -71,7 +72,7 @@ public final class Location implements Comparable<Location>, Serializable {
         int x = Integer.MAX_VALUE;
         int y = Integer.MAX_VALUE;
         int z = Integer.MAX_VALUE;
-        String world = null;
+        UUID world = null;
         for (Location loc : structure){
             world = loc.getWorld();
             if (loc.getX() < x){

@@ -11,9 +11,11 @@ import com.sk89q.worldedit.extent.reorder.MultiStageReorder;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.PasteBuilder;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -21,7 +23,6 @@ import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
-import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.WorldEditLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ import java.util.Timer;
 import java.util.UUID;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
-import static java.lang.Math.PI;
+import static java.lang.Math.*;
 
 public class WorldEditHandler {
     protected final File schemDir;
@@ -111,10 +112,15 @@ public class WorldEditHandler {
         }
     }
 
+    private static Location rotate(final Location toRotate, final double theta, final Location centre){
+        final int xRot = (int) (centre.getX() + cos(theta) * (toRotate.getBlockX() - centre.getX()) - sin(theta) * (toRotate.getBlockZ() - centre.getZ()));
+        final int zRot = (int) (centre.getZ() + sin(theta) * (toRotate.getBlockX() - centre.getX()) + cos(theta) * (toRotate.getBlockZ() - centre.getZ()));
+        return new Location(centre.getExtent(), xRot, centre.getBlockY(), zRot);
+    }
 
-    public boolean pasteClipboard(@NotNull UUID playerID, @NotNull String schematicName, @NotNull Clipboard clipboard, double angle, WorldEditLocation pasteLoc) {
+    public boolean pasteClipboard(@NotNull UUID playerID, @NotNull String schematicName, @NotNull Clipboard clipboard, double angle, Location pasteLoc) {
         final long start = System.currentTimeMillis();
-        World world = pasteLoc.getWorld();
+        World world = (World) pasteLoc.getExtent();
         ClipboardHolder holder = new ClipboardHolder(clipboard);
         AffineTransform transform = new AffineTransform();
         transform = transform.rotateY(angle);
@@ -128,7 +134,7 @@ public class WorldEditHandler {
         int yLength = clipboard.getDimensions().y();
         int zLength = clipboard.getDimensions().z();
         BlockVector3 offset = clipboard.getMinimumPoint().subtract(clipboard.getOrigin());
-        Location minPoint = new Location(pasteLoc.getWorld().getName(), to.add(offset).x(), to.add(offset).y(), to.add(offset).z());
+        Location minPoint = new Location(pasteLoc.getExtent(), to.add(offset).toVector3());
         final double theta = -(angle * (PI / 180.0));
 
 
@@ -141,7 +147,7 @@ public class WorldEditHandler {
             for (int y = 0 ; y <= yLength ; y++){
                 for (int x = 0 ; x <= xLength ; x++){
                     for (int z = 0 ; z <= zLength ; z++){
-                        Location loc = minPoint.add(x, y, z).rotate(theta, pasteLoc.toSBloc());
+                        Location loc = rotate(new Location(minPoint.getExtent(), minPoint.toVector().add(new Vector3(x, y, z))),theta, pasteLoc);
                         solidStructure.add(loc);
                         if ((x == 0 || x == xLength || y == 0 || y == yLength || z == 0 || z == zLength) && !boundingBox.contains(loc)) {
                             boundingBox.add(loc);

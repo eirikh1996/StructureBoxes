@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.sk89q.worldedit:worldedit-core:7.3.10-SNAPSHOT")
+    implementation("com.sk89q.worldedit:worldedit-core:7.3.10-SNAPSHOT")
 }
 
 java {

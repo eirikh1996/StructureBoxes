@@ -25,23 +25,28 @@ import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,21 +57,21 @@ import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX
 public class BlockListener {
 
     @Listener
-    public void onBlockPlace(ChangeBlockEvent.Place event, @Root Player player) throws IOException {
+    public void onBlockPlace(ChangeBlockEvent.All event, @Root ServerPlayer player) throws IOException {
         if (event.isCancelled()) {
             return;
         }
-        final Optional<ItemStack> optionalItemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
-        if (!optionalItemInHand.isPresent()){
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
+        if (itemInHand == null || itemInHand.type() == ItemTypes.AIR.get()){
             return;
         }
-        final ItemStack itemInHand = optionalItemInHand.get();
-        final Optional<List<Text>> optionalLore = itemInHand.get(Keys.ITEM_LORE);
+        final Optional<List<Component>> optionalLore = itemInHand.get(Keys.LORE);
         if (!optionalLore.isPresent()){
             return;
         }
-        final List<Text> lore = optionalLore.get();
-        final String loreID = TextSerializers.LEGACY_FORMATTING_CODE.serialize(lore.get(0));
+        final List<Component> lore = optionalLore.get();
+        final LegacyComponentSerializer serializer = LegacyComponentSerializer.legacyAmpersand();
+        final String loreID = serializer.serialize(lore.get(0));
         String schematicID = "";
         if (!loreID.startsWith(Settings.StructureBoxPrefix)){
             boolean hasAlternativePrefix = false;
@@ -85,31 +90,33 @@ public class BlockListener {
              schematicID = loreID.replace(Settings.StructureBoxPrefix, "");
         }
         if (Settings.RequirePermissionPerStructureBox && !player.hasPermission("structureboxes.place." + schematicID)) {
-            player.sendMessage(Text.of(I18nSupport.getInternationalisedString("Place - No permission for this ID")));
+            player.sendMessage(serializer.deserialize(I18nSupport.getInternationalisedString("Place - No permission for this ID")));
             return;
         }
-        final SpongeWorld world = StructureBoxes.getInstance().getWorldEditPlugin().getWorld(player.getWorld());
+        final SpongeWorld world = StructureBoxes.getInstance().getWorldEditPlugin().getWorld(player.world());
         final WorldEditHandler weHandler = StructureBoxes.getInstance().getWorldEditHandler();
         final Clipboard clipboard = weHandler.loadClipboardFromSchematic(world, schematicID);
         if (clipboard == null) {
-            player.sendMessage(Text.of(I18nSupport.getInternationalisedString("Command - No schematic")));
+            player.sendMessage(serializer.deserialize(I18nSupport.getInternationalisedString("Command - No schematic")));
             event.setCancelled(true);
             return;
         }
         BlockSnapshot snapshot = null;
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
+        for (Transaction<BlockSnapshot> transaction : event.transactions()) {
+            final BlockSnapshot finalReplacement = transaction.finalReplacement();
+            if (!transaction.isValid() || !finalReplacement.state().type().equals(Settings.StructureBoxItem)) {
                 continue;
             }
-            snapshot = transaction.getFinal();
+            snapshot = finalReplacement;
+            break;
         }
         if (snapshot == null) {
             return;
         }
 
-        final Location<World> placed = snapshot.getLocation().get();
+        final ServerLocation placed = snapshot.location().orElseThrow(RuntimeException::new);
         final Direction sDir = weHandler.getClipboardFacingFromOrigin(clipboard, MathUtils.spongeToSBLoc(placed));
-        final Direction pDir = Direction.fromYaw((float) player.getHeadRotation().getY());
+        final Direction pDir = Direction.fromYaw((float) player.headRotation().get().y());
         final double angle = pDir.getAngle(sDir);
         boolean exemptFromRegionRestriction = false;
         if (!Settings.RestrictToRegionsExceptions.isEmpty()){

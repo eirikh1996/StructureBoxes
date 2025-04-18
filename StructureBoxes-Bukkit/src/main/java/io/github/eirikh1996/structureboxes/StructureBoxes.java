@@ -8,7 +8,9 @@ import com.massivecraft.factions.engine.EnginePermBuild;
 import com.massivecraft.factions.entity.MFlag;
 import com.palmergames.bukkit.towny.Towny;
 import com.plotsquared.bukkit.BukkitPlatform;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.listener.EventAbstractionListener;
 import com.wasteofplastic.askyblock.ASkyBlock;
@@ -30,7 +32,6 @@ import io.github.eirikh1996.structureboxes.utils.GriefPreventionUtils;
 import io.github.eirikh1996.structureboxes.utils.IslandWorldUtils;
 import io.github.eirikh1996.structureboxes.utils.LandClaimingUtils;
 import io.github.eirikh1996.structureboxes.utils.LandsUtils;
-import io.github.eirikh1996.structureboxes.utils.Location;
 import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.PlotSquaredUtils;
 import io.github.eirikh1996.structureboxes.utils.RedProtectUtils;
@@ -127,10 +128,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void onLoad() {
         instance = this;
-        String packageName = getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf(".") + 1);
-        Settings.IsLegacy = Integer.parseInt(version.split("_")[1]) <= 12;
-        Settings.Is1_17 = Integer.parseInt(version.split("_")[1]) <= 17;
         Plugin wg = getServer().getPluginManager().getPlugin("WorldGuard");
         //Check for WorldGuard
         if (wg instanceof WorldGuardPlugin){
@@ -502,7 +499,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     public boolean structureWithinRegion(UUID playerID, String schematicID, Collection<Location> locations) {
         boolean withinRegion = true;
         for (Location loc : locations){
-            if (RegionUtils.isWithinRegion(MathUtils.sb2BukkitLoc(loc))){
+            if (RegionUtils.isWithinRegion(BukkitAdapter.adapt(loc))){
                 continue;
             }
             withinRegion = false;
@@ -543,7 +540,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         }
         final Deque<Location> locations = structure.getLocationsToRemove();
         for (Location loc : locations) {
-            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(loc);
+            org.bukkit.Location bukkitLoc = BukkitAdapter.adapt(loc);
             if (!bukkitLoc.getBlock().getType().name().endsWith("_DOOR"))
                 continue;
         }
@@ -559,7 +556,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     if (poll == null)
                         break;
                     final Material origType = (Material) locationMaterialHashMap.get(poll);
-                    org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(poll);
+                    org.bukkit.Location bukkitLoc = BukkitAdapter.adapt(poll);
                     Block b = bukkitLoc.getBlock();
                     if (b.getState() instanceof InventoryHolder){
                         InventoryHolder holder = (InventoryHolder) b.getState();
@@ -590,7 +587,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         @NotNull final Player p = getServer().getPlayer(playerID);
         assert p != null;
         for (Location location : locations){
-            World world = getServer().getWorld(location.getWorld());
+            World world = BukkitAdapter.adapt((com.sk89q.worldedit.world.World) location.getExtent());
             org.bukkit.Location bukkitLoc = new org.bukkit.Location(world, location.getX(), location.getY(), location.getZ());
             if (Settings.Debug) {
                 world.spawnParticle(Particle.ANGRY_VILLAGER, bukkitLoc, 1);
@@ -700,7 +697,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     @Override
     public void clearInterior(Collection<Location> interior) {
         for (Location location : interior){
-            org.bukkit.Location bukkitLoc = MathUtils.sb2BukkitLoc(location);
+            org.bukkit.Location bukkitLoc = BukkitAdapter.adapt(location);
             //ignore air blocks
             if (bukkitLoc.getBlock().getType().name().endsWith("AIR")){
                 continue;
