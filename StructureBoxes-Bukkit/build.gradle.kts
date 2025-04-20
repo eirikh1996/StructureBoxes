@@ -5,6 +5,7 @@
 plugins {
     id("com.gradleup.shadow") version "8.3.5"
     id("buildlogic.java-conventions")
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
     //id("io.github.0ffz.github-packages") version "1.2.1" // This plugin will allow us to authenticate to GitHub Packages automatically.
 }
 
@@ -26,8 +27,7 @@ repositories {
 dependencies {
     implementation(project(":structureboxes-factionsuuid"))
     implementation(project(":structureboxes-core"))
-    //paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-    api("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     api("com.sk89q.worldedit:worldedit-bukkit:7.3.10-SNAPSHOT")
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.13-SNAPSHOT")
     implementation("com.github.TownyAdvanced.Towny:towny:0.101.1.7")
@@ -35,7 +35,7 @@ dependencies {
     api("com.intellectualsites.plotsquared:plotsquared-core:7.5.1")
     api("com.intellectualsites.plotsquared:plotsquared-bukkit:7.5.1") { isTransitive = false }
     compileOnly("com.github.Angeschossen:LandsAPI:7.13.1")
-    api(files(
+    compileOnly(files(
         "/../libs/bukkit/MassiveCore.jar",
         "/../libs/bukkit/Factions.jar",
         "/../libs/bukkit/civs.jar",
@@ -51,7 +51,7 @@ dependencies {
         "/../libs/bukkit/skyblock/IslandWorld.jar",
         "/../libs/bukkit/skyblock/SkyBlock.jar"
     ))
-    implementation("org.bstats:bstats-bukkit:3.1.0")
+    compileOnly("org.bstats:bstats-bukkit:3.1.0")
 }
 
 java {
@@ -60,14 +60,18 @@ java {
 }
 
 tasks.shadowJar {
-    archiveBaseName.set("StructureBoxes")
+    archiveBaseName.set("StructureBoxes-Bukkit")
     archiveClassifier.set("")
     archiveVersion.set("")
     dependencies {
         include(project(":structureboxes-core"))
         include(project(":structureboxes-factionsuuid"))
+        include(dependency("org.bstats:bstats-bukkit:3.1.0"))
     }
-    relocate("org.bstats", "io.github.eirikh1996.bstats")
+
+    relocate("org.bstats", "io.github.eirikh1996.structureboxes.metrics")
+
+
 }
 
 description = "StructureBoxes-Bukkit"

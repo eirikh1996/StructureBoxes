@@ -175,10 +175,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                 Settings.FAWE = false;
             }
         }
-
-        String weVersion = worldEditPlugin.getDescription().getVersion();
-
-        int versionNumber = Settings.IsLegacy ? 6 : 7;
         final Map data;
         try {
             File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");

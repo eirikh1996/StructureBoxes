@@ -4,6 +4,7 @@ import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class I18nSupport {
@@ -15,7 +16,8 @@ public class I18nSupport {
         languageFile = new Properties();
         final File file = new File(datafolder.getAbsolutePath() + "/localisation/lang_" + Settings.locale + ".properties");
         try {
-            languageFile.load(new FileInputStream(file));
+            InputStream stream = new FileInputStream(file);
+            languageFile.load(new InputStreamReader(stream, StandardCharsets.UTF_8));
             return true;
         } catch (IOException e) {
             e.printStackTrace();
