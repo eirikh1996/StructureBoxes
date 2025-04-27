@@ -1,6 +1,6 @@
+/*
 package io.github.eirikh1996.structureboxes.listener;
 
-import com.flowpowered.math.vector.Vector3i;
 import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
@@ -12,7 +12,7 @@ import io.github.pulverizer.movecraft.event.CraftTranslateEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 
@@ -73,3 +73,4 @@ public class MovecraftListener {
         }
     }
 }
+*/

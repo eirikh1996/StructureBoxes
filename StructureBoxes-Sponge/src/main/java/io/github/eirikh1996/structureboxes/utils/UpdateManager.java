@@ -5,18 +5,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
@@ -28,28 +31,28 @@ public class UpdateManager implements Runnable {
 
     @Override
     public void run() {
-        StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Checking for updates")));
-        Task.builder().async().delay(5, TimeUnit.SECONDS).execute(() -> {
+        StructureBoxes.getInstance().getConsole().sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Checking for updates")));
+        Sponge.asyncScheduler().submit(Task.builder().delay(5, TimeUnit.SECONDS).execute(() -> {
             final String newVersion = getNewVersion();
             if (newVersion == null) {
-                StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Up to date")));
+                StructureBoxes.getInstance().getConsole().sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Up to date")));
                 return;
             }
-            for (Player p : Sponge.getServer().getOnlinePlayers()) {
+            for (ServerPlayer p : Sponge.server().onlinePlayers()) {
                 if (!p.hasPermission("structureboxes.update")) {
                     continue;
                 }
-                p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
-                p.sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
+                p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
+                p.sendMessage(Component.text(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
             }
-            StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
-            StructureBoxes.getInstance().getConsole().sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
+            StructureBoxes.getInstance().getConsole().sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
+            StructureBoxes.getInstance().getConsole().sendMessage(Component.text(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
             this.newVersion = newVersion;
-        }).submit(StructureBoxes.getInstance());
+        }).build());
     }
 
     private String getNewVersion() {
-        String currentVersion = StructureBoxes.getInstance().getPlugin().getVersion().get();
+        String currentVersion = StructureBoxes.getInstance().getPlugin().metadata().version().getQualifier();
         try {
 
 
@@ -80,18 +83,21 @@ public class UpdateManager implements Runnable {
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player p) {
-        if (!p.hasPermission("structureboxes.update"))
+    public void onPlayerJoin(ServerSideConnectionEvent.Login event) {
+        final User user = event.user();
+        final Optional<ServerPlayer> pOpt = user.player();
+        if (!user.hasPermission("structureboxes.update") || pOpt.isEmpty())
             return;
-        Task.builder().async().delay(2, TimeUnit.SECONDS).execute(() -> {
+        final ServerPlayer p = pOpt.get();
+        Sponge.asyncScheduler().submit(Task.builder().delay(2, TimeUnit.SECONDS).execute(() -> {
             final String newVersion = getNewVersion();
             if (newVersion == null) {
                 return;
             }
-            p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
-            p.sendMessage(Text.of(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
+            p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Update - Update available").replace("%f", newVersion).replace("%d", newVersion).replace("{NewVersion}", newVersion)));
+            p.sendMessage(Component.text(COMMAND_PREFIX + "https://ore.spongepowered.org/eirikh1996/Structure-Boxes/versions"));
 
-        }).submit(StructureBoxes.getInstance());
+        }).build());
         }
 
     public static synchronized UpdateManager getInstance() {

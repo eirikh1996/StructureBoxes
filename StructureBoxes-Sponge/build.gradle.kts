@@ -6,6 +6,7 @@ import org.spongepowered.gradle.plugin.config.PluginLoaders
 
 plugins {
     id("buildlogic.java-conventions")
+    id("com.gradleup.shadow") version "8.3.5"
     id("java-library")
     id("org.spongepowered.gradle.plugin") version "2.0.2"
 }
@@ -34,13 +35,22 @@ sponge {
     }
 }
 
+tasks.shadowJar {
+    archiveBaseName.set("StructureBoxes-Bukkit")
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    dependencies {
+        include(project(":structureboxes-core"))
+    }
+}
+
 dependencies {
     api(project(":structureboxes-core"))
-    api("com.sk89q.worldedit:worldedit-sponge:7.2.1")
     compileOnly("org.bstats:bstats-sponge:3.1.0")
     compileOnly(files(
         "/../libs/sponge/movecraft-0.4.1.jar",
         "/../libs/sponge/EagleFactions-1.2.0-API-11.0.0.jar",
+        "/../libs/sponge/worldedit-sponge-api14-7.3.12-SNAPSHOT-dist.jar"
         ))
 }
 

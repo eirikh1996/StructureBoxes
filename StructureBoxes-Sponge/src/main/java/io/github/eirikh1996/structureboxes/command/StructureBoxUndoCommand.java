@@ -1,94 +1,90 @@
 package io.github.eirikh1996.structureboxes.command;
 
+import com.sk89q.worldedit.sponge.SpongeAdapter;
 import com.sk89q.worldedit.util.Location;
 import io.github.eirikh1996.structureboxes.Structure;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.StructureManager;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.carrier.CarrierBlockEntity;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static io.github.eirikh1996.structureboxes.utils.ChatUtils.COMMAND_PREFIX;
 
 public class StructureBoxUndoCommand implements CommandExecutor {
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+    public CommandResult execute(CommandContext args){
         final long start = System.currentTimeMillis();
-        if (!(src instanceof Player)){
-            src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Must Be Player")));
+        if (!(args.cause().root() instanceof Player)){
+            args.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Must Be Player")));
             return CommandResult.success();
         }
-        final Player p = (Player) src;
+        final ServerPlayer p = (ServerPlayer) args.cause().root();
         if (!p.hasPermission("structureboxes.undo")){
-            src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission")));
+            p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - No permission")));
             return CommandResult.success();
         }
-        Structure structure = StructureManager.getInstance().getLatestStructure(p.getUniqueId());
+        Structure structure = StructureManager.getInstance().getLatestStructure(p.uniqueId());
         if (structure == null){
-            src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
+            p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
         String schematicName = structure.getSchematicName();
         Map<Location, Object> locationMaterialHashMap = structure.getOriginalBlocks();
         if (locationMaterialHashMap == null) {
-            src.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
+            p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - latest session expired")));
             return CommandResult.success();
         }
         StructureBoxes.getInstance().clearStructure(structure);
-        ItemStack structureBox = ItemStack.builder().fromBlockState(((BlockType) Settings.StructureBoxItem).getDefaultState()).build();
-        List<Text> lore = new ArrayList<>();
-        structureBox.offer(Keys.DISPLAY_NAME, Text.of(Settings.StructureBoxLore));
-        lore.add(Text.of(Settings.StructureBoxPrefix + schematicName));
+        ItemStack structureBox = ItemStack.builder().fromBlockState(((BlockType) Settings.StructureBoxItem).defaultState()).build();
+        List<Component> lore = new ArrayList<>();
+        structureBox.offer(Keys.DISPLAY_NAME, Component.text(Settings.StructureBoxLore));
+        lore.add(Component.text(Settings.StructureBoxPrefix + schematicName));
         for (String instruction : Settings.StructureBoxInstruction) {
-            final Text text = Text.of(instruction);
+            final Component text = Component.text(instruction);
             if (lore.contains(text)) {
                 continue;
             }
             lore.add(text);
         }
-        structureBox.offer(Keys.ITEM_LORE, lore);
-        p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo")));
-        PlayerInventory pInv = (PlayerInventory) p.getInventory();
+        structureBox.offer(Keys.LORE, lore);
+        p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Command - Successful undo")));
+        PlayerInventory pInv = p.inventory();
         if (!structure.isProcessing()) {
             structure.setProcessing(true);
         }
 
-
-        if (!pInv.getMain().canFit(structureBox)){
-            p.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space")));
-            final Entity item = p.getWorld().createEntity(EntityTypes.ITEM, p.getPosition());
-            item.offer(Keys.REPRESENTED_ITEM, structureBox.createSnapshot());
-            p.getWorld().spawnEntity(item);
+        //if inventory is full, drop item on the ground
+        if (!pInv.primary().canFit(structureBox)){
+            p.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Inventory - No space")));
+            final Entity item = p.world().createEntity(EntityTypes.ITEM, p.position());
+            item.offer(Keys.ITEM_STACK_SNAPSHOT, structureBox.asImmutable());
+            p.world().spawnEntity(item);
             return CommandResult.success();
         }
-        p.getInventory().offer(structureBox);
+        p.inventory().offer(structureBox);
 
         if (Settings.Debug){
             final long end = System.currentTimeMillis();
-            Sponge.getServer().getBroadcastChannel().send(Text.of("Undo took (ms): " + (end - start)));
+            Sponge.server().broadcastAudience().sendMessage(Component.text("Undo took (ms): " + (end - start)));
         }
         return CommandResult.success();
     }
@@ -112,7 +108,7 @@ public class StructureBoxUndoCommand implements CommandExecutor {
                 if (location == null)
                     break;
                 final BlockType origType = (BlockType) locationMaterialHashMap.get(location);
-                ServerLocation spongeLoc = MathUtils.sbToSpongeLoc(location);
+                ServerLocation spongeLoc = SpongeAdapter.adapt(location);
                 Optional<? extends BlockEntity> tileHolder = spongeLoc.blockEntity();
                 if (tileHolder.isPresent() && tileHolder.get() instanceof CarrierBlockEntity){
                     CarrierBlockEntity carrier = (CarrierBlockEntity) tileHolder.get();

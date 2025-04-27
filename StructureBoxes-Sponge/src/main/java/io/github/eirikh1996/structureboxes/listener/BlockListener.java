@@ -18,21 +18,18 @@
 package io.github.eirikh1996.structureboxes.listener;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.sponge.SpongeAdapter;
 import com.sk89q.worldedit.sponge.SpongeWorld;
 import io.github.eirikh1996.structureboxes.*;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
-import io.github.eirikh1996.structureboxes.utils.IWorldEditLocation;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -44,9 +41,8 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.io.IOException;
 import java.util.List;
@@ -93,7 +89,7 @@ public class BlockListener {
             player.sendMessage(serializer.deserialize(I18nSupport.getInternationalisedString("Place - No permission for this ID")));
             return;
         }
-        final SpongeWorld world = StructureBoxes.getInstance().getWorldEditPlugin().getWorld(player.world());
+        final SpongeWorld world = (SpongeWorld) SpongeAdapter.adapt(player.world());
         final WorldEditHandler weHandler = StructureBoxes.getInstance().getWorldEditHandler();
         final Clipboard clipboard = weHandler.loadClipboardFromSchematic(world, schematicID);
         if (clipboard == null) {
@@ -115,7 +111,7 @@ public class BlockListener {
         }
 
         final ServerLocation placed = snapshot.location().orElseThrow(RuntimeException::new);
-        final Direction sDir = weHandler.getClipboardFacingFromOrigin(clipboard, MathUtils.spongeToSBLoc(placed));
+        final Direction sDir = weHandler.getClipboardFacingFromOrigin(clipboard, SpongeAdapter.adapt(placed, Vector3d.ZERO));
         final Direction pDir = Direction.fromYaw((float) player.headRotation().get().y());
         final double angle = pDir.getAngle(sDir);
         boolean exemptFromRegionRestriction = false;
@@ -124,7 +120,7 @@ public class BlockListener {
                 if (exception == null){
                     continue;
                 }
-                if (lore.get(0).toPlain().toLowerCase().contains(exception.toLowerCase())){
+                if ((lore.get(0)).insertion().toLowerCase().contains(exception.toLowerCase())){
                     exemptFromRegionRestriction = true;
                     break;
                 }
@@ -132,32 +128,32 @@ public class BlockListener {
             }
         }
         if (Settings.RestrictToRegionsEnabled && !exemptFromRegionRestriction && !RegionUtils.isWithinRegion(placed) && !player.hasPermission("structureboxes.bypassregionrestriction")) {
-            player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Must be within region")));
+            player.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Place - Must be within region")));
             event.setCancelled(true);
             return;
         }
-        if (!weHandler.pasteClipboard(player.getUniqueId(), schematicID, clipboard, angle, new IWorldEditLocation(placed))) {
+        if (!weHandler.pasteClipboard(player.uniqueId(), schematicID, clipboard, angle, SpongeAdapter.adapt(placed, Vector3d.ZERO))) {
             event.setCancelled(true);
             return;
         }
-        Task.builder().execute(() -> {
-            placed.setBlockType(BlockTypes.AIR);
-        }).submit(StructureBoxes.getInstance());
+        Sponge.server().scheduler().submit(Task.builder().execute(() -> {
+            placed.setBlockType(BlockTypes.AIR.get());
+        }).build());
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event, @Root Player player) {
+    public void onBlockBreak(ChangeBlockEvent.All event, @Root Player player) {
         BlockSnapshot snapshot = null;
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (!transaction.isValid() || !transaction.getFinal().getExtendedState().getType().equals(Settings.StructureBoxItem)) {
+        for (Transaction<BlockSnapshot> transaction : event.transactions(Operations.BREAK.get()).toList()) {
+            if (!transaction.isValid() || !transaction.finalReplacement().state().type().equals(Settings.StructureBoxItem)) {
                 continue;
             }
-            snapshot = transaction.getFinal();
+            snapshot = transaction.finalReplacement();
         }
-        if (snapshot == null || !snapshot.getLocation().isPresent()) {
+        if (snapshot == null || snapshot.location().isEmpty()) {
             return;
         }
-        final Structure structure = StructureManager.getInstance().getStructureAt(MathUtils.spongeToSBLoc(snapshot.getLocation().get()));
+        final Structure structure = StructureManager.getInstance().getStructureAt(SpongeAdapter.adapt(snapshot.location().get(), Vector3d.ZERO));
         if (structure == null) {
             return;
         }
@@ -165,7 +161,7 @@ public class BlockListener {
             return;
         }
         StructureManager.getInstance().removeStructure(structure);
-        player.sendMessage(Text.of(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
+        player.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Session - Expired due to block broken")));
     }
 /*
     @Listener
@@ -200,13 +196,4 @@ public class BlockListener {
 
     }*/
 
-    private boolean isFragile(BlockState state) {
-        final BlockType type = state.getType();
-        return type == BlockTypes.STANDING_SIGN ||
-                type == BlockTypes.WALL_SIGN ||
-                type == BlockTypes.REDSTONE_WIRE ||
-                type == BlockTypes.LADDER ||
-                type == BlockTypes.POWERED_REPEATER ||
-                type == BlockTypes.UNPOWERED_REPEATER;
-    }
 }

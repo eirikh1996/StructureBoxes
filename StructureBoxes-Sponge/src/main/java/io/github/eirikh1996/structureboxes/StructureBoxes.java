@@ -54,6 +54,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandCompletion;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
@@ -61,12 +64,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -121,6 +124,7 @@ public class StructureBoxes implements SBMain {
 
     private SystemSubject console;
     @Inject private PluginContainer container;
+
 
     @Listener
     public void onGameLoaded(LoadedGameEvent event) {
@@ -178,6 +182,11 @@ public class StructureBoxes implements SBMain {
             logger.error(I18nSupport.getInternationalisedString("Startup - Error reading WE config"));
             e.printStackTrace();
         }
+
+        Sponge.eventManager().registerListeners(container, new BlockListener());
+        if (Sponge.metricsConfigManager().collectionState(container) != Tristate.TRUE && !Settings.Metrics) {
+            return;
+        }
         final boolean noRegionProvider = !regionProviderFound;
         metrics.addCustomChart(new AdvancedPie("region_providers", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
@@ -194,13 +203,80 @@ public class StructureBoxes implements SBMain {
         }));
         metrics.addCustomChart(new SimplePie("localisation", () -> Settings.locale));
 
-        if (Sponge.metricsConfigManager().collectionState(container) != Tristate.TRUE && !Settings.Metrics) {
-            metrics.shutdown();
-        }
+
         //Register listener
-        Sponge.eventManager().registerListeners(container, new BlockListener());
 
 
+
+
+    }
+
+    @Listener
+    public void onRegisterCommand(RegisterCommandEvent<Command.Parameterized> event) {
+        //Register commands
+        //Create command
+        Command.Parameterized createCommand = Command.builder()
+                .permission("structureboxes.create")
+                .addParameter(Parameter.string().completer((context, input) -> {
+                    final List<CommandCompletion> completions = new ArrayList<>();
+                    if (!(context.cause().root() instanceof ServerPlayer)) {
+                        return completions;
+                    }
+                    final String[] files = instance.getWorldEditHandler().getSchemDir().list(((dir, name) -> name.endsWith(".schematic") || name.endsWith(".schem")));
+                    if (files == null)
+                        return completions;
+                    for (String file : files) {
+                        if (!input.isEmpty() && !file.startsWith(input))
+                            continue;
+                        completions.add(CommandCompletion.of(file.replace(".schematic", "").replace(".schem", "")));
+                    }
+                    return completions;
+                }).build())
+                .executor(new StructureBoxCreateCommand())
+                .build();
+
+        //undo command
+        Command.Parameterized undoCommand = Command.builder()
+                .executor(new StructureBoxUndoCommand())
+                .permission("structureboxes.undo")
+                .build();
+
+
+        //reload command
+        Command.Parameterized reloadCommand = Command.builder()
+                .executor(new StructureBoxReloadCommand())
+                .permission("structureboxes.reload")
+                .build();
+
+        //sessions command
+        Command.Parameterized sessionsCommand = Command.builder()
+                .addParameter(Parameter.integerNumber().key(Parameter.key("page", Integer.class)).build())
+                .addParameter(Parameter.string().key(Parameter.key("player|-a", String.class))
+                        .requiredPermission("structurebox.sessions.others")
+                        .completer((context, input) -> {
+                            final List<String> args = new ArrayList<>();
+                            Sponge.server().onlinePlayers().forEach((p) -> args.add(p.name()));
+                            args.add("-a");
+                            final List<CommandCompletion> completions = new ArrayList<>();
+                            args.forEach((arg) -> {
+                                if (arg.toLowerCase().startsWith(input.toLowerCase())) {
+                                    completions.add(CommandCompletion.of(arg));
+                                }
+                            });
+                            return completions;
+                        }).build())
+                .executor(new StructureBoxSessionsCommand())
+                .build();
+
+        Command.Parameterized structureBoxCommand = Command.builder()
+                .executor(new StructureBoxCommand(container))
+                .addChild(createCommand, "create", "cr", "c")
+                .addChild(undoCommand, "undo", "u" , "ud")
+                .addChild(reloadCommand, "reload", "r", "rl")
+                .addChild(sessionsCommand, "sessions", "s")
+                .build();
+
+        event.register(plugin, structureBoxCommand, "structurebox", "sbox", "sb");
     }
 
     @Listener
@@ -251,7 +327,7 @@ public class StructureBoxes implements SBMain {
         final HashMap<Location, Object> originalBlocks = new HashMap<>();
         Player p = Sponge.server().player(playerID).get();
         for (Location loc : locations){
-            ServerLocation spongeLoc = ServerLocation.of((ServerWorld) ((SpongeWorld) loc.getExtent()).getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+            ServerLocation spongeLoc = SpongeAdapter.adapt(loc);
             originalBlocks.put(loc, spongeLoc.blockType());
             if (!Settings.CheckFreeSpace){
                 continue;
@@ -296,7 +372,7 @@ public class StructureBoxes implements SBMain {
 
     public void clearInterior(Collection<Location> interior) {
         for (Location loc : interior){
-            ServerLocation.of((ServerWorld) ((SpongeWorld) loc.getExtent()).getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()).setBlockType(BlockTypes.AIR.get(), BlockChangeFlags.NONE);
+            SpongeAdapter.adapt(loc).setBlockType(BlockTypes.AIR.get(), BlockChangeFlags.NONE);
         }
     }
 
@@ -380,6 +456,10 @@ public class StructureBoxes implements SBMain {
             Files.copy(source, target);
         }
 
+
+    }
+
+    private void handleMetrics() {
 
     }
 
