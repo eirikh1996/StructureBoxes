@@ -4,7 +4,9 @@ import io.github.eirikh1996.structureboxes.StructureBoxes;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class RegionUtils {
 
     public static boolean isWithinRegion(Location location){

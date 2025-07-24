@@ -4,7 +4,9 @@ import br.net.fabiozumbi12.RedProtect.Bukkit.Region;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class RedProtectUtils {
     public static boolean canBuild(Player player, Location location){
         final Region region = StructureBoxes.getInstance().getRedProtectPlugin().getAPI().getRegion(location);

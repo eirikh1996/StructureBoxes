@@ -10,6 +10,7 @@ import world.bentobox.bentobox.lists.Flags;
 
 import java.util.Optional;
 
+@Deprecated(forRemoval = true)
 public class BentoBoxUtils {
 
     public static boolean canBuild(Player player, org.bukkit.Location location) {

@@ -11,7 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
-
+@Deprecated(
+        forRemoval = true
+)
 public class PlotSquaredUtils {
     private static Map<String, Object> worlds;
     public static final StructureboxFlag STRUCTUREBOX_FLAG = new StructureboxFlag();

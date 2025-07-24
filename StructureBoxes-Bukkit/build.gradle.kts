@@ -68,10 +68,7 @@ tasks.shadowJar {
         include(project(":structureboxes-factionsuuid"))
         include(dependency("org.bstats:bstats-bukkit:3.1.0"))
     }
-
     relocate("org.bstats", "io.github.eirikh1996.structureboxes.metrics")
-
-
 }
 
 description = "StructureBoxes-Bukkit"

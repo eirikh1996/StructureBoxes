@@ -5,6 +5,7 @@ import com.massivecraft.massivecore.ps.PS;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+@Deprecated
 public class FactionsUtils {
     public static boolean allowBuild(Player player, Location location){
         PS ps = PS.valueOf(location);

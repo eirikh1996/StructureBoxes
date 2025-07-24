@@ -4,7 +4,7 @@ import com.wasteofplastic.acidisland.ASkyBlockAPI;
 import com.wasteofplastic.acidisland.Island;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(forRemoval = true)
 public class AcidIslandUtils {
     public static boolean canBuild(Player player, Location location) {
         final Island island = ASkyBlockAPI.getInstance().getIslandAt(location);

@@ -7,7 +7,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-
+@Deprecated(
+        forRemoval = true
+)
 public class LandClaimingUtils {
     private static final List<ClaimedBlock> claimedBlocks = StructureBoxes.getInstance().getLandClaimingPlugin().claimedBlock;
     private static final List<ClaimedLand> claimedLands = StructureBoxes.getInstance().getLandClaimingPlugin().claimedLand;

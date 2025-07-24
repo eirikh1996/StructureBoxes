@@ -8,7 +8,7 @@ plugins {
     id("buildlogic.java-conventions")
     id("com.gradleup.shadow") version "8.3.5"
     id("java-library")
-    id("org.spongepowered.gradle.plugin") version "2.0.2"
+    id("org.spongepowered.gradle.plugin") version "2.3.0"
 }
 
 repositories {
@@ -31,22 +31,34 @@ sponge {
     plugin("structureboxes") {
         displayName("StructureBoxes")
         version("3.0")
-
+        links {
+            homepage("https://ore.spongepowered.org/eirikh1996/Structure-Boxes")
+            source("https://github.com/eirikh1996/StructureBoxes")
+            issues("https://github.com/eirikh1996/StructureBoxes/issues")
+        }
+        contributor("eirikh1996") {
+            description("Lead Developer")
+        }
+        entrypoint("io.github.eirikh1996.structureboxes.StructureBoxes")
     }
 }
 
 tasks.shadowJar {
-    archiveBaseName.set("StructureBoxes-Bukkit")
+    archiveBaseName.set("StructureBoxes-Sponge")
     archiveClassifier.set("")
     archiveVersion.set("")
     dependencies {
         include(project(":structureboxes-core"))
+        include(dependency("org.bstats:bstats-sponge:3.1.0"))
+        include(dependency("org.bstats:bstats-base:3.1.0"))
     }
+    relocate("org.bstats", "io.github.eirikh1996.structureboxes.metrics")
 }
 
 dependencies {
     api(project(":structureboxes-core"))
-    compileOnly("org.bstats:bstats-sponge:3.1.0")
+    api("org.bstats:bstats-base:3.1.0")
+    api("org.bstats:bstats-sponge:3.1.0")
     compileOnly(files(
         "/../libs/sponge/movecraft-0.4.1.jar",
         "/../libs/sponge/EagleFactions-1.2.0-API-11.0.0.jar",

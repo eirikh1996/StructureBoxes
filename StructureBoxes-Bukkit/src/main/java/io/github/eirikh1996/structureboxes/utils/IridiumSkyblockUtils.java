@@ -6,6 +6,7 @@ import com.iridium.iridiumskyblock.User;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+@Deprecated(forRemoval = true)
 public class IridiumSkyblockUtils {
 
     public static boolean canBuild(Player player, Location location) {

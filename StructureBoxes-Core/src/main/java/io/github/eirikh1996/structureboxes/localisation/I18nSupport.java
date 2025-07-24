@@ -2,6 +2,8 @@ package io.github.eirikh1996.structureboxes.localisation;
 
 import io.github.eirikh1996.structureboxes.SBMain;
 import io.github.eirikh1996.structureboxes.settings.Settings;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +28,7 @@ public class I18nSupport {
     }
 
 
-
+    @Deprecated
     public static String getInternationalisedString(String key){
         String property = languageFile.getProperty(key);
         return property != null ? property : key;

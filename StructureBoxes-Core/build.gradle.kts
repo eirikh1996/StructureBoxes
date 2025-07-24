@@ -14,6 +14,8 @@ repositories {
 
 dependencies {
     implementation("com.sk89q.worldedit:worldedit-core:7.3.10-SNAPSHOT")
+    implementation("net.kyori:adventure-api:4.22.0")
+    implementation("net.kyori:adventure-text-serializer-plain:4.22.0")
 }
 
 java {

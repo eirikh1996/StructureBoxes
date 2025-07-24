@@ -18,8 +18,11 @@ import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import io.github.eirikh1996.structureboxes.processing.RegionPredicate;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.CollectionUtils;
 import io.github.eirikh1996.structureboxes.utils.IncrementalPlacementTask;
@@ -48,12 +51,16 @@ public class WorldEditHandler {
     protected final File schemDir;
     protected final SBMain sbMain;
     protected final Map<UUID, IncrementalPlacementTask> playerIncrementPlacementMap = new HashMap<>();
+    private Map<Object, RegionPredicate> REGISTERED_REGION_VALIDATORS;
 
     protected WorldEditHandler(File schemDir, SBMain sbMain) {
         this.schemDir = schemDir;
         this.sbMain = sbMain;
     }
 
+    public boolean registerValidator(@NotNull RegionPredicate validator, @NotNull Object plugin) {
+        return REGISTERED_REGION_VALIDATORS.put(plugin, validator) == null;
+    }
     @NotNull private static final Map<BlockType, MultiStageReorder.PlacementPriority> priorityMap;
     static {
         Map<BlockType, MultiStageReorder.PlacementPriority> priorityMap1;
@@ -304,10 +311,17 @@ public class WorldEditHandler {
             for (int y = 0 ; y <= clipboard.getDimensions().y(); y++){
                 for (int z = 0 ; z <= clipboard.getDimensions().z(); z++){
                     BlockVector3 pos = BlockVector3.at(minX + x, minY + y, minZ + z);
+                    BlockState state;
+                    try { //Invoking getBlock may cause a NullPointerException in Sponge WorldEdit
+                        state = clipboard.getBlock(pos);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    BlockType type = state.getBlockType();
                     if (
-                            clipboard.getBlock(pos).getBlockType().id().equalsIgnoreCase("minecraft:air")||
-                            clipboard.getBlock(pos).getBlockType().id().equalsIgnoreCase("minecraft:cave_air")||
-                            clipboard.getBlock(pos).getBlockType().id().equalsIgnoreCase("minecraft:void_air")
+                            type == BlockTypes.AIR ||
+                            type == BlockTypes.CAVE_AIR||
+                            type == BlockTypes.VOID_AIR
                     ){
                         continue;
                     }

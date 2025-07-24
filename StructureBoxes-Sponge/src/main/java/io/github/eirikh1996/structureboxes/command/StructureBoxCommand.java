@@ -22,13 +22,6 @@ import java.util.List;
 public class StructureBoxCommand implements CommandExecutor {
     private final PluginContainer plugin;
 
-    public void register(final PluginContainer container) {
-
-
-
-        Command.builder().executor(this);
-    }
-
     public StructureBoxCommand(final PluginContainer plugin) {
         this.plugin = plugin;
 

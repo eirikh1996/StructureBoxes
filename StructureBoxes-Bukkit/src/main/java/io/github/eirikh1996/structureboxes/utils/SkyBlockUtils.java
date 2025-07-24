@@ -7,7 +7,9 @@ import org.Bukkitters.SkyBlock.Utils.IChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class SkyBlockUtils {
 
     private static SkyBlocks sb = new SkyBlocks();

@@ -26,11 +26,11 @@ import com.sk89q.worldedit.util.Location;
 
 import io.github.aquerr.eaglefactions.EagleFactionsPlugin;
 
+import io.github.eirikh1996.structureboxes.utils.serializers.BlockTypeSerializer;
 import io.leangen.geantyref.TypeToken;
 
 import io.github.eirikh1996.structureboxes.command.*;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
-import io.github.eirikh1996.structureboxes.listener.MovecraftListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
 import io.github.eirikh1996.structureboxes.settings.Settings;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
@@ -120,7 +120,8 @@ public class StructureBoxes implements SBMain {
     @NotNull private Optional<EagleFactionsPlugin> eagleFactionsPlugin = Optional.empty();
 
     private boolean plotSquaredInstalled = false;
-    @Inject private Metrics metrics;
+    private Metrics metrics;
+    @Inject private Metrics.Factory metricsFactory;
 
     private SystemSubject console;
     @Inject private PluginContainer container;
@@ -129,6 +130,7 @@ public class StructureBoxes implements SBMain {
     @Listener
     public void onGameLoaded(LoadedGameEvent event) {
         instance = this;
+        metrics = metricsFactory.make(6173);
 
         try {
             loadConfig();
@@ -150,13 +152,6 @@ public class StructureBoxes implements SBMain {
 
         worldEditPlugin = (SpongeWorldEdit) pluginManager.plugin("worldedit").get().instance();
         boolean regionProviderFound = false;
-        //Check for Movecraft
-        Optional<PluginContainer> movecraft = pluginManager.plugin("movecraft");
-        if (movecraft.isPresent() && movecraft.get().instance() != null) {
-            console.sendMessage(Component.text(COMMAND_PREFIX + I18nSupport.getInternationalisedString("Startup - Movecraft detected")));
-            Sponge.eventManager().registerListeners(container, new MovecraftListener());
-            movecraftPlugin = (Optional<Movecraft>) movecraft.get().instance();
-        }
         //Check for EagleFactions
         final Optional<PluginContainer> eagleFactions = pluginManager.plugin("eaglefactions");
         if (eagleFactions.isPresent() && eagleFactions.get().instance() instanceof EagleFactionsPlugin) {
@@ -217,7 +212,7 @@ public class StructureBoxes implements SBMain {
         //Create command
         Command.Parameterized createCommand = Command.builder()
                 .permission("structureboxes.create")
-                .addParameter(Parameter.string().completer((context, input) -> {
+                .addParameter(Parameter.string().key("schematic").completer((context, input) -> {
                     final List<CommandCompletion> completions = new ArrayList<>();
                     if (!(context.cause().root() instanceof ServerPlayer)) {
                         return completions;
@@ -416,12 +411,24 @@ public class StructureBoxes implements SBMain {
     }
 
     public void readConfig() throws IOException {
-        loader = HoconConfigurationLoader.builder().path(defaultConfig).build();
+        loader = HoconConfigurationLoader
+                .builder()
+                .path(defaultConfig)
+                .defaultOptions(
+                        (objects) -> {
+                            return objects.serializers(
+                                    (builder ->
+                                            builder.register(BlockType.class, new BlockTypeSerializer())
+                                    )
+                            );
+                        }
+                )
+                .build();
         final ConfigurationNode node = loader.load();
         //Read general config
         Settings.locale = node.node("Locale").getString("en");
         Settings.Metrics = node.node("Metrics").getBoolean(false);
-        Settings.StructureBoxItem = node.node("Structure Box Item").get(TypeToken.get(BlockType.class), BlockTypes.CHEST.get());
+        Settings.StructureBoxItem = node.node("Structure Box Item").get(BlockType.class, BlockTypes.CHEST.get());
         Settings.StructureBoxLore = node.node("Structure Box Display Name").getString("§6Structure Box");
         Settings.MaxStructureSize = node.node("Max Structure Size").getInt(10000);
         Settings.MaxSessionTime = node.node("Max Session Time").getInt(300);
@@ -446,13 +453,20 @@ public class StructureBoxes implements SBMain {
 
     public void loadLocales() throws IOException {
         final String[] LOCALES = {"en", "no", "it"};
-        final String LOCALE_PATH = "/locatisation/lang_(lang).properties";
+        final String LOCALE_PATH = "localisation/lang_(lang).properties";
+        final File localeDir = new File(getConfigDir().toFile(), "localisation");
+        if (!localeDir.exists()) {
+            localeDir.mkdirs();
+        }
         for (String locale : LOCALES){
             final String pathName = LOCALE_PATH.replace("(lang)", locale);
             final Path target = getConfigDir().resolve(pathName);
+            logger.info(target.toString());
+            logger.info(pathName);
             if (target.toFile().exists())
                 continue;
             final InputStream source = plugin.openResource(pathName).orElseThrow(IOException::new);
+            logger.info(source);
             Files.copy(source, target);
         }
 

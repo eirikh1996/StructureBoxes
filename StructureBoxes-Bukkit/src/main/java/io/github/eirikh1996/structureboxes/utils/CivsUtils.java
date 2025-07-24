@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.redcastlemedia.multitallented.civs.regions.Region;
 import org.redcastlemedia.multitallented.civs.regions.RegionManager;
 
+@Deprecated(forRemoval = true)
 public class CivsUtils {
     public static boolean allowBuild(Player player, Location location){
         Region region = RegionManager.getInstance().getRegionAt(location);

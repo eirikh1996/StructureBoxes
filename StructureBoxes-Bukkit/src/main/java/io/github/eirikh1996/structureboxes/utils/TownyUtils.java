@@ -8,7 +8,9 @@ import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 import io.github.eirikh1996.structureboxes.StructureBoxes;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class TownyUtils {
     public static boolean canBuild(Player player, Location location){
         return PlayerCacheUtil.getCachePermission(player, location, location.getBlock().getType(), TownyPermission.ActionType.BUILD);

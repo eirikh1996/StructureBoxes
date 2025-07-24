@@ -17,7 +17,9 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+@Deprecated(
+        forRemoval = true
+)
 public class WorldGuardUtils {
     private static final Method CAN_BUILD = ReflectionUtils.getMethod(WorldGuardPlugin.class, "canBuild", Player.class, Location.class);
     private static final Method GET_REGION_MANAGER = ReflectionUtils.getMethod(WorldGuardPlugin.class,"getRegionManager", World.class);

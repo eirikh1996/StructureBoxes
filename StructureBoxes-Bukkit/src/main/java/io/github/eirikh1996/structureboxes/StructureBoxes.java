@@ -18,6 +18,9 @@ import io.github.eirikh1996.structureboxes.commands.StructureBoxCommand;
 import io.github.eirikh1996.structureboxes.listener.BlockListener;
 import io.github.eirikh1996.structureboxes.listener.InventoryListener;
 import io.github.eirikh1996.structureboxes.localisation.I18nSupport;
+import io.github.eirikh1996.structureboxes.processing.validators.RegionValidatorManager;
+import io.github.eirikh1996.structureboxes.processing.validators.FactionsRegionValidator;
+import io.github.eirikh1996.structureboxes.processing.validators.WorldGuardRegionValidator;
 import io.github.eirikh1996.structureboxes.region.FactionsFlagManager;
 import io.github.eirikh1996.structureboxes.region.RedProtectFlagManager;
 import io.github.eirikh1996.structureboxes.region.WorldGuardFlagManager;
@@ -32,7 +35,6 @@ import io.github.eirikh1996.structureboxes.utils.GriefPreventionUtils;
 import io.github.eirikh1996.structureboxes.utils.IslandWorldUtils;
 import io.github.eirikh1996.structureboxes.utils.LandClaimingUtils;
 import io.github.eirikh1996.structureboxes.utils.LandsUtils;
-import io.github.eirikh1996.structureboxes.utils.MathUtils;
 import io.github.eirikh1996.structureboxes.utils.PlotSquaredUtils;
 import io.github.eirikh1996.structureboxes.utils.RedProtectUtils;
 import io.github.eirikh1996.structureboxes.utils.RegionUtils;
@@ -46,7 +48,6 @@ import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import me.zombie_striker.landclaiming.LandClaiming;
 import net.countercraft.movecraft.Movecraft;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.Bukkitters.SkyBlock.Main;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -166,15 +167,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        //if on 1.13 and up, Check if FAWE is installed
-        if (!Settings.IsLegacy) {
-            try {
-                Class.forName("com.boydti.fawe.bukkit.FaweBukkit");
-                Settings.FAWE = true;
-            } catch (ClassNotFoundException e) {
-                Settings.FAWE = false;
-            }
-        }
         final Map data;
         try {
             File weConfig = new File(getWorldEditPlugin().getDataFolder(), "config" + (Settings.FAWE ? "-legacy" : "") + ".yml");
@@ -190,7 +182,6 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
         File schemDir = new File(worldEditPlugin.getDataFolder(), (String) ((Map) data.get("saving")).get("dir"));
 
         //Check if there is a compatible version of WorldEdit
-        worldEditHandler = new WorldEditHandler(schemDir, this);
 
         boolean foundRegionProvider = false;
         //Check for WorldGuard
@@ -205,6 +196,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     listener,
                     EventPriority.NORMAL,
                     new WorldGuardFlagManager(), this);
+            RegionValidatorManager.getInstance().registerRegionValidator(new WorldGuardRegionValidator(), worldGuardPlugin.getName());
         }
         Plugin f = getServer().getPluginManager().getPlugin("Factions");
         try {
@@ -240,6 +232,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
                     EventPriority.NORMAL,
                     FactionsFlagManager.getInstance(),
                     this);
+            RegionValidatorManager.getInstance().registerRegionValidator(new FactionsRegionValidator(), factionsPlugin.getName());
         } else if (factionsUUIDInstalled && FactionsUUIDUtils.isFactionsUUID(f)) { //Check for FactionsUUID
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Factions detected"));
             foundRegionProvider = true;
@@ -383,6 +376,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
             Settings.RestrictToRegionsEnabled = false;
             getLogger().info(I18nSupport.getInternationalisedString("Startup - Restrict to regions set to false"));
         }
+        worldEditHandler = new WorldEditHandler(schemDir, this);
         if (Settings.Metrics) {
             metrics = new Metrics(this);
             final boolean noRegionProvider = !foundRegionProvider;
@@ -692,6 +686,7 @@ public class StructureBoxes extends JavaPlugin implements SBMain {
     public void logMessage(Level level, String message) {
         getLogger().log(level, message);
     }
+
 
     @Override
     public void clearInterior(Collection<Location> interior) {

@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class SuperiorSkyblockUtils {
     public static boolean canBuild(Player player, Location location) {
         final Island island = SuperiorSkyblockAPI.getIslandAt(location);

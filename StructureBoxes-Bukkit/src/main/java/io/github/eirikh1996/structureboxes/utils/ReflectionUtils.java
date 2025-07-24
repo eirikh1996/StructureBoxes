@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
+@Deprecated(
+        forRemoval = true
+)
 public class ReflectionUtils {
     public static Class getClass(String classPath) {
         Class clazz;

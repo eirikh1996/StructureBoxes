@@ -5,7 +5,9 @@ import me.angeschossen.lands.api.integration.LandsIntegration;
 import me.angeschossen.lands.api.land.Land;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
+@Deprecated(
+        forRemoval = true
+)
 public class LandsUtils {
 
     private static LandsIntegration landsInt = new LandsIntegration(StructureBoxes.getInstance());
